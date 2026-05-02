@@ -60,3 +60,34 @@ html[dir="ltr"] body {
 .rise {
   animation: subtle-rise 0.6s ease-out both;
 }
+
+@keyframes knx-bg-drift {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 50%;
+  }
+  50% {
+    background-position: 100% 20%, 0% 80%, 60% 40%;
+  }
+  100% {
+    background-position: 0% 0%, 100% 100%, 50% 50%;
+  }
+}
+
+.knx-animated-bg {
+  background-color: #ffffff;
+  background-image:
+    radial-gradient(45% 45% at 15% 20%, rgba(0, 176, 112, 0.16), transparent 70%),
+    radial-gradient(40% 40% at 85% 80%, rgba(0, 122, 77, 0.14), transparent 70%),
+    radial-gradient(35% 35% at 50% 50%, rgba(167, 243, 208, 0.25), transparent 70%);
+  background-size: 200% 200%, 200% 200%, 200% 200%;
+  animation: knx-bg-drift 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knx-animated-bg {
+    animation: none;
+  }
+  .rise {
+    animation: none;
+  }
+}
