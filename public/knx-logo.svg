@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" role="img" aria-label="KNX">
+  <title>KNX</title>
+  <style>
+    .w { fill: #00965e; }
+    .t { fill: #ffffff; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 46px; letter-spacing: 6px; }
+  </style>
+  <rect class="w" x="0" y="0" width="240" height="80" rx="10" />
+  <text class="t" x="50%" y="55" text-anchor="middle">KNX</text>
+</svg>

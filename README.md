@@ -1,26 +1,44 @@
-# KNX Club Jordan
+# KNX Club Jordan — نادي KNX الأردني
 
-Simple website for the Jordanian KNX Club. Built with Next.js 15 (App Router) +
-React 19 + Tailwind CSS v4, with a Neon serverless Postgres backend for
-membership signups. Designed to deploy on Vercel.
+Bilingual (Arabic-default, English-switchable) website for the Jordanian KNX
+Club. Built with Next.js 15 (App Router) + React 19 + Tailwind CSS v4, with a
+Neon serverless Postgres backend for membership signups. Designed to deploy on
+Vercel.
 
 ## Stack
 
-- Next.js 15 (App Router, Edge runtime API)
+- Next.js 15 (App Router, dynamic `[locale]` segment, Edge API)
 - React 19
-- Tailwind CSS v4 (CSS-first config via `@theme`)
+- Tailwind CSS v4 (CSS-first config via `@theme`, `rtl:` variants)
+- `next/font` (Cairo for Arabic, Inter for English)
 - `@neondatabase/serverless` (HTTP driver, edge-compatible)
 - TypeScript 5
+
+## i18n
+
+- `/` → rewrites to `/ar` (Arabic, RTL) — default
+- `/en` → English, LTR
+- Language switcher in the header toggles between the two
+- Strings live in `lib/i18n.ts`
+
+## Logo
+
+Drop your official KNX logo at `public/knx-logo.svg`. It is referenced by:
+
+- `app/[locale]/components/Logo.tsx`
+- favicon (`icons.icon` in metadata)
+
+A neutral placeholder is committed; replace it in place with the real asset.
 
 ## Local development
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in DATABASE_URL from Neon
+cp .env.example .env.local   # fill DATABASE_URL from Neon
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000 (auto-redirects to `/ar`).
 
 ## Database
 
@@ -38,14 +56,7 @@ CREATE TABLE IF NOT EXISTS members (
 
 ## Deploy to Vercel
 
-1. Create a Neon project, copy the pooled connection string.
-2. Push this repo to GitHub and import into Vercel.
-3. Add `DATABASE_URL` to the Vercel project's environment variables.
-4. Deploy. The `/api/join` route runs on the Edge runtime and uses Neon's HTTP
-   driver, so it works with Vercel serverless/edge out of the box.
-
-## Branding
-
-The included `Logo` component is a stylised placeholder using the KNX green
-(`#00965e`). Drop the official KNX wordmark SVG into `app/components/Logo.tsx`
-(or replace with `<img>` / `next/image`) when you have the licensed asset.
+1. Create a Neon project and copy the pooled connection string.
+2. Push this repo and import it into Vercel.
+3. Add `DATABASE_URL` in Project → Settings → Environment Variables.
+4. Deploy. `/api/join` runs on the Edge runtime via Neon's HTTP driver.
