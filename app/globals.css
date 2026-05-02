@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-knx: #00965e;
+  --color-knx-dark: #007a4d;
+  --color-knx-light: #e6f5ee;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html,
+body {
+  background: #ffffff;
+  color: #111111;
+}
+
+::selection {
+  background: var(--color-knx);
+  color: #ffffff;
+}
