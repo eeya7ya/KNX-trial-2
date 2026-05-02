@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { locales } from "@/lib/i18n";
 
 export const config = {
-  matcher: ["/((?!_next|api|favicon.ico|knx-logo|.*\\..*).*)"],
+  matcher: ["/((?!_next|api|admin|favicon.ico|knx-logo|.*\\..*).*)"],
 };
 
 export function middleware(req: NextRequest) {

@@ -32,6 +32,7 @@ export type Dict = {
   services: {
     eyebrow: string;
     title: string;
+    brief: string;
     items: { title: string; body: string }[];
   };
   events: {
@@ -62,6 +63,7 @@ export type Dict = {
   faq: {
     eyebrow: string;
     title: string;
+    brief: string;
     items: { q: string; a: string }[];
   };
   footer: {
@@ -69,6 +71,8 @@ export type Dict = {
     rights: string;
     contact: string;
   };
+  detailCta: string;
+  close: string;
 };
 
 const ar: Dict = {
@@ -121,6 +125,7 @@ const ar: Dict = {
   services: {
     eyebrow: "الخدمات",
     title: "ما نقدمه لأعضائنا",
+    brief: "تدريب، لقاءات، مشاريع مشتركة، ومكتبة موارد. اضغط للاطلاع على التفاصيل الكاملة.",
     items: [
       {
         title: "تدريب ETS",
@@ -180,6 +185,7 @@ const ar: Dict = {
   faq: {
     eyebrow: "أسئلة شائعة",
     title: "قبل أن تنضم",
+    brief: "إجابات سريعة على أكثر الأسئلة شيوعاً حول العضوية والورش.",
     items: [
       {
         q: "هل العضوية مدفوعة؟",
@@ -200,6 +206,8 @@ const ar: Dict = {
     rights: "جميع الحقوق محفوظة.",
     contact: "للتواصل",
   },
+  detailCta: "اعرض التفاصيل",
+  close: "إغلاق",
 };
 
 const en: Dict = {
@@ -252,6 +260,7 @@ const en: Dict = {
   services: {
     eyebrow: "Services",
     title: "What we offer members",
+    brief: "Training, meetups, joint projects, and a resource library. Tap to see full details.",
     items: [
       {
         title: "ETS training",
@@ -311,6 +320,7 @@ const en: Dict = {
   faq: {
     eyebrow: "FAQ",
     title: "Before you join",
+    brief: "Quick answers to the most common questions about membership and workshops.",
     items: [
       {
         q: "Is membership paid?",
@@ -331,6 +341,8 @@ const en: Dict = {
     rights: "All rights reserved.",
     contact: "Contact",
   },
+  detailCta: "View details",
+  close: "Close",
 };
 
 const dictionaries: Record<Locale, Dict> = { ar, en };

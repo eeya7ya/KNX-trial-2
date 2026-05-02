@@ -91,3 +91,32 @@ html[dir="ltr"] body {
     animation: none;
   }
 }
+
+/* Full-page snap scroll: one scroll → next section */
+.knx-snap-root {
+  position: fixed;
+  inset: 0;
+  height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scroll-padding-top: 0;
+}
+
+.knx-snap-page {
+  min-height: 100svh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+}
+
+@supports not (height: 100svh) {
+  .knx-snap-root {
+    height: 100vh;
+  }
+  .knx-snap-page {
+    min-height: 100vh;
+  }
+}
