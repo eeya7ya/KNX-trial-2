@@ -2,18 +2,61 @@
 
 @theme {
   --color-knx: #00965e;
-  --color-knx-dark: #007a4d;
-  --color-knx-light: #e6f5ee;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-knx-50: #ecfdf5;
+  --color-knx-100: #d1fae5;
+  --color-knx-200: #a7f3d0;
+  --color-knx-500: #00b070;
+  --color-knx-600: #00965e;
+  --color-knx-700: #007a4d;
+  --color-knx-800: #065f3c;
+  --color-knx-900: #064e34;
+  --color-ink: #0a0a0a;
+  --color-ink-muted: #525252;
+  --color-line: #e7e7e7;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), "Segoe UI", Tahoma, sans-serif;
+}
+
+:root {
+  color-scheme: light;
 }
 
 html,
 body {
   background: #ffffff;
-  color: #111111;
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html[dir="rtl"] body {
+  font-family: var(--font-arabic);
+}
+
+html[dir="ltr"] body {
+  font-family: var(--font-sans);
 }
 
 ::selection {
   background: var(--color-knx);
   color: #ffffff;
+}
+
+.hairline {
+  border-color: var(--color-line);
+}
+
+@keyframes subtle-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise {
+  animation: subtle-rise 0.6s ease-out both;
 }
