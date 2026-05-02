@@ -1,9 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" role="img" aria-label="KNX">
-  <title>KNX</title>
-  <style>
-    .w { fill: #00965e; }
-    .t { fill: #ffffff; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 46px; letter-spacing: 6px; }
-  </style>
-  <rect class="w" x="0" y="0" width="240" height="80" rx="10" />
-  <text class="t" x="50%" y="55" text-anchor="middle">KNX</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 96" role="img" aria-label="KNX Club Jordan">
+  <title>KNX Club Jordan</title>
+  <defs>
+    <linearGradient id="knxBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00b070" />
+      <stop offset="100%" stop-color="#007a4d" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="280" height="96" rx="16" fill="url(#knxBg)" />
+  <g fill="#ffffff" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Inter, sans-serif" font-weight="800">
+    <text x="140" y="58" text-anchor="middle" font-size="44" letter-spacing="8">KNX</text>
+    <text x="140" y="80" text-anchor="middle" font-size="11" letter-spacing="6" opacity="0.85">CLUB · JORDAN</text>
+  </g>
 </svg>

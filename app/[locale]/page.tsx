@@ -30,7 +30,7 @@ export default async function Page({
     <>
       <Header dict={dict} locale={L} />
 
-      <main className="bg-white">
+      <main className="knx-animated-bg">
         {/* HERO */}
         <section className="relative overflow-hidden">
           <div
@@ -47,12 +47,10 @@ export default async function Page({
                 <span className="h-1.5 w-1.5 rounded-full bg-knx" />
                 {dict.hero.eyebrow}
               </span>
-              <h1 className="mt-6 text-[2.6rem] font-extrabold leading-[1.05] tracking-tight md:text-[4.2rem]">
-                {dict.hero.titleA}
-                <br />
-                <span className="text-knx-700">{dict.hero.titleAccent}</span>
-                <br />
-                {dict.hero.titleB}
+              <h1 className="mt-6 text-[2.6rem] font-extrabold leading-[1.25] tracking-tight md:text-[4.2rem] md:leading-[1.2]">
+                <span className="block">{dict.hero.titleA}</span>
+                <span className="mt-2 block text-knx-700 md:mt-3">{dict.hero.titleAccent}</span>
+                <span className="mt-2 block md:mt-3">{dict.hero.titleB}</span>
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-muted">
                 {dict.hero.body}
