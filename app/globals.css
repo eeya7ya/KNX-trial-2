@@ -93,6 +93,10 @@ html[dir="ltr"] body {
 }
 
 /* Full-page snap scroll: one scroll → next section */
+:root {
+  --knx-header-h: 73px;
+}
+
 .knx-snap-root {
   position: fixed;
   inset: 0;
@@ -102,7 +106,7 @@ html[dir="ltr"] body {
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
-  scroll-padding-top: 0;
+  scroll-padding-top: var(--knx-header-h);
 }
 
 .knx-snap-page {
@@ -110,6 +114,25 @@ html[dir="ltr"] body {
   scroll-snap-align: start;
   scroll-snap-stop: always;
   display: flex;
+  padding-top: var(--knx-header-h);
+}
+
+/* Solid, choreographed entrance for each snapped page */
+@keyframes knx-page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0) scale(0.985);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.knx-page-active > * {
+  animation: knx-page-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @supports not (height: 100svh) {
@@ -118,5 +141,14 @@ html[dir="ltr"] body {
   }
   .knx-snap-page {
     min-height: 100vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knx-snap-root {
+    scroll-behavior: auto;
+  }
+  .knx-page-active > * {
+    animation: none;
   }
 }

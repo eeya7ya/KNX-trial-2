@@ -94,3 +94,53 @@ export type ContentTable = (typeof CONTENT_TABLES)[number];
 export function isContentTable(value: string): value is ContentTable {
   return (CONTENT_TABLES as readonly string[]).includes(value);
 }
+
+export type NewsItem = {
+  id: number;
+  title: string;
+  body: string;
+  image_url: string | null;
+  created_at: string;
+};
+export type VideoItem = {
+  id: number;
+  title: string;
+  url: string;
+  description: string | null;
+  created_at: string;
+};
+export type PictureItem = {
+  id: number;
+  title: string;
+  url: string;
+  description: string | null;
+  created_at: string;
+};
+
+export type PublicContent = {
+  news: NewsItem[];
+  videos: VideoItem[];
+  pictures: PictureItem[];
+};
+
+export async function getPublicContent(): Promise<PublicContent> {
+  try {
+    await ensureSchema();
+    const [news, videos, pictures] = await Promise.all([
+      sql`SELECT id, title, body, image_url, created_at FROM news
+          WHERE published = TRUE ORDER BY created_at DESC LIMIT 6`,
+      sql`SELECT id, title, url, description, created_at FROM videos
+          WHERE published = TRUE ORDER BY created_at DESC LIMIT 6`,
+      sql`SELECT id, title, url, description, created_at FROM pictures
+          WHERE published = TRUE ORDER BY created_at DESC LIMIT 6`,
+    ]);
+    return {
+      news: news as unknown as NewsItem[],
+      videos: videos as unknown as VideoItem[],
+      pictures: pictures as unknown as PictureItem[],
+    };
+  } catch (err) {
+    console.error("getPublicContent error", err);
+    return { news: [], videos: [], pictures: [] };
+  }
+}
