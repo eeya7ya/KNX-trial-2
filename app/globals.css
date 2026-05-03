@@ -61,32 +61,16 @@ html[dir="ltr"] body {
   animation: subtle-rise 0.6s ease-out both;
 }
 
-@keyframes knx-bg-drift {
-  0% {
-    background-position: 0% 0%, 100% 100%, 50% 50%;
-  }
-  50% {
-    background-position: 100% 20%, 0% 80%, 60% 40%;
-  }
-  100% {
-    background-position: 0% 0%, 100% 100%, 50% 50%;
-  }
-}
-
 .knx-animated-bg {
   background-color: #ffffff;
   background-image:
     radial-gradient(45% 45% at 15% 20%, rgba(0, 176, 112, 0.16), transparent 70%),
     radial-gradient(40% 40% at 85% 80%, rgba(0, 122, 77, 0.14), transparent 70%),
     radial-gradient(35% 35% at 50% 50%, rgba(167, 243, 208, 0.25), transparent 70%);
-  background-size: 200% 200%, 200% 200%, 200% 200%;
-  animation: knx-bg-drift 18s ease-in-out infinite;
+  background-attachment: local;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .knx-animated-bg {
-    animation: none;
-  }
   .rise {
     animation: none;
   }
@@ -115,24 +99,24 @@ html[dir="ltr"] body {
   scroll-snap-stop: always;
   display: flex;
   padding-top: var(--knx-header-h);
+  contain: layout paint style;
 }
 
-/* Solid, choreographed entrance for each snapped page */
+/* Lightweight entrance for the active snapped page (opacity + translate only) */
 @keyframes knx-page-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 28px, 0) scale(0.985);
-    filter: blur(4px);
+    transform: translate3d(0, 16px, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 .knx-page-active > * {
-  animation: knx-page-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: knx-page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
 }
 
 @supports not (height: 100svh) {
