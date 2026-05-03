@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { Logo } from "./Logo";
 import { JoinForm } from "./JoinForm";
 import {
   IconBolt,
@@ -103,11 +102,14 @@ export function HomeSections({
             </div>
           </div>
           <div className="md:col-span-5">
-            <div className="relative mx-auto aspect-square max-w-sm">
-              <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-knx-50 to-white ring-1 ring-knx-100" />
-              <div className="absolute inset-0 grid place-items-center p-12">
-                <Logo className="h-32 w-auto md:h-44" />
-              </div>
+            <div className="relative mx-auto aspect-square max-w-sm overflow-hidden rounded-[2rem] ring-1 ring-knx-100">
+              <img
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=70"
+                alt="Team collaborating on smart building projects"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-knx-50/80 via-knx-100/40 to-white/10 mix-blend-multiply" />
+              <div className="absolute inset-0 bg-knx-700/15" />
               <div className="absolute -bottom-4 -end-4 rounded-2xl border border-line bg-white px-5 py-4 shadow-sm">
                 <p className="text-xs font-medium text-ink-muted">ISO/IEC 14543-3</p>
                 <p className="text-sm font-semibold">KNX · ETS6 · Secure</p>
