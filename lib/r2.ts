@@ -1,7 +1,7 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 type R2Config = {
-  accountId: string;
+  endpoint: string;
   accessKeyId: string;
   secretAccessKey: string;
   bucket: string;
@@ -10,19 +10,28 @@ type R2Config = {
 
 let cached: { config: R2Config; client: S3Client } | null = null;
 
-function readConfig(): R2Config {
+function deriveEndpoint(): string | undefined {
+  const explicit = process.env.R2_ENDPOINT;
+  if (explicit) return explicit.replace(/\/+$/, "");
   const accountId = process.env.R2_ACCOUNT_ID;
+  if (accountId) return `https://${accountId}.r2.cloudflarestorage.com`;
+  return undefined;
+}
+
+function readConfig(): R2Config {
+  const endpoint = deriveEndpoint();
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  const bucket = process.env.R2_BUCKET;
-  const publicBaseUrl = process.env.R2_PUBLIC_BASE_URL;
+  const bucket = process.env.R2_BUCKET || process.env.R2_BUCKET_NAME;
+  const publicBaseUrl =
+    process.env.R2_PUBLIC_BASE_URL ||
+    (endpoint && bucket ? `${endpoint}/${bucket}` : undefined);
 
   const missing = [
-    ["R2_ACCOUNT_ID", accountId],
+    ["R2_ENDPOINT (or R2_ACCOUNT_ID)", endpoint],
     ["R2_ACCESS_KEY_ID", accessKeyId],
     ["R2_SECRET_ACCESS_KEY", secretAccessKey],
-    ["R2_BUCKET", bucket],
-    ["R2_PUBLIC_BASE_URL", publicBaseUrl],
+    ["R2_BUCKET (or R2_BUCKET_NAME)", bucket],
   ]
     .filter(([, v]) => !v)
     .map(([k]) => k);
@@ -30,7 +39,7 @@ function readConfig(): R2Config {
     throw new Error(`R2 env vars missing: ${missing.join(", ")}`);
   }
   return {
-    accountId: accountId!,
+    endpoint: endpoint!,
     accessKeyId: accessKeyId!,
     secretAccessKey: secretAccessKey!,
     bucket: bucket!,
@@ -43,7 +52,7 @@ function getClient() {
   const config = readConfig();
   const client = new S3Client({
     region: "auto",
-    endpoint: `https://${config.accountId}.r2.cloudflarestorage.com`,
+    endpoint: config.endpoint,
     credentials: {
       accessKeyId: config.accessKeyId,
       secretAccessKey: config.secretAccessKey,
