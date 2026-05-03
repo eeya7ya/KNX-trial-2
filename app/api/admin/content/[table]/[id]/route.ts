@@ -22,5 +22,6 @@ export async function DELETE(
   else if (table === "videos") await sql`DELETE FROM videos WHERE id = ${numId}`;
   else if (table === "pictures") await sql`DELETE FROM pictures WHERE id = ${numId}`;
   else if (table === "prompts") await sql`DELETE FROM prompts WHERE id = ${numId}`;
+  else if (table === "team_members") await sql`DELETE FROM team_members WHERE id = ${numId}`;
   return NextResponse.json({ ok: true });
 }

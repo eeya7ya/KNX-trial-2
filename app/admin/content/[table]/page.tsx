@@ -11,7 +11,7 @@ const META: Record<ContentTable, {
   fields: {
     name: string;
     label: string;
-    type: "text" | "textarea" | "url";
+    type: "text" | "textarea" | "url" | "checkbox";
     required?: boolean;
     upload?: { kind: "image" | "video" | "file"; accept: string };
   }[];
@@ -65,11 +65,27 @@ const META: Record<ContentTable, {
       { name: "tags", label: "Tags (comma separated)", type: "text" },
     ],
   },
+  team_members: {
+    label: "Team",
+    fields: [
+      { name: "name", label: "Name", type: "text", required: true },
+      { name: "role", label: "Role / position", type: "text" },
+      { name: "company", label: "Company", type: "text" },
+      {
+        name: "photo_url",
+        label: "Photo",
+        type: "url",
+        upload: { kind: "image", accept: "image/*" },
+      },
+      { name: "is_partner", label: "Mark as KNX partner (shows partner logo)", type: "checkbox" },
+    ],
+  },
 };
 
 type Row = {
   id: number;
-  title: string;
+  title?: string;
+  name?: string;
   created_at: string;
   published: boolean;
   [k: string]: unknown;
@@ -83,6 +99,8 @@ async function loadRows(table: ContentTable): Promise<Row[]> {
     return (await sql`SELECT * FROM videos ORDER BY created_at DESC LIMIT 200`) as Row[];
   if (table === "pictures")
     return (await sql`SELECT * FROM pictures ORDER BY created_at DESC LIMIT 200`) as Row[];
+  if (table === "team_members")
+    return (await sql`SELECT * FROM team_members ORDER BY is_partner DESC, created_at ASC LIMIT 200`) as Row[];
   return (await sql`SELECT * FROM prompts ORDER BY created_at DESC LIMIT 200`) as Row[];
 }
 
@@ -108,7 +126,7 @@ export default async function ContentPage({
         fields={meta.fields}
         initialRows={rows.map((r) => ({
           id: r.id,
-          title: r.title,
+          title: r.title ?? r.name ?? "",
           created_at: r.created_at,
           published: r.published,
         }))}

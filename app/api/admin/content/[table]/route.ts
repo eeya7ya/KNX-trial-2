@@ -16,17 +16,22 @@ function fields(table: string): string[] {
       return ["title", "url", "description", "published"];
     case "prompts":
       return ["title", "body", "tags", "published"];
+    case "team_members":
+      return ["name", "role", "company", "photo_url", "is_partner", "published"];
     default:
       return [];
   }
 }
 
+const BOOL_FIELDS = new Set(["published", "is_partner"]);
+
 function pickFields(table: string, body: Row) {
   const out: Record<string, unknown> = {};
   for (const f of fields(table)) {
     let v = body[f];
-    if (f === "published") {
-      v = v === undefined ? true : Boolean(v);
+    if (BOOL_FIELDS.has(f)) {
+      const def = f === "published" ? true : false;
+      v = v === undefined ? def : Boolean(v);
     } else if (typeof v !== "string" || v.trim() === "") {
       v = null;
     } else {
@@ -53,6 +58,8 @@ export async function GET(_: Request, ctx: { params: Promise<{ table: string }> 
     rows = await sql`SELECT * FROM pictures ORDER BY created_at DESC LIMIT 200`;
   else if (table === "prompts")
     rows = await sql`SELECT * FROM prompts ORDER BY created_at DESC LIMIT 200`;
+  else if (table === "team_members")
+    rows = await sql`SELECT * FROM team_members ORDER BY is_partner DESC, created_at ASC LIMIT 200`;
   return NextResponse.json({ ok: true, rows });
 }
 
@@ -85,6 +92,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ table: string 
   } else if (table === "prompts") {
     await sql`INSERT INTO prompts (title, body, tags, published)
       VALUES (${data.title}, ${data.body}, ${data.tags}, ${data.published})`;
+  } else if (table === "team_members") {
+    await sql`INSERT INTO team_members (name, role, company, photo_url, is_partner, published)
+      VALUES (${data.name}, ${data.role}, ${data.company}, ${data.photo_url}, ${data.is_partner}, ${data.published})`;
   }
   return NextResponse.json({ ok: true });
 }
