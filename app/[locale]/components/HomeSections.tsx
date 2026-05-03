@@ -145,27 +145,27 @@ export function HomeSections({
       {/* HERO — page 1 */}
       <section
         id="hero"
-        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-16 pt-[var(--knx-header-h)] md:pb-20"
+        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-8 pt-[var(--knx-header-h)] md:pb-10"
       >
-        <div className="flex w-full flex-1 items-start pt-2 md:pt-4">
-          <div className="mx-auto grid w-full max-w-7xl items-center gap-4 px-6 md:grid-cols-12 md:gap-10">
+        <div className="flex w-full flex-1 items-center">
+          <div className="mx-auto grid w-full max-w-7xl items-center gap-6 px-6 md:grid-cols-12 md:gap-10">
             <div className="md:col-span-7 rise">
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted">
                 <span className="h-1.5 w-1.5 rounded-full bg-knx" />
                 {dict.hero.eyebrow}
               </span>
-              <h1 className="mt-3 text-[1.9rem] font-extrabold leading-[1.15] tracking-tight md:text-[2.75rem] md:leading-[1.1] lg:text-[3rem]">
+              <h1 className="mt-4 text-[2.1rem] font-extrabold leading-[1.15] tracking-tight md:text-[3.25rem] md:leading-[1.08] lg:text-[3.75rem]">
                 <span className="block">{dict.hero.titleA}</span>
                 <span className="mt-1 block text-knx-700">{dict.hero.titleAccent}</span>
                 <span className="mt-1 block">{dict.hero.titleB}</span>
               </h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-muted md:mt-4 md:text-base">
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-ink-muted md:mt-6 md:text-lg">
                 {dict.hero.body}
               </p>
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div className="mt-7 flex flex-wrap items-center gap-3">
                 <a
                   href="#join"
-                  className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-knx-700"
+                  className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-knx-700"
                 >
                   {dict.hero.primaryCta}
                   <IconArrow
@@ -175,21 +175,21 @@ export function HomeSections({
                 </a>
                 <Link
                   href={`/${locale}/about`}
-                  className="inline-flex items-center gap-2 rounded-full border border-line px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-ink"
+                  className="inline-flex items-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink"
                 >
                   {dict.hero.secondaryCta}
                 </Link>
               </div>
             </div>
             <div className="md:col-span-5">
-              <div className="relative mx-auto grid aspect-square w-full max-w-xs place-items-center md:max-w-sm lg:max-w-md">
-                <Logo className="h-36 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-48 lg:h-56" />
+              <div className="relative mx-auto grid aspect-square w-full max-w-sm place-items-center md:max-w-md lg:max-w-lg">
+                <Logo className="h-44 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-56 lg:h-64" />
               </div>
             </div>
           </div>
         </div>
 
-        <Stats items={dict.stats} className="mt-4 md:mt-6" />
+        <Stats items={dict.stats} className="mt-6 md:mt-8" />
       </section>
 
       {/* ABOUT — brief */}

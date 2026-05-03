@@ -1,9 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
-type Field = { name: string; label: string; type: "text" | "textarea" | "url"; required?: boolean };
+type UploadKind = "image" | "video" | "file";
+type Field = {
+  name: string;
+  label: string;
+  type: "text" | "textarea" | "url";
+  required?: boolean;
+  upload?: { kind: UploadKind; accept: string };
+};
 type Row = { id: number; title: string; created_at: string; published: boolean };
 
 export function ContentManager({
@@ -22,10 +29,31 @@ export function ContentManager({
     Object.fromEntries(fields.map((f) => [f.name, ""])),
   );
   const [published, setPublished] = useState(true);
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
 
   function reset() {
     setValues(Object.fromEntries(fields.map((f) => [f.name, ""])));
     setPublished(true);
+    setUploadProgress({});
+  }
+
+  async function handleUpload(field: Field, file: File) {
+    if (!field.upload) return;
+    setUploadingField(field.name);
+    setErr("");
+    setUploadProgress((p) => ({ ...p, [field.name]: 0 }));
+    try {
+      const url = await uploadWithProgress(file, field.upload.kind, (pct) =>
+        setUploadProgress((p) => ({ ...p, [field.name]: pct })),
+      );
+      setValues((v) => ({ ...v, [field.name]: url }));
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploadingField(null);
+    }
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -95,6 +123,36 @@ export function ContentManager({
                   className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none transition focus:border-knx"
                 />
               )}
+              {f.upload && (
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                  <input
+                    ref={(el) => {
+                      fileInputs.current[f.name] = el;
+                    }}
+                    type="file"
+                    accept={f.upload.accept}
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleUpload(f, file);
+                      e.target.value = "";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputs.current[f.name]?.click()}
+                    disabled={uploadingField === f.name || busy}
+                    className="rounded-full border border-line px-3 py-1.5 font-medium text-ink transition hover:border-ink disabled:opacity-50"
+                  >
+                    {uploadingField === f.name
+                      ? `Uploading… ${uploadProgress[f.name] ?? 0}%`
+                      : `Upload ${f.upload.kind} to R2`}
+                  </button>
+                  <span className="text-ink-muted">
+                    or paste a URL above
+                  </span>
+                </div>
+              )}
             </label>
           ))}
           <label className="flex items-center gap-2 text-sm">
@@ -147,4 +205,36 @@ export function ContentManager({
       </div>
     </div>
   );
+}
+
+function uploadWithProgress(
+  file: File,
+  kind: UploadKind,
+  onProgress: (pct: number) => void,
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", kind);
+    xhr.open("POST", "/api/admin/upload");
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () => {
+      try {
+        const body = JSON.parse(xhr.responseText) as { ok?: boolean; url?: string; error?: string };
+        if (xhr.status >= 200 && xhr.status < 300 && body.ok && body.url) {
+          onProgress(100);
+          resolve(body.url);
+        } else {
+          reject(new Error(body.error || `Upload failed (${xhr.status})`));
+        }
+      } catch {
+        reject(new Error("Upload failed"));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Network error during upload"));
+    xhr.send(fd);
+  });
 }

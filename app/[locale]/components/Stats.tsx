@@ -118,7 +118,7 @@ function StatCard({
       role="listitem"
       aria-pressed={active}
       onClick={onActivate}
-      className={`group relative flex flex-col items-center justify-center bg-white px-3 py-4 text-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-knx ${
+      className={`group relative flex flex-col items-center justify-center gap-2 bg-white px-4 py-8 text-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-knx md:gap-3 md:py-12 ${
         active ? "bg-knx-50" : "hover:bg-knx-50/60"
       }`}
     >
@@ -128,13 +128,13 @@ function StatCard({
         }`}
       />
       <p
-        className={`text-2xl font-extrabold tracking-tight text-ink transition-transform duration-300 md:text-3xl ${
+        className={`text-4xl font-extrabold tracking-tight text-ink transition-transform duration-300 md:text-5xl lg:text-6xl ${
           active ? "scale-110" : "group-hover:scale-105"
         }`}
       >
         {display}
       </p>
-      <p className="mt-1 text-xs text-ink-muted md:text-sm">{stat.label}</p>
+      <p className="text-sm text-ink-muted md:text-base">{stat.label}</p>
     </button>
   );
 }

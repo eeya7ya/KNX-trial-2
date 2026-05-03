@@ -54,9 +54,31 @@ CREATE TABLE IF NOT EXISTS members (
 );
 ```
 
+## Media storage (Cloudflare R2)
+
+Images and videos uploaded from the admin (`/admin/content/news`,
+`/admin/content/pictures`, `/admin/content/videos`) are stored in a Cloudflare
+R2 bucket via the S3-compatible API. The public URL of each object is what
+gets persisted in the `image_url` / `url` columns and rendered on the site.
+
+Required env vars:
+
+- `R2_ACCOUNT_ID` — your Cloudflare account ID
+- `R2_ACCESS_KEY_ID` — R2 token access key
+- `R2_SECRET_ACCESS_KEY` — R2 token secret
+- `R2_BUCKET` — bucket name (e.g. `knx-media`)
+- `R2_PUBLIC_BASE_URL` — public base URL for objects, no trailing slash
+  (e.g. `https://media.knxclub.jo` if you've attached a custom domain, or the
+  bucket's `*.r2.dev` URL if public access is enabled)
+
+The admin UI provides an "Upload to R2" button next to each media URL field;
+the file is sent to `/api/admin/upload` (admin-cookie protected), uploaded to
+R2 server-side, and the resulting public URL is filled into the field.
+
 ## Deploy to Vercel
 
 1. Create a Neon project and copy the pooled connection string.
 2. Push this repo and import it into Vercel.
-3. Add `DATABASE_URL` in Project → Settings → Environment Variables.
+3. Add `DATABASE_URL`, `ADMIN_PASSWORD`, and the `R2_*` vars in
+   Project → Settings → Environment Variables.
 4. Deploy. `/api/join` runs on the Edge runtime via Neon's HTTP driver.
