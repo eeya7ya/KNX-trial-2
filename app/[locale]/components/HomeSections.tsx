@@ -145,7 +145,7 @@ export function HomeSections({
       {/* HERO — page 1 */}
       <section
         id="hero"
-        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-8 pt-[var(--knx-header-h)] md:pb-10"
+        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-20 pt-[var(--knx-header-h)] md:pb-28"
       >
         <div className="flex w-full flex-1 items-center">
           <div className="mx-auto grid w-full max-w-7xl items-center gap-6 px-6 md:grid-cols-12 md:gap-10">
