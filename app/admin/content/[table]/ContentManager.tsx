@@ -7,7 +7,7 @@ type UploadKind = "image" | "video" | "file";
 type Field = {
   name: string;
   label: string;
-  type: "text" | "textarea" | "url";
+  type: "text" | "textarea" | "url" | "checkbox";
   required?: boolean;
   upload?: { kind: UploadKind; accept: string };
 };
@@ -28,6 +28,9 @@ export function ContentManager({
   const [values, setValues] = useState<Record<string, string>>(() =>
     Object.fromEntries(fields.map((f) => [f.name, ""])),
   );
+  const [bools, setBools] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(fields.filter((f) => f.type === "checkbox").map((f) => [f.name, false])),
+  );
   const [published, setPublished] = useState(true);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
@@ -35,6 +38,9 @@ export function ContentManager({
 
   function reset() {
     setValues(Object.fromEntries(fields.map((f) => [f.name, ""])));
+    setBools(
+      Object.fromEntries(fields.filter((f) => f.type === "checkbox").map((f) => [f.name, false])),
+    );
     setPublished(true);
     setUploadProgress({});
   }
@@ -64,7 +70,7 @@ export function ContentManager({
       const res = await fetch(`/api/admin/content/${table}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, published }),
+        body: JSON.stringify({ ...values, ...bools, published }),
       });
       const body = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !body.ok) {
@@ -98,11 +104,24 @@ export function ContentManager({
         <div className="mt-4 grid gap-4">
           {fields.map((f) => (
             <label key={f.name} className="block">
-              <span className="mb-1 block text-xs font-medium uppercase tracking-wider text-ink-muted">
-                {f.label}
-                {f.required && <span className="text-red-500"> *</span>}
-              </span>
-              {f.type === "textarea" ? (
+              {f.type !== "checkbox" && (
+                <span className="mb-1 block text-xs font-medium uppercase tracking-wider text-ink-muted">
+                  {f.label}
+                  {f.required && <span className="text-red-500"> *</span>}
+                </span>
+              )}
+              {f.type === "checkbox" ? (
+                <span className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={bools[f.name] ?? false}
+                    onChange={(e) =>
+                      setBools((b) => ({ ...b, [f.name]: e.target.checked }))
+                    }
+                  />
+                  {f.label}
+                </span>
+              ) : f.type === "textarea" ? (
                 <textarea
                   required={f.required}
                   rows={4}

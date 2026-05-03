@@ -249,27 +249,45 @@ export function HomeSections({
           href={`/${locale}/members`}
           dir={dict.dir}
         >
-          <ul className="mt-6 grid w-full max-w-4xl grid-cols-2 gap-3 md:grid-cols-3">
-            {dict.members.items.slice(0, 3).map((m) => (
-              <li
-                key={m.name}
-                className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 text-start"
-              >
-                <Avatar name={m.name} />
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-ink">{m.name}</p>
-                  <p className="truncate text-xs text-ink-muted">{m.role}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {content && content.team.length > 0 && (
+            <ul className="mt-6 grid w-full max-w-4xl grid-cols-2 gap-3 md:grid-cols-3">
+              {content.team.slice(0, 3).map((m) => (
+                <li
+                  key={m.id}
+                  className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 text-start"
+                >
+                  {m.photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={m.photo_url}
+                      alt={m.name}
+                      className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <Avatar name={m.name} />
+                  )}
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-ink">{m.name}</p>
+                    {m.role && (
+                      <p className="truncate text-xs text-ink-muted">{m.role}</p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </BriefCard>
       </Section>
 
-      {/* UPDATES — admin-uploaded content from DB */}
-      {content && hasContent(content) && (
+      {/* LATEST NEWS — single item, half text / half media */}
+      {content && content.latestNews && (
         <Section id="updates">
-          <UpdatesSection content={content} dict={dict} />
+          <LatestNewsSection
+            item={content.latestNews}
+            dict={dict}
+            locale={locale}
+          />
         </Section>
       )}
 
@@ -396,37 +414,16 @@ function BriefCard({
   );
 }
 
-function hasContent(c: PublicContent) {
-  return c.news.length + c.videos.length + c.pictures.length > 0;
-}
-
-function youtubeId(url: string): string | null {
-  try {
-    const u = new URL(url);
-    if (u.hostname.includes("youtu.be")) return u.pathname.slice(1) || null;
-    if (u.hostname.includes("youtube.com")) {
-      return u.searchParams.get("v") || u.pathname.split("/").pop() || null;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-function UpdatesSection({ content, dict }: { content: PublicContent; dict: Dict }) {
-  const isAr = dict.dir === "rtl";
-  const t = {
-    eyebrow: isAr ? "آخر التحديثات" : "Latest updates",
-    title: isAr ? "أحدث ما لدينا" : "Fresh from the club",
-    body: isAr
-      ? "أخبار وفعاليات وموارد جديدة يضيفها الفريق."
-      : "News, media, and resources added by the team.",
-    news: isAr ? "أخبار" : "News",
-    videos: isAr ? "فيديوهات" : "Videos",
-    pictures: isAr ? "صور" : "Pictures",
-    watch: isAr ? "شاهد" : "Watch",
-    open: isAr ? "افتح" : "Open",
-  };
+function LatestNewsSection({
+  item,
+  dict,
+  locale,
+}: {
+  item: NonNullable<PublicContent["latestNews"]>;
+  dict: Dict;
+  locale: Locale;
+}) {
+  const t = dict.newsSection;
   return (
     <div className="mx-auto w-full max-w-7xl px-6">
       <div className="text-center">
@@ -440,99 +437,56 @@ function UpdatesSection({ content, dict }: { content: PublicContent; dict: Dict 
         <p className="mx-auto mt-4 max-w-2xl text-base text-ink-muted md:text-lg">{t.body}</p>
       </div>
 
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
-        <div className="rounded-2xl border border-line bg-white p-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">{t.news}</p>
-          {content.news.length === 0 ? (
-            <p className="mt-3 text-sm text-ink-muted">—</p>
-          ) : (
-            <ul className="mt-3 space-y-3">
-              {content.news.slice(0, 4).map((n) => (
-                <li key={n.id} className="border-b border-line pb-3 last:border-0 last:pb-0">
-                  {n.image_url && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={n.image_url}
-                      alt=""
-                      className="mb-2 h-28 w-full rounded-lg object-cover"
-                      loading="lazy"
-                    />
-                  )}
-                  <p className="text-sm font-semibold">{n.title}</p>
-                  <p className="mt-1 line-clamp-2 text-xs text-ink-muted">{n.body}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="rounded-2xl border border-line bg-white p-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-            {t.videos}
+      <article className="mt-10 grid items-stretch gap-0 overflow-hidden rounded-3xl border border-line bg-white shadow-sm md:grid-cols-2">
+        <div className="flex flex-col justify-center p-6 md:p-10">
+          <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+            {new Date(item.created_at).toLocaleDateString(
+              locale === "ar" ? "ar-JO" : "en-GB",
+              { year: "numeric", month: "long", day: "numeric" },
+            )}
+          </span>
+          <h3 className="mt-3 text-2xl font-bold leading-tight tracking-tight md:text-3xl">
+            {item.title}
+          </h3>
+          <p className="mt-4 line-clamp-6 text-base text-ink-muted md:text-lg">
+            {item.body}
           </p>
-          {content.videos.length === 0 ? (
-            <p className="mt-3 text-sm text-ink-muted">—</p>
-          ) : (
-            <ul className="mt-3 space-y-3">
-              {content.videos.slice(0, 4).map((v) => {
-                const id = youtubeId(v.url);
-                const thumb = id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
-                return (
-                  <li key={v.id} className="border-b border-line pb-3 last:border-0 last:pb-0">
-                    <a
-                      href={v.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-3 text-sm transition hover:text-knx-700"
-                    >
-                      {thumb && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={thumb}
-                          alt=""
-                          className="h-14 w-24 flex-shrink-0 rounded-md object-cover"
-                          loading="lazy"
-                        />
-                      )}
-                      <span className="font-semibold">{v.title}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <Link
+              href={`/${locale}/news/${item.id}`}
+              className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-knx-700"
+            >
+              {t.readMore}
+              <IconArrow
+                className="h-4 w-4 transition group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
+                dir={dict.dir}
+              />
+            </Link>
+            <Link
+              href={`/${locale}/news`}
+              className="inline-flex items-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink"
+            >
+              {t.seeAll}
+            </Link>
+          </div>
         </div>
-
-        <div className="rounded-2xl border border-line bg-white p-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-            {t.pictures}
-          </p>
-          {content.pictures.length === 0 ? (
-            <p className="mt-3 text-sm text-ink-muted">—</p>
+        <div className="relative min-h-[260px] bg-neutral-100 md:min-h-[420px]">
+          {item.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={item.image_url}
+              alt={item.title}
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+            />
           ) : (
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              {content.pictures.slice(0, 4).map((p) => (
-                <a
-                  key={p.id}
-                  href={p.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  title={p.title}
-                  className="block overflow-hidden rounded-lg"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={p.url}
-                    alt={p.title}
-                    className="h-24 w-full object-cover transition hover:scale-105"
-                    loading="lazy"
-                  />
-                </a>
-              ))}
+            <div className="absolute inset-0 flex items-center justify-center text-ink-muted">
+              <Logo className="h-20 w-auto opacity-60" />
             </div>
           )}
         </div>
-      </div>
+      </article>
     </div>
   );
 }
+

@@ -81,6 +81,18 @@ export function ensureSchema(): Promise<void> {
         created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS team_members (
+        id           BIGSERIAL PRIMARY KEY,
+        name         TEXT NOT NULL,
+        role         TEXT,
+        company      TEXT,
+        photo_url    TEXT,
+        is_partner   BOOLEAN NOT NULL DEFAULT FALSE,
+        published    BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
   })().catch((err) => {
     schemaReady = null;
     throw err;
@@ -88,7 +100,7 @@ export function ensureSchema(): Promise<void> {
   return schemaReady;
 }
 
-export const CONTENT_TABLES = ["news", "videos", "pictures", "prompts"] as const;
+export const CONTENT_TABLES = ["news", "videos", "pictures", "prompts", "team_members"] as const;
 export type ContentTable = (typeof CONTENT_TABLES)[number];
 
 export function isContentTable(value: string): value is ContentTable {
@@ -116,31 +128,62 @@ export type PictureItem = {
   description: string | null;
   created_at: string;
 };
+export type TeamMemberItem = {
+  id: number;
+  name: string;
+  role: string | null;
+  company: string | null;
+  photo_url: string | null;
+  is_partner: boolean;
+  created_at: string;
+};
 
 export type PublicContent = {
+  latestNews: NewsItem | null;
   news: NewsItem[];
   videos: VideoItem[];
   pictures: PictureItem[];
+  team: TeamMemberItem[];
 };
 
 export async function getPublicContent(): Promise<PublicContent> {
   try {
     await ensureSchema();
-    const [news, videos, pictures] = await Promise.all([
+    const [news, videos, pictures, team] = await Promise.all([
       sql`SELECT id, title, body, image_url, created_at FROM news
-          WHERE published = TRUE ORDER BY created_at DESC LIMIT 6`,
+          WHERE published = TRUE ORDER BY created_at DESC LIMIT 12`,
       sql`SELECT id, title, url, description, created_at FROM videos
-          WHERE published = TRUE ORDER BY created_at DESC LIMIT 6`,
+          WHERE published = TRUE ORDER BY created_at DESC LIMIT 24`,
       sql`SELECT id, title, url, description, created_at FROM pictures
-          WHERE published = TRUE ORDER BY created_at DESC LIMIT 6`,
+          WHERE published = TRUE ORDER BY created_at DESC LIMIT 24`,
+      sql`SELECT id, name, role, company, photo_url, is_partner, created_at
+          FROM team_members WHERE published = TRUE
+          ORDER BY is_partner DESC, created_at ASC LIMIT 50`,
     ]);
+    const newsList = news as unknown as NewsItem[];
     return {
-      news: news as unknown as NewsItem[],
+      latestNews: newsList[0] ?? null,
+      news: newsList,
       videos: videos as unknown as VideoItem[],
       pictures: pictures as unknown as PictureItem[],
+      team: team as unknown as TeamMemberItem[],
     };
   } catch (err) {
     console.error("getPublicContent error", err);
-    return { news: [], videos: [], pictures: [] };
+    return { latestNews: null, news: [], videos: [], pictures: [], team: [] };
+  }
+}
+
+export async function getNewsById(id: number): Promise<NewsItem | null> {
+  try {
+    await ensureSchema();
+    const rows = (await sql`
+      SELECT id, title, body, image_url, created_at FROM news
+      WHERE id = ${id} AND published = TRUE LIMIT 1
+    `) as unknown as NewsItem[];
+    return rows[0] ?? null;
+  } catch (err) {
+    console.error("getNewsById error", err);
+    return null;
   }
 }

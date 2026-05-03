@@ -10,10 +10,32 @@ export type Dict = {
     services: string;
     events: string;
     members: string;
+    news: string;
+    gallery: string;
     faq: string;
     join: string;
     contact: string;
     switchTo: string;
+  };
+  newsSection: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    readMore: string;
+    seeAll: string;
+    empty: string;
+    backToList: string;
+  };
+  gallerySection: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    pictures: string;
+    videos: string;
+    empty: string;
+  };
+  membersSection: {
+    partnerLabel: string;
   };
   hero: {
     eyebrow: string;
@@ -94,10 +116,32 @@ const ar: Dict = {
     services: "الخدمات",
     events: "الفعاليات",
     members: "الأعضاء",
+    news: "الأخبار",
+    gallery: "المعرض",
     faq: "الأسئلة",
     join: "انضم إلينا",
     contact: "تواصل",
     switchTo: "EN",
+  },
+  newsSection: {
+    eyebrow: "آخر الأخبار",
+    title: "أحدث ما لدينا",
+    body: "أهم الأخبار والتحديثات من الفريق.",
+    readMore: "اقرأ المزيد",
+    seeAll: "كل الأخبار",
+    empty: "لا توجد أخبار منشورة بعد.",
+    backToList: "العودة إلى الأخبار",
+  },
+  gallerySection: {
+    eyebrow: "المعرض",
+    title: "صور وفيديوهات",
+    body: "لقطات من الفعاليات والورش والمشاريع.",
+    pictures: "صور",
+    videos: "فيديوهات",
+    empty: "لا توجد عناصر بعد.",
+  },
+  membersSection: {
+    partnerLabel: "شريك KNX",
   },
   hero: {
     eyebrow: "نادي KNX الأردني",
@@ -254,10 +298,32 @@ const en: Dict = {
     services: "Services",
     events: "Events",
     members: "Members",
+    news: "News",
+    gallery: "Gallery",
     faq: "FAQ",
     join: "Join",
     contact: "Contact",
     switchTo: "ع",
+  },
+  newsSection: {
+    eyebrow: "Latest news",
+    title: "Fresh from the club",
+    body: "Highlights and updates straight from the team.",
+    readMore: "Read more",
+    seeAll: "All news",
+    empty: "No news published yet.",
+    backToList: "Back to news",
+  },
+  gallerySection: {
+    eyebrow: "Gallery",
+    title: "Photos & videos",
+    body: "Moments from events, workshops, and projects.",
+    pictures: "Pictures",
+    videos: "Videos",
+    empty: "No items yet.",
+  },
+  membersSection: {
+    partnerLabel: "KNX partner",
   },
   hero: {
     eyebrow: "KNX Club Jordan",

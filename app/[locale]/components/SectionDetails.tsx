@@ -8,6 +8,7 @@ import {
   IconCheck,
 } from "./Icons";
 import type { Dict } from "@/lib/i18n";
+import type { TeamMemberItem } from "@/lib/db";
 
 const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook, IconShield, IconBadge];
 
@@ -91,7 +92,13 @@ export function EventsDetail({ dict }: { dict: Dict }) {
   );
 }
 
-export function MembersDetail({ dict }: { dict: Dict }) {
+export function MembersDetail({
+  dict,
+  team,
+}: {
+  dict: Dict;
+  team: TeamMemberItem[];
+}) {
   return (
     <div>
       <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
@@ -103,37 +110,52 @@ export function MembersDetail({ dict }: { dict: Dict }) {
       <p className="mt-10 text-xs font-semibold uppercase tracking-widest text-knx-700">
         {dict.members.boardLabel}
       </p>
-      <ul className="mt-3 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-2">
-        {dict.members.items.map((m) => (
-          <li key={m.name} className="flex items-start gap-4 bg-white p-6">
-            <Avatar name={m.name} size="lg" />
-            <div className="min-w-0">
-              <p className="text-base font-semibold text-ink">{m.name}</p>
-              <p className="mt-1 text-sm text-ink-muted">{m.role}</p>
-              {m.company && (
-                <p className="mt-1 text-xs text-ink-muted">{m.company}</p>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
 
-      {dict.members.partners.length > 0 && (
-        <>
-          <p className="mt-10 text-xs font-semibold uppercase tracking-widest text-knx-700">
-            {dict.members.partnersLabel}
-          </p>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {dict.members.partners.map((p) => (
-              <li
-                key={p}
-                className="rounded-full border border-line bg-white px-3 py-1.5 text-sm text-ink-muted"
-              >
-                {p}
-              </li>
-            ))}
-          </ul>
-        </>
+      {team.length === 0 ? (
+        <p className="mt-3 rounded-2xl border border-line bg-white p-8 text-center text-sm text-ink-muted">
+          —
+        </p>
+      ) : (
+        <ul className="mt-4 grid gap-4">
+          {team.map((m) => (
+            <li
+              key={m.id}
+              className="flex flex-wrap items-center gap-5 rounded-2xl border border-line bg-white p-5 md:p-6"
+            >
+              {m.photo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={m.photo_url}
+                  alt={m.name}
+                  className="h-20 w-20 flex-shrink-0 rounded-2xl object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <Avatar name={m.name} size="lg" />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-lg font-semibold text-ink">{m.name}</p>
+                {m.role && <p className="mt-1 text-sm text-ink-muted">{m.role}</p>}
+                {m.company && (
+                  <p className="mt-1 text-xs text-ink-muted">{m.company}</p>
+                )}
+              </div>
+              {m.is_partner && (
+                <div className="flex items-center gap-2 rounded-full border border-line bg-knx-50 px-3 py-1.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/KNX_logo.svg.png"
+                    alt="KNX partner"
+                    className="h-6 w-auto"
+                  />
+                  <span className="text-xs font-semibold text-knx-700">
+                    {dict.membersSection.partnerLabel}
+                  </span>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

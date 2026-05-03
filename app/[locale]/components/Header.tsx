@@ -25,6 +25,12 @@ export function Header({ dict, locale }: { dict: Dict; locale: Locale }) {
           <Link href={`/${locale}/members`} className="transition hover:text-ink">
             {dict.nav.members}
           </Link>
+          <Link href={`/${locale}/news`} className="transition hover:text-ink">
+            {dict.nav.news}
+          </Link>
+          <Link href={`/${locale}/gallery`} className="transition hover:text-ink">
+            {dict.nav.gallery}
+          </Link>
           <Link href={`/${locale}/faq`} className="transition hover:text-ink">
             {dict.nav.faq}
           </Link>
