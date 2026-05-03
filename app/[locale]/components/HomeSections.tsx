@@ -1,26 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Header } from "./Header";
 import { Logo } from "./Logo";
 import { JoinForm } from "./JoinForm";
 import { Stats } from "./Stats";
-import {
-  IconBolt,
-  IconUsers,
-  IconShield,
-  IconBook,
-  IconBuilding,
-  IconBadge,
-  IconArrow,
-  IconCheck,
-} from "./Icons";
+import { IconArrow } from "./Icons";
+import { Avatar } from "./SectionDetails";
 import type { Dict, Locale } from "@/lib/i18n";
 import type { PublicContent } from "@/lib/db";
-
-const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook, IconShield, IconBadge];
-
-type DetailKey = "about" | "services" | "events" | "members" | "faq";
 
 export function HomeSections({
   dict,
@@ -33,21 +22,7 @@ export function HomeSections({
   footer: ReactNode;
   content?: PublicContent;
 }) {
-  const [open, setOpen] = useState<DetailKey | null>(null);
-  const openRef = useRef<DetailKey | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    openRef.current = open;
-  }, [open]);
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(null);
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   // Solid full-page snap: one wheel/swipe → exactly one section, with locked animation window.
   useEffect(() => {
@@ -106,7 +81,6 @@ export function HomeSections({
     }
 
     function onWheel(e: WheelEvent) {
-      if (openRef.current) return;
       if (Math.abs(e.deltaY) < 8) return;
       e.preventDefault();
       if (locked) return;
@@ -114,7 +88,6 @@ export function HomeSections({
     }
 
     function onKey(e: KeyboardEvent) {
-      if (openRef.current) return;
       if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
         e.preventDefault();
         if (!locked) goTo(activeIndex + 1);
@@ -129,7 +102,7 @@ export function HomeSections({
       touchStartY = e.touches[0]?.clientY ?? null;
     }
     function onTouchEnd(e: TouchEvent) {
-      if (touchStartY == null || locked || openRef.current) return;
+      if (touchStartY == null || locked) return;
       const endY = e.changedTouches[0]?.clientY ?? touchStartY;
       const dy = touchStartY - endY;
       touchStartY = null;
@@ -152,16 +125,6 @@ export function HomeSections({
     };
   }, []);
 
-  useEffect(() => {
-    if (open) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = prev;
-      };
-    }
-  }, [open]);
-
   // Mark visit once per session
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -177,29 +140,29 @@ export function HomeSections({
 
   return (
     <div ref={rootRef} className="knx-snap-root knx-animated-bg">
-      <Header dict={dict} locale={locale} onOpenDetail={(k) => setOpen(k)} />
+      <Header dict={dict} locale={locale} />
 
       {/* HERO — page 1 */}
       <section
         id="hero"
-        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-3 pt-[var(--knx-header-h)] md:pb-5"
+        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-4 pt-[var(--knx-header-h)] md:pb-6"
       >
-        <div className="flex w-full flex-1 items-center">
-          <div className="mx-auto grid w-full max-w-7xl items-center gap-3 px-6 md:grid-cols-12 md:gap-8">
+        <div className="flex w-full flex-1 items-start pt-4 md:pt-8">
+          <div className="mx-auto grid w-full max-w-7xl items-center gap-4 px-6 md:grid-cols-12 md:gap-10">
             <div className="md:col-span-7 rise">
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted">
                 <span className="h-1.5 w-1.5 rounded-full bg-knx" />
                 {dict.hero.eyebrow}
               </span>
-              <h1 className="mt-3 text-[1.75rem] font-extrabold leading-[1.15] tracking-tight md:text-[2.5rem] md:leading-[1.1] lg:text-[2.85rem]">
+              <h1 className="mt-3 text-[1.9rem] font-extrabold leading-[1.15] tracking-tight md:text-[2.75rem] md:leading-[1.1] lg:text-[3rem]">
                 <span className="block">{dict.hero.titleA}</span>
                 <span className="mt-1 block text-knx-700">{dict.hero.titleAccent}</span>
                 <span className="mt-1 block">{dict.hero.titleB}</span>
               </h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-muted md:text-base">
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-muted md:mt-4 md:text-base">
                 {dict.hero.body}
               </p>
-              <div className="mt-4 flex flex-wrap items-center gap-3">
+              <div className="mt-5 flex flex-wrap items-center gap-3">
                 <a
                   href="#join"
                   className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-knx-700"
@@ -210,24 +173,23 @@ export function HomeSections({
                     dir={dict.dir}
                   />
                 </a>
-                <button
-                  type="button"
-                  onClick={() => setOpen("about")}
+                <Link
+                  href={`/${locale}/about`}
                   className="inline-flex items-center gap-2 rounded-full border border-line px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-ink"
                 >
                   {dict.hero.secondaryCta}
-                </button>
+                </Link>
               </div>
             </div>
             <div className="md:col-span-5">
-              <div className="relative mx-auto grid aspect-square w-full max-w-xs place-items-center md:max-w-md">
-                <Logo className="h-32 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-44 lg:h-52" />
+              <div className="relative mx-auto grid aspect-square w-full max-w-xs place-items-center md:max-w-sm lg:max-w-md">
+                <Logo className="h-36 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-48 lg:h-56" />
               </div>
             </div>
           </div>
         </div>
 
-        <Stats items={dict.stats} className="mt-3 md:mt-4" />
+        <Stats items={dict.stats} className="mt-4 md:mt-6" />
       </section>
 
       {/* ABOUT — brief */}
@@ -237,7 +199,7 @@ export function HomeSections({
           title={dict.about.title}
           body={dict.about.body}
           cta={dict.detailCta}
-          onClick={() => setOpen("about")}
+          href={`/${locale}/about`}
           dir={dict.dir}
         />
       </Section>
@@ -249,7 +211,7 @@ export function HomeSections({
           title={dict.services.title}
           body={dict.services.brief}
           cta={dict.detailCta}
-          onClick={() => setOpen("services")}
+          href={`/${locale}/services`}
           dir={dict.dir}
         >
           <ul className="mt-6 grid w-full max-w-3xl grid-cols-2 gap-2 text-sm md:grid-cols-3">
@@ -272,7 +234,7 @@ export function HomeSections({
           title={dict.events.title}
           body={dict.events.body}
           cta={dict.detailCta}
-          onClick={() => setOpen("events")}
+          href={`/${locale}/events`}
           dir={dict.dir}
         />
       </Section>
@@ -284,7 +246,7 @@ export function HomeSections({
           title={dict.members.title}
           body={dict.members.brief}
           cta={dict.detailCta}
-          onClick={() => setOpen("members")}
+          href={`/${locale}/members`}
           dir={dict.dir}
         >
           <ul className="mt-6 grid w-full max-w-4xl grid-cols-2 gap-3 md:grid-cols-3">
@@ -338,7 +300,7 @@ export function HomeSections({
           title={dict.faq.title}
           body={dict.faq.brief}
           cta={dict.detailCta}
-          onClick={() => setOpen("faq")}
+          href={`/${locale}/faq`}
           dir={dict.dir}
         />
       </Section>
@@ -371,16 +333,6 @@ export function HomeSections({
         </div>
         <div className="w-full border-t border-line">{footer}</div>
       </section>
-
-      {open && (
-        <DetailModal onClose={() => setOpen(null)} closeLabel={dict.close}>
-          {open === "about" && <AboutDetail dict={dict} />}
-          {open === "services" && <ServicesDetail dict={dict} />}
-          {open === "events" && <EventsDetail dict={dict} />}
-          {open === "members" && <MembersDetail dict={dict} />}
-          {open === "faq" && <FaqDetail dict={dict} />}
-        </DetailModal>
-      )}
     </div>
   );
 }
@@ -409,7 +361,7 @@ function BriefCard({
   title,
   body,
   cta,
-  onClick,
+  href,
   dir,
   children,
 }: {
@@ -417,7 +369,7 @@ function BriefCard({
   title: string;
   body: string;
   cta: string;
-  onClick: () => void;
+  href: string;
   dir: "rtl" | "ltr";
   children?: ReactNode;
 }) {
@@ -430,9 +382,8 @@ function BriefCard({
       <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight md:text-5xl">{title}</h2>
       <p className="mt-5 max-w-2xl text-base text-ink-muted md:text-lg">{body}</p>
       {children}
-      <button
-        type="button"
-        onClick={onClick}
+      <Link
+        href={href}
         className="group mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-knx-700"
       >
         {cta}
@@ -440,214 +391,8 @@ function BriefCard({
           className="h-4 w-4 transition group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
           dir={dir}
         />
-      </button>
+      </Link>
     </div>
-  );
-}
-
-function DetailModal({
-  children,
-  onClose,
-  closeLabel,
-}: {
-  children: ReactNode;
-  onClose: () => void;
-  closeLabel: string;
-}) {
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
-    >
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label={closeLabel}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-      />
-      <div className="relative z-10 max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl md:p-10">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={closeLabel}
-          className="absolute end-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-line text-ink-muted transition hover:border-ink hover:text-ink"
-        >
-          ×
-        </button>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function AboutDetail({ dict }: { dict: Dict }) {
-  return (
-    <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-        {dict.about.eyebrow}
-      </span>
-      <h3 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{dict.about.title}</h3>
-      <p className="mt-4 text-ink-muted">{dict.about.body}</p>
-      <ul className="mt-8 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
-        {dict.about.pillars.map((p) => (
-          <li key={p.title} className="bg-white p-5">
-            <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-knx-50 text-knx-700">
-              <IconCheck className="h-4 w-4" />
-            </div>
-            <h4 className="font-semibold">{p.title}</h4>
-            <p className="mt-2 text-sm text-ink-muted">{p.body}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function ServicesDetail({ dict }: { dict: Dict }) {
-  return (
-    <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-        {dict.services.eyebrow}
-      </span>
-      <h3 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{dict.services.title}</h3>
-      <div className="mt-6 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-2">
-        {dict.services.items.map((item, i) => {
-          const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
-          return (
-            <div key={item.title} className="bg-white p-5">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-ink text-white">
-                <Icon className="h-5 w-5" />
-              </div>
-              <h4 className="text-base font-semibold">{item.title}</h4>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.body}</p>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function EventsDetail({ dict }: { dict: Dict }) {
-  return (
-    <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-        {dict.events.eyebrow}
-      </span>
-      <h3 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{dict.events.title}</h3>
-      <p className="mt-4 text-ink-muted">{dict.events.body}</p>
-      <ul className="mt-6 overflow-hidden rounded-2xl border border-line">
-        {dict.events.rows.map((row, i) => (
-          <li
-            key={row.title}
-            className={`flex flex-wrap items-center justify-between gap-3 px-5 py-4 transition hover:bg-neutral-50 ${
-              i !== 0 ? "border-t border-line" : ""
-            }`}
-          >
-            <div className="flex flex-col">
-              <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">{row.tag}</span>
-              <span className="mt-1 text-base font-semibold">{row.title}</span>
-              <span className="mt-1 text-sm text-ink-muted">{row.meta}</span>
-            </div>
-            <span className="rounded-full border border-line px-3 py-1 text-xs font-medium text-ink-muted">
-              {dict.events.soon}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function MembersDetail({ dict }: { dict: Dict }) {
-  return (
-    <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-        {dict.members.eyebrow}
-      </span>
-      <h3 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{dict.members.title}</h3>
-      <p className="mt-4 text-ink-muted">{dict.members.brief}</p>
-
-      <p className="mt-8 text-xs font-semibold uppercase tracking-widest text-knx-700">
-        {dict.members.boardLabel}
-      </p>
-      <ul className="mt-3 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-2">
-        {dict.members.items.map((m) => (
-          <li key={m.name} className="flex items-start gap-4 bg-white p-5">
-            <Avatar name={m.name} size="lg" />
-            <div className="min-w-0">
-              <p className="text-base font-semibold text-ink">{m.name}</p>
-              <p className="mt-1 text-sm text-ink-muted">{m.role}</p>
-              {m.company && (
-                <p className="mt-1 text-xs text-ink-muted">{m.company}</p>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {dict.members.partners.length > 0 && (
-        <>
-          <p className="mt-8 text-xs font-semibold uppercase tracking-widest text-knx-700">
-            {dict.members.partnersLabel}
-          </p>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {dict.members.partners.map((p) => (
-              <li
-                key={p}
-                className="rounded-full border border-line bg-white px-3 py-1.5 text-sm text-ink-muted"
-              >
-                {p}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-    </div>
-  );
-}
-
-function FaqDetail({ dict }: { dict: Dict }) {
-  return (
-    <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-        {dict.faq.eyebrow}
-      </span>
-      <h3 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{dict.faq.title}</h3>
-      <dl className="mt-6 divide-y divide-line border-y border-line">
-        {dict.faq.items.map((item) => (
-          <details key={item.q} className="group py-4">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-              <dt className="text-base font-semibold">{item.q}</dt>
-              <span className="grid h-7 w-7 place-items-center rounded-full border border-line text-ink-muted transition group-open:rotate-45 group-open:border-ink group-open:text-ink">
-                +
-              </span>
-            </summary>
-            <dd className="mt-3 text-sm text-ink-muted">{item.a}</dd>
-          </details>
-        ))}
-      </dl>
-    </div>
-  );
-}
-
-function Avatar({ name, size = "md" }: { name: string; size?: "md" | "lg" }) {
-  const initials = name
-    .replace(/^(م\.|د\.|أ\.|Eng\.|Dr\.|Mr\.|Ms\.)\s*/i, "")
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w.charAt(0))
-    .join("")
-    .toUpperCase();
-  const dim = size === "lg" ? "h-12 w-12 text-base" : "h-10 w-10 text-sm";
-  return (
-    <span
-      aria-hidden="true"
-      className={`grid ${dim} flex-shrink-0 place-items-center rounded-full bg-knx-50 font-bold text-knx-700`}
-    >
-      {initials || "·"}
-    </span>
   );
 }
 
