@@ -181,49 +181,54 @@ export function HomeSections({
       {header}
 
       {/* HERO — page 1 */}
-      <Section id="hero" className="!py-6 md:!py-10">
-        <div className="mx-auto grid max-w-7xl items-center gap-6 px-6 md:grid-cols-12 md:gap-10">
-          <div className="md:col-span-7 rise">
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-knx" />
-              {dict.hero.eyebrow}
-            </span>
-            <h1 className="mt-4 text-[2rem] font-extrabold leading-[1.15] tracking-tight md:text-[3.2rem] md:leading-[1.1]">
-              <span className="block">{dict.hero.titleA}</span>
-              <span className="mt-1 block text-knx-700 md:mt-2">{dict.hero.titleAccent}</span>
-              <span className="mt-1 block md:mt-2">{dict.hero.titleB}</span>
-            </h1>
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-ink-muted md:text-lg">
-              {dict.hero.body}
-            </p>
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <a
-                href="#join"
-                className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-knx-700"
-              >
-                {dict.hero.primaryCta}
-                <IconArrow
-                  className="h-4 w-4 transition group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
-                  dir={dict.dir}
-                />
-              </a>
-              <a
-                href="#about"
-                className="inline-flex items-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink"
-              >
-                {dict.hero.secondaryCta}
-              </a>
+      <section
+        id="hero"
+        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-4 pt-[var(--knx-header-h)] md:pb-6"
+      >
+        <div className="flex w-full flex-1 items-center">
+          <div className="mx-auto grid w-full max-w-7xl items-center gap-4 px-6 md:grid-cols-12 md:gap-10">
+            <div className="md:col-span-7 rise">
+              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted">
+                <span className="h-1.5 w-1.5 rounded-full bg-knx" />
+                {dict.hero.eyebrow}
+              </span>
+              <h1 className="mt-3 text-[1.9rem] font-extrabold leading-[1.15] tracking-tight md:text-[3rem] md:leading-[1.1]">
+                <span className="block">{dict.hero.titleA}</span>
+                <span className="mt-1 block text-knx-700 md:mt-1.5">{dict.hero.titleAccent}</span>
+                <span className="mt-1 block md:mt-1.5">{dict.hero.titleB}</span>
+              </h1>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-muted md:mt-4 md:text-base">
+                {dict.hero.body}
+              </p>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <a
+                  href="#join"
+                  className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-knx-700 md:py-3"
+                >
+                  {dict.hero.primaryCta}
+                  <IconArrow
+                    className="h-4 w-4 transition group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
+                    dir={dict.dir}
+                  />
+                </a>
+                <a
+                  href="#about"
+                  className="inline-flex items-center gap-2 rounded-full border border-line px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-ink md:py-3"
+                >
+                  {dict.hero.secondaryCta}
+                </a>
+              </div>
             </div>
-          </div>
-          <div className="md:col-span-5">
-            <div className="relative mx-auto grid aspect-square w-full max-w-md place-items-center md:max-w-xl">
-              <Logo className="h-44 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-64 lg:h-72" />
+            <div className="md:col-span-5">
+              <div className="relative mx-auto grid aspect-square w-full max-w-sm place-items-center md:max-w-lg">
+                <Logo className="h-36 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-56 lg:h-64" />
+              </div>
             </div>
           </div>
         </div>
 
-        <Stats items={dict.stats} className="mt-6 md:mt-8" />
-      </Section>
+        <Stats items={dict.stats} className="mt-4 md:mt-6" />
+      </section>
 
       {/* ABOUT — brief */}
       <Section id="about">
