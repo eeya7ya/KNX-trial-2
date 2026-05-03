@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Logo } from "./Logo";
 import { JoinForm } from "./JoinForm";
 import {
@@ -14,6 +14,7 @@ import {
   IconCheck,
 } from "./Icons";
 import type { Dict, Locale } from "@/lib/i18n";
+import type { PublicContent } from "@/lib/db";
 
 const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook, IconShield, IconBadge];
 
@@ -24,13 +25,16 @@ export function HomeSections({
   locale,
   header,
   footer,
+  content,
 }: {
   dict: Dict;
   locale: Locale;
   header: ReactNode;
   footer: ReactNode;
+  content?: PublicContent;
 }) {
   const [open, setOpen] = useState<DetailKey | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -39,6 +43,106 @@ export function HomeSections({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  // Solid full-page snap: one wheel/swipe → exactly one section, with locked animation window.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const pages = Array.from(
+      root.querySelectorAll<HTMLElement>(".knx-snap-page"),
+    );
+    if (pages.length === 0) return;
+
+    let activeIndex = 0;
+    let locked = false;
+    let unlockTimer: ReturnType<typeof setTimeout> | null = null;
+
+    function setActive(i: number) {
+      pages.forEach((p, idx) => p.classList.toggle("knx-page-active", idx === i));
+      activeIndex = i;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        let best: { i: number; ratio: number } | null = null;
+        for (const e of entries) {
+          const i = pages.indexOf(e.target as HTMLElement);
+          if (i < 0) continue;
+          if (!best || e.intersectionRatio > best.ratio) {
+            best = { i, ratio: e.intersectionRatio };
+          }
+        }
+        if (best && best.ratio > 0.5 && best.i !== activeIndex) setActive(best.i);
+      },
+      { root, threshold: [0.25, 0.5, 0.75] },
+    );
+    pages.forEach((p) => io.observe(p));
+    setActive(0);
+
+    function lock(ms: number) {
+      locked = true;
+      if (unlockTimer) clearTimeout(unlockTimer);
+      unlockTimer = setTimeout(() => {
+        locked = false;
+      }, ms);
+    }
+
+    function goTo(i: number) {
+      const target = Math.max(0, Math.min(pages.length - 1, i));
+      if (target === activeIndex) return;
+      pages[target].scrollIntoView({ behavior: "smooth", block: "start" });
+      setActive(target);
+      lock(800);
+    }
+
+    function onWheel(e: WheelEvent) {
+      if (open) return;
+      if (Math.abs(e.deltaY) < 8) return;
+      e.preventDefault();
+      if (locked) return;
+      goTo(activeIndex + (e.deltaY > 0 ? 1 : -1));
+    }
+
+    function onKey(e: KeyboardEvent) {
+      if (open) return;
+      if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
+        e.preventDefault();
+        if (!locked) goTo(activeIndex + 1);
+      } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+        e.preventDefault();
+        if (!locked) goTo(activeIndex - 1);
+      }
+    }
+
+    let touchStartY: number | null = null;
+    function onTouchStart(e: TouchEvent) {
+      touchStartY = e.touches[0]?.clientY ?? null;
+    }
+    function onTouchEnd(e: TouchEvent) {
+      if (touchStartY == null || locked) return;
+      const endY = e.changedTouches[0]?.clientY ?? touchStartY;
+      const dy = touchStartY - endY;
+      touchStartY = null;
+      if (Math.abs(dy) < 40) return;
+      goTo(activeIndex + (dy > 0 ? 1 : -1));
+    }
+
+    root.addEventListener("wheel", onWheel, { passive: false });
+    root.addEventListener("touchstart", onTouchStart, { passive: true });
+    root.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("keydown", onKey);
+
+    return () => {
+      io.disconnect();
+      root.removeEventListener("wheel", onWheel);
+      root.removeEventListener("touchstart", onTouchStart);
+      root.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("keydown", onKey);
+      if (unlockTimer) clearTimeout(unlockTimer);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -64,7 +168,7 @@ export function HomeSections({
   }, [locale]);
 
   return (
-    <div className="knx-snap-root knx-animated-bg">
+    <div ref={rootRef} className="knx-snap-root knx-animated-bg">
       {header}
 
       {/* HERO — page 1 */}
@@ -103,15 +207,8 @@ export function HomeSections({
             </div>
           </div>
           <div className="md:col-span-5">
-            <div className="relative mx-auto aspect-square max-w-sm">
-              <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-knx-50 to-white ring-1 ring-knx-100" />
-              <div className="absolute inset-0 grid place-items-center p-12">
-                <Logo className="h-32 w-auto md:h-44" />
-              </div>
-              <div className="absolute -bottom-4 -end-4 rounded-2xl border border-line bg-white px-5 py-4 shadow-sm">
-                <p className="text-xs font-medium text-ink-muted">ISO/IEC 14543-3</p>
-                <p className="text-sm font-semibold">KNX · ETS6 · Secure</p>
-              </div>
+            <div className="relative mx-auto grid aspect-square w-full max-w-xl place-items-center">
+              <Logo className="h-56 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-72 lg:h-80" />
             </div>
           </div>
         </div>
@@ -173,6 +270,13 @@ export function HomeSections({
         />
       </Section>
 
+      {/* UPDATES — admin-uploaded content from DB */}
+      {content && hasContent(content) && (
+        <Section id="updates">
+          <UpdatesSection content={content} dict={dict} />
+        </Section>
+      )}
+
       {/* JOIN — full action */}
       <Section id="join" className="bg-ink text-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 md:grid-cols-12">
@@ -206,8 +310,11 @@ export function HomeSections({
       </Section>
 
       {/* FOOTER pinned in its own snap page */}
-      <section className="knx-snap-page snap-start border-t border-line bg-white">
-        {footer}
+      <section
+        id="contact-page"
+        className="knx-snap-page snap-start items-center justify-center border-t border-line bg-white"
+      >
+        <div className="w-full">{footer}</div>
       </section>
 
       {open && (
@@ -417,6 +524,147 @@ function FaqDetail({ dict }: { dict: Dict }) {
           </details>
         ))}
       </dl>
+    </div>
+  );
+}
+
+function hasContent(c: PublicContent) {
+  return c.news.length + c.videos.length + c.pictures.length > 0;
+}
+
+function youtubeId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes("youtu.be")) return u.pathname.slice(1) || null;
+    if (u.hostname.includes("youtube.com")) {
+      return u.searchParams.get("v") || u.pathname.split("/").pop() || null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function UpdatesSection({ content, dict }: { content: PublicContent; dict: Dict }) {
+  const isAr = dict.dir === "rtl";
+  const t = {
+    eyebrow: isAr ? "آخر التحديثات" : "Latest updates",
+    title: isAr ? "أحدث ما لدينا" : "Fresh from the club",
+    body: isAr
+      ? "أخبار وفعاليات وموارد جديدة يضيفها الفريق."
+      : "News, media, and resources added by the team.",
+    news: isAr ? "أخبار" : "News",
+    videos: isAr ? "فيديوهات" : "Videos",
+    pictures: isAr ? "صور" : "Pictures",
+    watch: isAr ? "شاهد" : "Watch",
+    open: isAr ? "افتح" : "Open",
+  };
+  return (
+    <div className="mx-auto w-full max-w-7xl px-6">
+      <div className="text-center">
+        <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-knx-700">
+          <span className="h-px w-8 bg-knx-700" />
+          {t.eyebrow}
+        </span>
+        <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+          {t.title}
+        </h2>
+        <p className="mx-auto mt-4 max-w-2xl text-base text-ink-muted md:text-lg">{t.body}</p>
+      </div>
+
+      <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <div className="rounded-2xl border border-line bg-white p-5">
+          <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">{t.news}</p>
+          {content.news.length === 0 ? (
+            <p className="mt-3 text-sm text-ink-muted">—</p>
+          ) : (
+            <ul className="mt-3 space-y-3">
+              {content.news.slice(0, 4).map((n) => (
+                <li key={n.id} className="border-b border-line pb-3 last:border-0 last:pb-0">
+                  {n.image_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={n.image_url}
+                      alt=""
+                      className="mb-2 h-28 w-full rounded-lg object-cover"
+                      loading="lazy"
+                    />
+                  )}
+                  <p className="text-sm font-semibold">{n.title}</p>
+                  <p className="mt-1 line-clamp-2 text-xs text-ink-muted">{n.body}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-line bg-white p-5">
+          <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+            {t.videos}
+          </p>
+          {content.videos.length === 0 ? (
+            <p className="mt-3 text-sm text-ink-muted">—</p>
+          ) : (
+            <ul className="mt-3 space-y-3">
+              {content.videos.slice(0, 4).map((v) => {
+                const id = youtubeId(v.url);
+                const thumb = id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
+                return (
+                  <li key={v.id} className="border-b border-line pb-3 last:border-0 last:pb-0">
+                    <a
+                      href={v.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-3 text-sm transition hover:text-knx-700"
+                    >
+                      {thumb && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={thumb}
+                          alt=""
+                          className="h-14 w-24 flex-shrink-0 rounded-md object-cover"
+                          loading="lazy"
+                        />
+                      )}
+                      <span className="font-semibold">{v.title}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-line bg-white p-5">
+          <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+            {t.pictures}
+          </p>
+          {content.pictures.length === 0 ? (
+            <p className="mt-3 text-sm text-ink-muted">—</p>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {content.pictures.slice(0, 4).map((p) => (
+                <a
+                  key={p.id}
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  title={p.title}
+                  className="block overflow-hidden rounded-lg"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={p.url}
+                    alt={p.title}
+                    className="h-24 w-full object-cover transition hover:scale-105"
+                    loading="lazy"
+                  />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
