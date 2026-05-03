@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Logo } from "./Logo";
 import { JoinForm } from "./JoinForm";
+import { Stats } from "./Stats";
 import {
   IconBolt,
   IconUsers,
@@ -180,56 +181,54 @@ export function HomeSections({
       {header}
 
       {/* HERO — page 1 */}
-      <Section id="hero">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 md:grid-cols-12">
-          <div className="md:col-span-7 rise">
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-knx" />
-              {dict.hero.eyebrow}
-            </span>
-            <h1 className="mt-5 text-[2.2rem] font-extrabold leading-[1.2] tracking-tight md:text-[3.6rem] md:leading-[1.15]">
-              <span className="block">{dict.hero.titleA}</span>
-              <span className="mt-2 block text-knx-700 md:mt-3">{dict.hero.titleAccent}</span>
-              <span className="mt-2 block md:mt-3">{dict.hero.titleB}</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-ink-muted md:text-lg">
-              {dict.hero.body}
-            </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <a
-                href="#join"
-                className="group inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-knx-700"
-              >
-                {dict.hero.primaryCta}
-                <IconArrow
-                  className="h-4 w-4 transition group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
-                  dir={dict.dir}
-                />
-              </a>
-              <a
-                href="#about"
-                className="inline-flex items-center gap-2 rounded-full border border-line px-7 py-3.5 text-sm font-semibold text-ink transition hover:border-ink"
-              >
-                {dict.hero.secondaryCta}
-              </a>
+      <section
+        id="hero"
+        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-4 pt-[var(--knx-header-h)] md:pb-6"
+      >
+        <div className="flex w-full flex-1 items-center">
+          <div className="mx-auto grid w-full max-w-7xl items-center gap-4 px-6 md:grid-cols-12 md:gap-10">
+            <div className="md:col-span-7 rise">
+              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted">
+                <span className="h-1.5 w-1.5 rounded-full bg-knx" />
+                {dict.hero.eyebrow}
+              </span>
+              <h1 className="mt-3 text-[1.9rem] font-extrabold leading-[1.15] tracking-tight md:text-[3rem] md:leading-[1.1]">
+                <span className="block">{dict.hero.titleA}</span>
+                <span className="mt-1 block text-knx-700 md:mt-1.5">{dict.hero.titleAccent}</span>
+                <span className="mt-1 block md:mt-1.5">{dict.hero.titleB}</span>
+              </h1>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-muted md:mt-4 md:text-base">
+                {dict.hero.body}
+              </p>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <a
+                  href="#join"
+                  className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-knx-700 md:py-3"
+                >
+                  {dict.hero.primaryCta}
+                  <IconArrow
+                    className="h-4 w-4 transition group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
+                    dir={dict.dir}
+                  />
+                </a>
+                <a
+                  href="#about"
+                  className="inline-flex items-center gap-2 rounded-full border border-line px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-ink md:py-3"
+                >
+                  {dict.hero.secondaryCta}
+                </a>
+              </div>
             </div>
-          </div>
-          <div className="md:col-span-5">
-            <div className="relative mx-auto grid aspect-square w-full max-w-xl place-items-center">
-              <Logo className="h-56 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-72 lg:h-80" />
+            <div className="md:col-span-5">
+              <div className="relative mx-auto grid aspect-square w-full max-w-sm place-items-center md:max-w-lg">
+                <Logo className="h-36 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-56 lg:h-64" />
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mx-auto mt-10 grid w-full max-w-7xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line px-0 md:grid-cols-4">
-          {dict.stats.map((s) => (
-            <div key={s.label} className="bg-white px-4 py-5 text-center">
-              <p className="text-2xl font-extrabold tracking-tight text-ink md:text-3xl">{s.value}</p>
-              <p className="mt-1 text-xs text-ink-muted md:text-sm">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
+        <Stats items={dict.stats} className="mt-4 md:mt-6" />
+      </section>
 
       {/* ABOUT — brief */}
       <Section id="about">
