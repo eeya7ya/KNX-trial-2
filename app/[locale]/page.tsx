@@ -26,31 +26,11 @@ export default async function Page({
       header={<Header dict={dict} locale={L} />}
       footer={
         <footer id="contact" className="w-full">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-3">
-            <div>
-              <Logo className="h-8 w-auto" />
-              <p className="mt-4 max-w-xs text-sm text-ink-muted">{dict.footer.tagline}</p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-ink-muted">
-                {dict.footer.contact}
-              </p>
-              <a
-                href="mailto:hello@knxclub.jo"
-                className="mt-3 inline-block text-base font-medium text-ink hover:text-knx-700"
-                dir="ltr"
-              >
-                hello@knxclub.jo
-              </a>
-              <p className="mt-1 text-sm text-ink-muted" dir="ltr">
-                Amman, Jordan
-              </p>
-            </div>
-            <div className="md:text-end">
-              <p className="text-sm text-ink-muted">
-                © {new Date().getFullYear()} KNX Club Jordan. {dict.footer.rights}
-              </p>
-            </div>
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">
+            <p className="text-xs text-ink-muted md:text-sm">
+              © {new Date().getFullYear()} KNX Club Jordan. {dict.footer.rights}
+            </p>
+            <Logo className="h-7 w-auto" />
           </div>
         </footer>
       }

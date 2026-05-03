@@ -317,12 +317,33 @@ export function HomeSections({
         />
       </Section>
 
-      {/* FOOTER pinned in its own snap page */}
+      {/* CONTACT — hero on top, footer pinned to bottom */}
       <section
         id="contact-page"
-        className="knx-snap-page snap-start items-center justify-center border-t border-line bg-white"
+        className="knx-snap-page snap-start !flex-col border-t border-line bg-white"
       >
-        <div className="w-full">{footer}</div>
+        <div className="flex flex-1 items-center justify-center px-6">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-knx-700">
+              <span className="h-px w-8 bg-knx-700" />
+              {dict.footer.contact}
+            </span>
+            <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+              {dict.footer.tagline}
+            </h2>
+            <a
+              href="mailto:hello@knxclub.jo"
+              className="mt-8 inline-block text-2xl font-semibold text-ink hover:text-knx-700 md:text-3xl"
+              dir="ltr"
+            >
+              hello@knxclub.jo
+            </a>
+            <p className="mt-3 text-sm text-ink-muted" dir="ltr">
+              Amman, Jordan
+            </p>
+          </div>
+        </div>
+        <div className="w-full border-t border-line">{footer}</div>
       </section>
 
       {open && (
