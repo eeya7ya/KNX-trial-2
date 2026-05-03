@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { uploadToR2, isR2Configured, type UploadKind } from "@/lib/r2";
+import { uploadToR2, r2ConfigError, type UploadKind } from "@/lib/r2";
 
 export const runtime = "nodejs";
 
@@ -18,11 +18,9 @@ export async function POST(req: Request) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
-  if (!isR2Configured()) {
-    return NextResponse.json(
-      { ok: false, error: "R2 storage is not configured on the server" },
-      { status: 500 },
-    );
+  const cfgErr = r2ConfigError();
+  if (cfgErr) {
+    return NextResponse.json({ ok: false, error: cfgErr }, { status: 500 });
   }
 
   let form: FormData;
@@ -59,6 +57,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, url, key });
   } catch (err) {
     console.error("R2 upload failed", err);
-    return NextResponse.json({ ok: false, error: "Upload failed" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Upload failed";
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
