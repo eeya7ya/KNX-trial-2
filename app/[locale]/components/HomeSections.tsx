@@ -34,7 +34,12 @@ export function HomeSections({
   content?: PublicContent;
 }) {
   const [open, setOpen] = useState<DetailKey | null>(null);
+  const openRef = useRef<DetailKey | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    openRef.current = open;
+  }, [open]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -60,9 +65,13 @@ export function HomeSections({
     let unlockTimer: ReturnType<typeof setTimeout> | null = null;
 
     function setActive(i: number) {
-      pages.forEach((p, idx) => p.classList.toggle("knx-page-active", idx === i));
+      if (i === activeIndex) return;
+      pages[activeIndex]?.classList.remove("knx-page-active");
+      pages[i]?.classList.add("knx-page-active");
       activeIndex = i;
     }
+
+    pages[0].classList.add("knx-page-active");
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -74,12 +83,11 @@ export function HomeSections({
             best = { i, ratio: e.intersectionRatio };
           }
         }
-        if (best && best.ratio > 0.5 && best.i !== activeIndex) setActive(best.i);
+        if (best && best.ratio > 0.5) setActive(best.i);
       },
-      { root, threshold: [0.25, 0.5, 0.75] },
+      { root, threshold: [0.5] },
     );
     pages.forEach((p) => io.observe(p));
-    setActive(0);
 
     function lock(ms: number) {
       locked = true;
@@ -98,7 +106,7 @@ export function HomeSections({
     }
 
     function onWheel(e: WheelEvent) {
-      if (open) return;
+      if (openRef.current) return;
       if (Math.abs(e.deltaY) < 8) return;
       e.preventDefault();
       if (locked) return;
@@ -106,7 +114,7 @@ export function HomeSections({
     }
 
     function onKey(e: KeyboardEvent) {
-      if (open) return;
+      if (openRef.current) return;
       if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
         e.preventDefault();
         if (!locked) goTo(activeIndex + 1);
@@ -121,7 +129,7 @@ export function HomeSections({
       touchStartY = e.touches[0]?.clientY ?? null;
     }
     function onTouchEnd(e: TouchEvent) {
-      if (touchStartY == null || locked) return;
+      if (touchStartY == null || locked || openRef.current) return;
       const endY = e.changedTouches[0]?.clientY ?? touchStartY;
       const dy = touchStartY - endY;
       touchStartY = null;
@@ -142,7 +150,7 @@ export function HomeSections({
       window.removeEventListener("keydown", onKey);
       if (unlockTimer) clearTimeout(unlockTimer);
     };
-  }, [open]);
+  }, []);
 
   useEffect(() => {
     if (open) {
