@@ -34,8 +34,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen grid-cols-[240px_1fr]">
       <aside className="border-r border-line bg-white p-5">
-        <div className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">KNX</p>
+        <div className="mb-6 flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/KNX_logo.svg.png"
+            alt="KNX Club Jordan"
+            className="h-9 w-auto"
+            draggable={false}
+          />
           <p className="text-lg font-bold">Admin</p>
         </div>
         <nav className="flex flex-col gap-1 text-sm">
