@@ -52,7 +52,7 @@ export default async function GalleryPage({
                     <img
                       src={p.url}
                       alt={p.title}
-                      className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-[1.03]"
+                      className="absolute inset-0 h-full w-full object-contain transition group-hover:scale-[1.03]"
                       loading="lazy"
                     />
                   </div>
