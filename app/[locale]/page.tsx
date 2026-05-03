@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getDict, isLocale, type Locale } from "@/lib/i18n";
 import { getPublicContent } from "@/lib/db";
-import { Header } from "./components/Header";
 import { Logo } from "./components/Logo";
 import { HomeSections } from "./components/HomeSections";
 
@@ -23,7 +22,6 @@ export default async function Page({
       dict={dict}
       locale={L}
       content={content}
-      header={<Header dict={dict} locale={L} />}
       footer={
         <footer id="contact" className="w-full">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">
