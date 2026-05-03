@@ -207,34 +207,45 @@ export function ContentManager({
   );
 }
 
-function uploadWithProgress(
+async function uploadWithProgress(
   file: File,
   kind: UploadKind,
   onProgress: (pct: number) => void,
 ): Promise<string> {
-  return new Promise((resolve, reject) => {
+  const contentType = file.type || "application/octet-stream";
+  const presignRes = await fetch("/api/admin/upload-url", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: file.name || "upload", contentType, kind }),
+  });
+  const presign = (await presignRes.json()) as {
+    ok?: boolean;
+    uploadUrl?: string;
+    publicUrl?: string;
+    error?: string;
+  };
+  if (!presignRes.ok || !presign.ok || !presign.uploadUrl || !presign.publicUrl) {
+    throw new Error(presign.error || `Could not prepare upload (${presignRes.status})`);
+  }
+
+  await new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("kind", kind);
-    xhr.open("POST", "/api/admin/upload");
+    xhr.open("PUT", presign.uploadUrl!);
+    xhr.setRequestHeader("Content-Type", contentType);
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
     };
     xhr.onload = () => {
-      try {
-        const body = JSON.parse(xhr.responseText) as { ok?: boolean; url?: string; error?: string };
-        if (xhr.status >= 200 && xhr.status < 300 && body.ok && body.url) {
-          onProgress(100);
-          resolve(body.url);
-        } else {
-          reject(new Error(body.error || `Upload failed (${xhr.status})`));
-        }
-      } catch {
-        reject(new Error("Upload failed"));
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress(100);
+        resolve();
+      } else {
+        reject(new Error(`Upload to R2 failed (${xhr.status})`));
       }
     };
     xhr.onerror = () => reject(new Error("Network error during upload"));
-    xhr.send(fd);
+    xhr.send(file);
   });
+
+  return presign.publicUrl;
 }
