@@ -29,7 +29,7 @@ export async function generateMetadata({
     description: isAr
       ? "النادي المهني الأردني لمعيار KNX — مجتمع للمكاملين والمهندسين والمعماريين."
       : "The Jordanian KNX Club — a community for KNX professionals, integrators, and architects.",
-    icons: { icon: "/knx-logo.svg" },
+    icons: { icon: "/KNX_logo.svg.png" },
   };
 }
 
