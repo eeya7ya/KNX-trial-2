@@ -53,10 +53,13 @@ function getClient() {
   const client = new S3Client({
     region: "auto",
     endpoint: config.endpoint,
+    forcePathStyle: true,
     credentials: {
       accessKeyId: config.accessKeyId,
       secretAccessKey: config.secretAccessKey,
     },
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
   cached = { config, client };
   return cached;
@@ -131,7 +134,6 @@ export async function getPresignedUploadUrl(args: {
     Bucket: config.bucket,
     Key: key,
     ContentType: args.contentType || "application/octet-stream",
-    CacheControl: "public, max-age=31536000, immutable",
   });
   const uploadUrl = await getSignedUrl(client, command, { expiresIn: 60 * 10 });
   return { key, uploadUrl, publicUrl: `${config.publicBaseUrl}/${key}` };
