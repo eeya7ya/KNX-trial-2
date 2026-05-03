@@ -9,6 +9,8 @@ export type Dict = {
     about: string;
     services: string;
     events: string;
+    members: string;
+    faq: string;
     join: string;
     contact: string;
     switchTo: string;
@@ -66,6 +68,15 @@ export type Dict = {
     brief: string;
     items: { q: string; a: string }[];
   };
+  members: {
+    eyebrow: string;
+    title: string;
+    brief: string;
+    boardLabel: string;
+    partnersLabel: string;
+    items: { name: string; role: string; company?: string }[];
+    partners: string[];
+  };
   footer: {
     tagline: string;
     rights: string;
@@ -82,6 +93,8 @@ const ar: Dict = {
     about: "من نحن",
     services: "الخدمات",
     events: "الفعاليات",
+    members: "الأعضاء",
+    faq: "الأسئلة",
     join: "انضم إلينا",
     contact: "تواصل",
     switchTo: "EN",
@@ -201,6 +214,29 @@ const ar: Dict = {
       },
     ],
   },
+  members: {
+    eyebrow: "أعضاء النادي",
+    title: "الوجوه التي تقود KNX في الأردن",
+    brief: "نخبة من المهندسين والمكاملين والمعماريين والمدرّبين يعملون معاً على تطوير سوق الأنظمة الذكية.",
+    boardLabel: "الهيئة المؤسسة",
+    partnersLabel: "شركات شريكة",
+    items: [
+      { name: "م. أحمد العلي", role: "رئيس النادي · مكامل أنظمة KNX", company: "Smart Systems Jordan" },
+      { name: "م. ليلى ناصر", role: "نائب الرئيس · مهندسة أتمتة", company: "Amman Automation" },
+      { name: "م. خالد دروزة", role: "أمين الصندوق · مستشار تقني", company: "BMS Consultants" },
+      { name: "م. هبة قاسم", role: "أمين السر · مهندسة كهرباء", company: "Jordan Electrical Co." },
+      { name: "م. عمر الحسيني", role: "عضو · مدرّب KNX معتمد", company: "ETS Training Center" },
+      { name: "م. ريم الزعبي", role: "عضو · معمارية أنظمة ذكية", company: "Smart Architects" },
+    ],
+    partners: [
+      "Smart Systems Jordan",
+      "Amman Automation",
+      "BMS Consultants",
+      "Jordan Electrical Co.",
+      "ETS Training Center",
+      "Smart Architects",
+    ],
+  },
   footer: {
     tagline: "النادي المهني الأردني لمعيار KNX.",
     rights: "جميع الحقوق محفوظة.",
@@ -217,6 +253,8 @@ const en: Dict = {
     about: "About",
     services: "Services",
     events: "Events",
+    members: "Members",
+    faq: "FAQ",
     join: "Join",
     contact: "Contact",
     switchTo: "ع",
@@ -334,6 +372,29 @@ const en: Dict = {
         q: "Which language are workshops delivered in?",
         a: "Mostly Arabic with English technical terms; some workshops are fully in English.",
       },
+    ],
+  },
+  members: {
+    eyebrow: "Club members",
+    title: "The people powering KNX Jordan",
+    brief: "Engineers, integrators, architects, and trainers driving smart-building adoption across the country.",
+    boardLabel: "Founding board",
+    partnersLabel: "Partner companies",
+    items: [
+      { name: "Eng. Ahmad Al-Ali", role: "President · KNX integrator", company: "Smart Systems Jordan" },
+      { name: "Eng. Layla Nasser", role: "Vice president · Automation engineer", company: "Amman Automation" },
+      { name: "Eng. Khaled Darwazeh", role: "Treasurer · Technical consultant", company: "BMS Consultants" },
+      { name: "Eng. Heba Qassem", role: "Secretary · Electrical engineer", company: "Jordan Electrical Co." },
+      { name: "Eng. Omar Al-Hussaini", role: "Member · Certified KNX tutor", company: "ETS Training Center" },
+      { name: "Eng. Reem Al-Zoubi", role: "Member · Smart-systems architect", company: "Smart Architects" },
+    ],
+    partners: [
+      "Smart Systems Jordan",
+      "Amman Automation",
+      "BMS Consultants",
+      "Jordan Electrical Co.",
+      "ETS Training Center",
+      "Smart Architects",
     ],
   },
   footer: {

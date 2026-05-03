@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Header } from "./Header";
 import { Logo } from "./Logo";
 import { JoinForm } from "./JoinForm";
 import { Stats } from "./Stats";
@@ -19,18 +20,16 @@ import type { PublicContent } from "@/lib/db";
 
 const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook, IconShield, IconBadge];
 
-type DetailKey = "about" | "services" | "events" | "faq";
+type DetailKey = "about" | "services" | "events" | "members" | "faq";
 
 export function HomeSections({
   dict,
   locale,
-  header,
   footer,
   content,
 }: {
   dict: Dict;
   locale: Locale;
-  header: ReactNode;
   footer: ReactNode;
   content?: PublicContent;
 }) {
@@ -178,32 +177,32 @@ export function HomeSections({
 
   return (
     <div ref={rootRef} className="knx-snap-root knx-animated-bg">
-      {header}
+      <Header dict={dict} locale={locale} onOpenDetail={(k) => setOpen(k)} />
 
       {/* HERO — page 1 */}
       <section
         id="hero"
-        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-4 pt-[var(--knx-header-h)] md:pb-6"
+        className="knx-snap-page snap-start relative flex w-full !flex-col px-4 pb-3 pt-[var(--knx-header-h)] md:pb-5"
       >
         <div className="flex w-full flex-1 items-center">
-          <div className="mx-auto grid w-full max-w-7xl items-center gap-4 px-6 md:grid-cols-12 md:gap-10">
+          <div className="mx-auto grid w-full max-w-7xl items-center gap-3 px-6 md:grid-cols-12 md:gap-8">
             <div className="md:col-span-7 rise">
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted">
                 <span className="h-1.5 w-1.5 rounded-full bg-knx" />
                 {dict.hero.eyebrow}
               </span>
-              <h1 className="mt-3 text-[1.9rem] font-extrabold leading-[1.15] tracking-tight md:text-[3rem] md:leading-[1.1]">
+              <h1 className="mt-3 text-[1.75rem] font-extrabold leading-[1.15] tracking-tight md:text-[2.5rem] md:leading-[1.1] lg:text-[2.85rem]">
                 <span className="block">{dict.hero.titleA}</span>
-                <span className="mt-1 block text-knx-700 md:mt-1.5">{dict.hero.titleAccent}</span>
-                <span className="mt-1 block md:mt-1.5">{dict.hero.titleB}</span>
+                <span className="mt-1 block text-knx-700">{dict.hero.titleAccent}</span>
+                <span className="mt-1 block">{dict.hero.titleB}</span>
               </h1>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-muted md:mt-4 md:text-base">
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-muted md:text-base">
                 {dict.hero.body}
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <a
                   href="#join"
-                  className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-knx-700 md:py-3"
+                  className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-knx-700"
                 >
                   {dict.hero.primaryCta}
                   <IconArrow
@@ -211,23 +210,24 @@ export function HomeSections({
                     dir={dict.dir}
                   />
                 </a>
-                <a
-                  href="#about"
-                  className="inline-flex items-center gap-2 rounded-full border border-line px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-ink md:py-3"
+                <button
+                  type="button"
+                  onClick={() => setOpen("about")}
+                  className="inline-flex items-center gap-2 rounded-full border border-line px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-ink"
                 >
                   {dict.hero.secondaryCta}
-                </a>
+                </button>
               </div>
             </div>
             <div className="md:col-span-5">
-              <div className="relative mx-auto grid aspect-square w-full max-w-sm place-items-center md:max-w-lg">
-                <Logo className="h-36 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-56 lg:h-64" />
+              <div className="relative mx-auto grid aspect-square w-full max-w-xs place-items-center md:max-w-md">
+                <Logo className="h-32 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-44 lg:h-52" />
               </div>
             </div>
           </div>
         </div>
 
-        <Stats items={dict.stats} className="mt-4 md:mt-6" />
+        <Stats items={dict.stats} className="mt-3 md:mt-4" />
       </section>
 
       {/* ABOUT — brief */}
@@ -275,6 +275,33 @@ export function HomeSections({
           onClick={() => setOpen("events")}
           dir={dict.dir}
         />
+      </Section>
+
+      {/* MEMBERS — brief */}
+      <Section id="members">
+        <BriefCard
+          eyebrow={dict.members.eyebrow}
+          title={dict.members.title}
+          body={dict.members.brief}
+          cta={dict.detailCta}
+          onClick={() => setOpen("members")}
+          dir={dict.dir}
+        >
+          <ul className="mt-6 grid w-full max-w-4xl grid-cols-2 gap-3 md:grid-cols-3">
+            {dict.members.items.slice(0, 3).map((m) => (
+              <li
+                key={m.name}
+                className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 text-start"
+              >
+                <Avatar name={m.name} />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-ink">{m.name}</p>
+                  <p className="truncate text-xs text-ink-muted">{m.role}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </BriefCard>
       </Section>
 
       {/* UPDATES — admin-uploaded content from DB */}
@@ -350,6 +377,7 @@ export function HomeSections({
           {open === "about" && <AboutDetail dict={dict} />}
           {open === "services" && <ServicesDetail dict={dict} />}
           {open === "events" && <EventsDetail dict={dict} />}
+          {open === "members" && <MembersDetail dict={dict} />}
           {open === "faq" && <FaqDetail dict={dict} />}
         </DetailModal>
       )}
@@ -532,6 +560,54 @@ function EventsDetail({ dict }: { dict: Dict }) {
   );
 }
 
+function MembersDetail({ dict }: { dict: Dict }) {
+  return (
+    <div>
+      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+        {dict.members.eyebrow}
+      </span>
+      <h3 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{dict.members.title}</h3>
+      <p className="mt-4 text-ink-muted">{dict.members.brief}</p>
+
+      <p className="mt-8 text-xs font-semibold uppercase tracking-widest text-knx-700">
+        {dict.members.boardLabel}
+      </p>
+      <ul className="mt-3 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-2">
+        {dict.members.items.map((m) => (
+          <li key={m.name} className="flex items-start gap-4 bg-white p-5">
+            <Avatar name={m.name} size="lg" />
+            <div className="min-w-0">
+              <p className="text-base font-semibold text-ink">{m.name}</p>
+              <p className="mt-1 text-sm text-ink-muted">{m.role}</p>
+              {m.company && (
+                <p className="mt-1 text-xs text-ink-muted">{m.company}</p>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {dict.members.partners.length > 0 && (
+        <>
+          <p className="mt-8 text-xs font-semibold uppercase tracking-widest text-knx-700">
+            {dict.members.partnersLabel}
+          </p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {dict.members.partners.map((p) => (
+              <li
+                key={p}
+                className="rounded-full border border-line bg-white px-3 py-1.5 text-sm text-ink-muted"
+              >
+                {p}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
+
 function FaqDetail({ dict }: { dict: Dict }) {
   return (
     <div>
@@ -553,6 +629,25 @@ function FaqDetail({ dict }: { dict: Dict }) {
         ))}
       </dl>
     </div>
+  );
+}
+
+function Avatar({ name, size = "md" }: { name: string; size?: "md" | "lg" }) {
+  const initials = name
+    .replace(/^(م\.|د\.|أ\.|Eng\.|Dr\.|Mr\.|Ms\.)\s*/i, "")
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w.charAt(0))
+    .join("")
+    .toUpperCase();
+  const dim = size === "lg" ? "h-12 w-12 text-base" : "h-10 w-10 text-sm";
+  return (
+    <span
+      aria-hidden="true"
+      className={`grid ${dim} flex-shrink-0 place-items-center rounded-full bg-knx-50 font-bold text-knx-700`}
+    >
+      {initials || "·"}
+    </span>
   );
 }
 
