@@ -8,21 +8,38 @@ export const dynamic = "force-dynamic";
 
 const META: Record<ContentTable, {
   label: string;
-  fields: { name: string; label: string; type: "text" | "textarea" | "url"; required?: boolean }[];
+  fields: {
+    name: string;
+    label: string;
+    type: "text" | "textarea" | "url";
+    required?: boolean;
+    upload?: { kind: "image" | "video" | "file"; accept: string };
+  }[];
 }> = {
   news: {
     label: "News",
     fields: [
       { name: "title", label: "Title", type: "text", required: true },
       { name: "body", label: "Body", type: "textarea", required: true },
-      { name: "image_url", label: "Image URL", type: "url" },
+      {
+        name: "image_url",
+        label: "Image URL",
+        type: "url",
+        upload: { kind: "image", accept: "image/*" },
+      },
     ],
   },
   videos: {
     label: "Videos",
     fields: [
       { name: "title", label: "Title", type: "text", required: true },
-      { name: "url", label: "Video URL (YouTube, Vimeo, mp4…)", type: "url", required: true },
+      {
+        name: "url",
+        label: "Video URL (YouTube, Vimeo, or upload mp4)",
+        type: "url",
+        required: true,
+        upload: { kind: "video", accept: "video/*" },
+      },
       { name: "description", label: "Description", type: "textarea" },
     ],
   },
@@ -30,7 +47,13 @@ const META: Record<ContentTable, {
     label: "Pictures",
     fields: [
       { name: "title", label: "Title", type: "text", required: true },
-      { name: "url", label: "Image URL", type: "url", required: true },
+      {
+        name: "url",
+        label: "Image URL",
+        type: "url",
+        required: true,
+        upload: { kind: "image", accept: "image/*" },
+      },
       { name: "description", label: "Description", type: "textarea" },
     ],
   },
