@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureSchema, sql } from "@/lib/db";
-import { sendAutoReply } from "@/lib/email";
+import { notifyAdmin, sendAutoReply } from "@/lib/email";
 
 export const runtime = "edge";
 
@@ -37,11 +37,14 @@ export async function POST(req: Request) {
       ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role
     `;
 
-    try {
-      await sendAutoReply({ to: email, name, kind: "join", locale });
-    } catch (mailErr) {
-      console.error("join auto-reply email failed", mailErr);
-    }
+    await Promise.all([
+      sendAutoReply({ to: email, name, kind: "join", locale }).catch((err) =>
+        console.error("join auto-reply email failed", err),
+      ),
+      notifyAdmin({ kind: "join", name, email, role, locale }).catch((err) =>
+        console.error("join admin notification failed", err),
+      ),
+    ]);
 
     return NextResponse.json({ ok: true });
   } catch (err) {

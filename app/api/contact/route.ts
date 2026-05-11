@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureSchema, sql } from "@/lib/db";
-import { sendAutoReply } from "@/lib/email";
+import { notifyAdmin, sendAutoReply } from "@/lib/email";
 
 export const runtime = "edge";
 
@@ -39,11 +39,14 @@ export async function POST(req: Request) {
       VALUES (${name}, ${email}, ${subject || null}, ${message})
     `;
 
-    try {
-      await sendAutoReply({ to: email, name, kind: "contact", locale });
-    } catch (mailErr) {
-      console.error("contact auto-reply email failed", mailErr);
-    }
+    await Promise.all([
+      sendAutoReply({ to: email, name, kind: "contact", locale }).catch((err) =>
+        console.error("contact auto-reply email failed", err),
+      ),
+      notifyAdmin({ kind: "contact", name, email, subject, message, locale }).catch(
+        (err) => console.error("contact admin notification failed", err),
+      ),
+    ]);
 
     return NextResponse.json({ ok: true });
   } catch (err) {

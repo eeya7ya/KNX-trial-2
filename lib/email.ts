@@ -190,3 +190,131 @@ export async function sendAutoReply(opts: {
     throw new Error(`Resend error ${res.status}: ${errBody}`);
   }
 }
+
+export type AdminNotificationField = { label: string; value: string };
+
+function renderAdminHtml(opts: {
+  title: string;
+  intro: string;
+  fields: AdminNotificationField[];
+  submittedAt: string;
+}): string {
+  const rows = opts.fields
+    .map(
+      (f) => `
+        <tr>
+          <td style="padding:10px 14px;border-bottom:1px solid #ececea;font-size:13px;color:#6b6b66;width:140px;vertical-align:top;">${escapeHtml(f.label)}</td>
+          <td style="padding:10px 14px;border-bottom:1px solid #ececea;font-size:14px;color:#1a1a1a;white-space:pre-wrap;word-break:break-word;">${escapeHtml(f.value || "—")}</td>
+        </tr>`,
+    )
+    .join("");
+  return `<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /></head>
+  <body style="margin:0;padding:0;background:#f6f6f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,Arial,sans-serif;color:#1a1a1a;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f6f6f4;padding:32px 16px;">
+      <tr><td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #ececea;">
+          <tr><td style="padding:28px 28px 8px 28px;">
+            <h1 style="margin:0 0 8px 0;font-size:18px;font-weight:700;color:#1a1a1a;">${escapeHtml(opts.title)}</h1>
+            <p style="margin:0 0 18px 0;font-size:14px;color:#3a3a3a;line-height:1.6;">${escapeHtml(opts.intro)}</p>
+          </td></tr>
+          <tr><td style="padding:0 28px 24px 28px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ececea;border-radius:10px;overflow:hidden;">
+              ${rows}
+              <tr>
+                <td style="padding:10px 14px;font-size:13px;color:#6b6b66;width:140px;vertical-align:top;">Submitted at</td>
+                <td style="padding:10px 14px;font-size:14px;color:#1a1a1a;">${escapeHtml(opts.submittedAt)}</td>
+              </tr>
+            </table>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>`;
+}
+
+function renderAdminText(opts: {
+  title: string;
+  intro: string;
+  fields: AdminNotificationField[];
+  submittedAt: string;
+}): string {
+  return [
+    opts.title,
+    opts.intro,
+    "",
+    ...opts.fields.map((f) => `${f.label}: ${f.value || "—"}`),
+    `Submitted at: ${opts.submittedAt}`,
+  ].join("\n");
+}
+
+export async function notifyAdmin(opts: {
+  kind: AutoReplyKind;
+  name: string;
+  email: string;
+  role?: string;
+  subject?: string;
+  message?: string;
+  locale?: string;
+}): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM;
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!apiKey || !from || !adminEmail) {
+    console.warn(
+      "notifyAdmin: RESEND_API_KEY, RESEND_FROM or ADMIN_EMAIL not set; skipping admin email.",
+    );
+    return;
+  }
+
+  const isJoin = opts.kind === "join";
+  const title = isJoin
+    ? "New membership signup — KNX Club Jordan"
+    : "New contact message — KNX Club Jordan";
+  const intro = isJoin
+    ? "A new person has requested to join the club. Their details are below."
+    : "A new contact message has been submitted. Details are below.";
+
+  const fields: AdminNotificationField[] = [
+    { label: "Name", value: opts.name },
+    { label: "Email", value: opts.email },
+  ];
+  if (isJoin) {
+    fields.push({ label: "Role / interest", value: opts.role ?? "" });
+  } else {
+    fields.push({ label: "Subject", value: opts.subject ?? "" });
+    fields.push({ label: "Message", value: opts.message ?? "" });
+  }
+  if (opts.locale) fields.push({ label: "Locale", value: opts.locale });
+
+  const submittedAt = new Date().toISOString();
+  const subjectLine = isJoin
+    ? `[KNX] New signup: ${opts.name}`
+    : `[KNX] New contact: ${opts.subject || opts.name}`;
+
+  const html = renderAdminHtml({ title, intro, fields, submittedAt });
+  const text = renderAdminText({ title, intro, fields, submittedAt });
+
+  const res = await fetch(RESEND_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: adminEmail.split(",").map((s) => s.trim()).filter(Boolean),
+      reply_to: opts.email,
+      subject: subjectLine,
+      html,
+      text,
+    }),
+  });
+
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => "");
+    throw new Error(`Resend admin error ${res.status}: ${errBody}`);
+  }
+}
