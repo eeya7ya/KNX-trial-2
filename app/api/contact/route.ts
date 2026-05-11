@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import { ensureSchema, sql } from "@/lib/db";
+import { notifyAdmin, sendAutoReply } from "@/lib/email";
 
 export const runtime = "edge";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: Request) {
-  let body: { name?: unknown; email?: unknown; subject?: unknown; message?: unknown };
+  let body: {
+    name?: unknown;
+    email?: unknown;
+    subject?: unknown;
+    message?: unknown;
+    locale?: unknown;
+  };
   try {
     body = await req.json();
   } catch {
@@ -16,6 +23,7 @@ export async function POST(req: Request) {
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const subject = typeof body.subject === "string" ? body.subject.trim().slice(0, 200) : "";
   const message = typeof body.message === "string" ? body.message.trim() : "";
+  const locale = typeof body.locale === "string" ? body.locale : "ar";
 
   if (name.length < 2 || name.length > 120)
     return NextResponse.json({ ok: false, error: "Name required" }, { status: 400 });
@@ -30,6 +38,16 @@ export async function POST(req: Request) {
       INSERT INTO communications (name, email, subject, message)
       VALUES (${name}, ${email}, ${subject || null}, ${message})
     `;
+
+    await Promise.all([
+      sendAutoReply({ to: email, name, kind: "contact", locale }).catch((err) =>
+        console.error("contact auto-reply email failed", err),
+      ),
+      notifyAdmin({ kind: "contact", name, email, subject, message, locale }).catch(
+        (err) => console.error("contact admin notification failed", err),
+      ),
+    ]);
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("contact error", err);
