@@ -338,11 +338,11 @@ export function HomeSections({
               {dict.footer.tagline}
             </h2>
             <a
-              href="mailto:hello@knxclub.jo"
+              href="mailto:hello@support.knx-jordan-club.com"
               className="mt-8 inline-block text-2xl font-semibold text-ink hover:text-knx-700 md:text-3xl"
               dir="ltr"
             >
-              hello@knxclub.jo
+              hello@support.knx-jordan-club.com
             </a>
             <p className="mt-3 text-sm text-ink-muted" dir="ltr">
               Amman, Jordan
