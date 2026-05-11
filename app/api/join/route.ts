@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { ensureSchema, sql } from "@/lib/db";
+import { sendAutoReply } from "@/lib/email";
 
 export const runtime = "edge";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: Request) {
-  let body: { name?: unknown; email?: unknown; role?: unknown };
+  let body: { name?: unknown; email?: unknown; role?: unknown; locale?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -16,6 +17,7 @@ export async function POST(req: Request) {
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const role = typeof body.role === "string" ? body.role.trim() : "";
+  const locale = typeof body.locale === "string" ? body.locale : "ar";
 
   if (name.length < 2 || name.length > 120) {
     return NextResponse.json({ ok: false, error: "Please enter your name." }, { status: 400 });
@@ -34,6 +36,13 @@ export async function POST(req: Request) {
       VALUES (${name}, ${email}, ${role || null})
       ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role
     `;
+
+    try {
+      await sendAutoReply({ to: email, name, kind: "join", locale });
+    } catch (mailErr) {
+      console.error("join auto-reply email failed", mailErr);
+    }
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("join error", err);
