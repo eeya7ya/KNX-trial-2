@@ -82,18 +82,11 @@ export async function generateMetadata({
       url: canonical,
       locale: isAr ? "ar_JO" : "en_US",
       alternateLocale: isAr ? "en_US" : "ar_JO",
-      images: [
-        {
-          url: "/KNX_logo.svg.png",
-          alt: "KNX Club Jordan",
-        },
-      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
-      images: ["/KNX_logo.svg.png"],
     },
     robots: {
       index: true,
