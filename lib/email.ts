@@ -162,7 +162,7 @@ export async function sendAutoReply(opts: {
   }
 
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://knxclub.jo";
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://knx-jordan-club.com";
   const logoUrl =
     process.env.EMAIL_LOGO_URL || `${siteUrl}/KNX_logo.svg.png`;
 
