@@ -69,7 +69,7 @@ export default async function Image() {
             color: "#a7f3d0",
           }}
         >
-          <div style={{ display: "flex" }}>knxclub.jo</div>
+          <div style={{ display: "flex" }}>knx-jordan-club.com</div>
           <div style={{ display: "flex" }}>Amman · Jordan</div>
         </div>
       </div>

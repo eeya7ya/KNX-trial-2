@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { getDict, isLocale, type Locale } from "@/lib/i18n";
 
 const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://knxclub.jo"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://knx-jordan-club.com"
 ).replace(/\/$/, "");
 
 const inter = Inter({
