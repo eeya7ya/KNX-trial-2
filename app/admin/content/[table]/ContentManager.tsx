@@ -11,7 +11,13 @@ type Field = {
   required?: boolean;
   upload?: { kind: UploadKind; accept: string };
 };
-type Row = { id: number; title: string; created_at: string; published: boolean };
+type Row = {
+  id: number;
+  title: string;
+  created_at: string;
+  published: boolean;
+  [k: string]: unknown;
+};
 
 export function ContentManager({
   table,
@@ -25,6 +31,7 @@ export function ContentManager({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [values, setValues] = useState<Record<string, string>>(() =>
     Object.fromEntries(fields.map((f) => [f.name, ""])),
   );
@@ -37,12 +44,34 @@ export function ContentManager({
   const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
 
   function reset() {
+    setEditingId(null);
     setValues(Object.fromEntries(fields.map((f) => [f.name, ""])));
     setBools(
       Object.fromEntries(fields.filter((f) => f.type === "checkbox").map((f) => [f.name, false])),
     );
     setPublished(true);
     setUploadProgress({});
+    setErr("");
+  }
+
+  function startEdit(row: Row) {
+    setEditingId(row.id);
+    setValues(
+      Object.fromEntries(
+        fields
+          .filter((f) => f.type !== "checkbox")
+          .map((f) => [f.name, row[f.name] == null ? "" : String(row[f.name])]),
+      ),
+    );
+    setBools(
+      Object.fromEntries(
+        fields.filter((f) => f.type === "checkbox").map((f) => [f.name, Boolean(row[f.name])]),
+      ),
+    );
+    setPublished(Boolean(row.published));
+    setUploadProgress({});
+    setErr("");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   async function handleUpload(field: Field, file: File) {
@@ -67,8 +96,12 @@ export function ContentManager({
     setBusy(true);
     setErr("");
     try {
-      const res = await fetch(`/api/admin/content/${table}`, {
-        method: "POST",
+      const url =
+        editingId == null
+          ? `/api/admin/content/${table}`
+          : `/api/admin/content/${table}/${editingId}`;
+      const res = await fetch(url, {
+        method: editingId == null ? "POST" : "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...values, ...bools, published }),
       });
@@ -100,7 +133,7 @@ export function ContentManager({
   return (
     <div className="mt-6 grid gap-8 md:grid-cols-[420px_1fr]">
       <form onSubmit={onSubmit} className="rounded-2xl border border-line bg-white p-5">
-        <p className="text-sm font-semibold">Add new</p>
+        <p className="text-sm font-semibold">{editingId == null ? "Add new" : "Edit entry"}</p>
         <div className="mt-4 grid gap-4">
           {fields.map((f) => (
             <label key={f.name} className="block">
@@ -184,13 +217,25 @@ export function ContentManager({
           </label>
         </div>
         {err && <p className="mt-3 text-sm text-red-600">{err}</p>}
-        <button
-          type="submit"
-          disabled={busy}
-          className="mt-5 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-knx-700 disabled:opacity-60"
-        >
-          {busy ? "Saving…" : "Save"}
-        </button>
+        <div className="mt-5 flex items-center gap-3">
+          <button
+            type="submit"
+            disabled={busy}
+            className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-knx-700 disabled:opacity-60"
+          >
+            {busy ? "Saving…" : editingId == null ? "Save" : "Update"}
+          </button>
+          {editingId != null && (
+            <button
+              type="button"
+              onClick={reset}
+              disabled={busy}
+              className="rounded-full border border-line px-5 py-2.5 text-sm font-semibold text-ink-muted transition hover:border-ink hover:text-ink disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
       <div className="rounded-2xl border border-line bg-white">
@@ -199,7 +244,12 @@ export function ContentManager({
         </div>
         <ul className="divide-y divide-line">
           {initialRows.map((r) => (
-            <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
+            <li
+              key={r.id}
+              className={`flex items-center justify-between gap-3 px-5 py-3 ${
+                editingId === r.id ? "bg-knx-50" : ""
+              }`}
+            >
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{r.title}</p>
                 <p className="text-xs text-ink-muted" dir="ltr">
@@ -207,14 +257,24 @@ export function ContentManager({
                   {!r.published && " · draft"}
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => onDelete(r.id)}
-                disabled={busy}
-                className="rounded-full border border-line px-3 py-1 text-xs text-ink-muted transition hover:border-red-400 hover:text-red-600 disabled:opacity-50"
-              >
-                Delete
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => startEdit(r)}
+                  disabled={busy}
+                  className="rounded-full border border-line px-3 py-1 text-xs text-ink-muted transition hover:border-ink hover:text-ink disabled:opacity-50"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDelete(r.id)}
+                  disabled={busy}
+                  className="rounded-full border border-line px-3 py-1 text-xs text-ink-muted transition hover:border-red-400 hover:text-red-600 disabled:opacity-50"
+                >
+                  Delete
+                </button>
+              </div>
             </li>
           ))}
           {initialRows.length === 0 && (
