@@ -71,6 +71,9 @@ const META: Record<ContentTable, {
       { name: "name", label: "Name", type: "text", required: true },
       { name: "role", label: "Role / position", type: "text" },
       { name: "company", label: "Company", type: "text" },
+      { name: "experience", label: "Experience", type: "text" },
+      { name: "phone", label: "Contact phone", type: "text" },
+      { name: "email", label: "Contact email", type: "text" },
       {
         name: "photo_url",
         label: "Photo",
@@ -125,6 +128,7 @@ export default async function ContentPage({
         table={table}
         fields={meta.fields}
         initialRows={rows.map((r) => ({
+          ...r,
           id: r.id,
           title: r.title ?? r.name ?? "",
           created_at: r.created_at,

@@ -9,6 +9,7 @@ import {
 } from "./Icons";
 import type { Dict } from "@/lib/i18n";
 import type { TeamMemberItem } from "@/lib/db";
+import { MembersDirectory } from "./MembersDirectory";
 
 const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook, IconShield, IconBadge];
 
@@ -111,52 +112,7 @@ export function MembersDetail({
         {dict.members.boardLabel}
       </p>
 
-      {team.length === 0 ? (
-        <p className="mt-3 rounded-2xl border border-line bg-white p-8 text-center text-sm text-ink-muted">
-          —
-        </p>
-      ) : (
-        <ul className="mt-4 grid gap-4">
-          {team.map((m) => (
-            <li
-              key={m.id}
-              className="flex flex-wrap items-center gap-5 rounded-2xl border border-line bg-white p-5 md:p-6"
-            >
-              {m.photo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={m.photo_url}
-                  alt={m.name}
-                  className="h-20 w-20 flex-shrink-0 rounded-2xl object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <Avatar name={m.name} size="lg" />
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="text-lg font-semibold text-ink">{m.name}</p>
-                {m.role && <p className="mt-1 text-sm text-ink-muted">{m.role}</p>}
-                {m.company && (
-                  <p className="mt-1 text-xs text-ink-muted">{m.company}</p>
-                )}
-              </div>
-              {m.is_partner && (
-                <div className="flex items-center gap-2 rounded-full border border-line bg-knx-50 px-3 py-1.5">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/KNX_logo.svg.png"
-                    alt="KNX partner"
-                    className="h-6 w-auto"
-                  />
-                  <span className="text-xs font-semibold text-knx-700">
-                    {dict.membersSection.partnerLabel}
-                  </span>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+      <MembersDirectory dict={dict} team={team} />
     </div>
   );
 }

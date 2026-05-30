@@ -93,6 +93,18 @@ export function ensureSchema(): Promise<void> {
         created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    // Member contact / experience details (added later — keep idempotent).
+    await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS experience TEXT`;
+    await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS phone TEXT`;
+    await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS email TEXT`;
+    // Editable homepage content (stats, about, services) keyed by section.
+    await sql`
+      CREATE TABLE IF NOT EXISTS site_settings (
+        key         TEXT PRIMARY KEY,
+        value       JSONB NOT NULL,
+        updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
   })().catch((err) => {
     schemaReady = null;
     throw err;
@@ -105,6 +117,49 @@ export type ContentTable = (typeof CONTENT_TABLES)[number];
 
 export function isContentTable(value: string): value is ContentTable {
   return (CONTENT_TABLES as readonly string[]).includes(value);
+}
+
+// Column lists used by the admin create/update API. Keep in sync with the
+// admin form metadata in app/admin/content/[table]/page.tsx.
+export const CONTENT_FIELDS: Record<ContentTable, string[]> = {
+  news: ["title", "body", "image_url", "published"],
+  videos: ["title", "url", "description", "published"],
+  pictures: ["title", "url", "description", "published"],
+  prompts: ["title", "body", "tags", "published"],
+  team_members: [
+    "name",
+    "role",
+    "company",
+    "photo_url",
+    "is_partner",
+    "experience",
+    "phone",
+    "email",
+    "published",
+  ],
+};
+
+export const BOOL_CONTENT_FIELDS = new Set(["published", "is_partner"]);
+
+/** Normalise a raw request body into the columns a content table accepts. */
+export function pickContentFields(
+  table: ContentTable,
+  body: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const f of CONTENT_FIELDS[table]) {
+    let v = body[f];
+    if (BOOL_CONTENT_FIELDS.has(f)) {
+      const def = f === "published" ? true : false;
+      v = v === undefined ? def : Boolean(v);
+    } else if (typeof v !== "string" || v.trim() === "") {
+      v = null;
+    } else {
+      v = v.trim();
+    }
+    out[f] = v;
+  }
+  return out;
 }
 
 export type NewsItem = {
@@ -135,6 +190,9 @@ export type TeamMemberItem = {
   company: string | null;
   photo_url: string | null;
   is_partner: boolean;
+  experience: string | null;
+  phone: string | null;
+  email: string | null;
   created_at: string;
 };
 
@@ -156,7 +214,8 @@ export async function getPublicContent(): Promise<PublicContent> {
           WHERE published = TRUE ORDER BY created_at DESC LIMIT 24`,
       sql`SELECT id, title, url, description, created_at FROM pictures
           WHERE published = TRUE ORDER BY created_at DESC LIMIT 24`,
-      sql`SELECT id, name, role, company, photo_url, is_partner, created_at
+      sql`SELECT id, name, role, company, photo_url, is_partner,
+                 experience, phone, email, created_at
           FROM team_members WHERE published = TRUE
           ORDER BY is_partner DESC, created_at ASC LIMIT 50`,
     ]);

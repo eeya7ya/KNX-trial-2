@@ -1,46 +1,10 @@
 import { NextResponse } from "next/server";
-import { ensureSchema, isContentTable, sql } from "@/lib/db";
+import { ensureSchema, isContentTable, pickContentFields, sql } from "@/lib/db";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
 
 type Row = Record<string, unknown>;
-
-function fields(table: string): string[] {
-  switch (table) {
-    case "news":
-      return ["title", "body", "image_url", "published"];
-    case "videos":
-      return ["title", "url", "description", "published"];
-    case "pictures":
-      return ["title", "url", "description", "published"];
-    case "prompts":
-      return ["title", "body", "tags", "published"];
-    case "team_members":
-      return ["name", "role", "company", "photo_url", "is_partner", "published"];
-    default:
-      return [];
-  }
-}
-
-const BOOL_FIELDS = new Set(["published", "is_partner"]);
-
-function pickFields(table: string, body: Row) {
-  const out: Record<string, unknown> = {};
-  for (const f of fields(table)) {
-    let v = body[f];
-    if (BOOL_FIELDS.has(f)) {
-      const def = f === "published" ? true : false;
-      v = v === undefined ? def : Boolean(v);
-    } else if (typeof v !== "string" || v.trim() === "") {
-      v = null;
-    } else {
-      v = v.trim();
-    }
-    out[f] = v;
-  }
-  return out;
-}
 
 export async function GET(_: Request, ctx: { params: Promise<{ table: string }> }) {
   if (!(await isAdminAuthenticated()))
@@ -77,7 +41,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ table: string 
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
-  const data = pickFields(table, body);
+  const data = pickContentFields(table, body);
   await ensureSchema();
 
   if (table === "news") {
@@ -93,8 +57,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ table: string 
     await sql`INSERT INTO prompts (title, body, tags, published)
       VALUES (${data.title}, ${data.body}, ${data.tags}, ${data.published})`;
   } else if (table === "team_members") {
-    await sql`INSERT INTO team_members (name, role, company, photo_url, is_partner, published)
-      VALUES (${data.name}, ${data.role}, ${data.company}, ${data.photo_url}, ${data.is_partner}, ${data.published})`;
+    await sql`INSERT INTO team_members
+        (name, role, company, photo_url, is_partner, experience, phone, email, published)
+      VALUES (${data.name}, ${data.role}, ${data.company}, ${data.photo_url},
+        ${data.is_partner}, ${data.experience}, ${data.phone}, ${data.email}, ${data.published})`;
   }
   return NextResponse.json({ ok: true });
 }

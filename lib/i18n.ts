@@ -154,14 +154,14 @@ const ar: Dict = {
     secondaryCta: "تعرّف علينا",
   },
   stats: [
-    { label: "مهندس ومكامل", value: "+150" },
-    { label: "ورشة تدريبية سنوياً", value: "12" },
-    { label: "شركة شريكة", value: "+30" },
-    { label: "سنة خبرة جماعية", value: "20" },
+    { label: "مهندس ومكامل", value: "+38" },
+    { label: "ورشة تدريبية", value: "+20" },
+    { label: "شركة شريكة", value: "+7" },
+    { label: "سنوات الخبرة التي يقدّمها شركاؤنا", value: "+12" },
   ],
   about: {
     eyebrow: "من نحن",
-    title: "مجتمع مهني للأنظمة الذكية في الأردن",
+    title: "مجتمع مهني لأنظمة KNX في الأردن",
     body:
       "نحن جمعية غير ربحية تضم محترفين متخصصين في معيار KNX، نسعى لتطوير سوق أتمتة المباني في المملكة عبر التدريب، تبادل الخبرات، والمشاريع المشتركة.",
     pillars: [
@@ -185,7 +185,7 @@ const ar: Dict = {
     brief: "تدريب، لقاءات، مشاريع مشتركة، ومكتبة موارد. اضغط للاطلاع على التفاصيل الكاملة.",
     items: [
       {
-        title: "تدريب ETS",
+        title: "ورش تدريبية",
         body: "ورش عملية على ETS6 لجميع المستويات من المبتدئ إلى المحترف.",
       },
       {
@@ -199,14 +199,6 @@ const ar: Dict = {
       {
         title: "مكتبة موارد",
         body: "وصول إلى أدلة فنية ومستندات تصميم وقوالب جاهزة بالعربية والإنجليزية.",
-      },
-      {
-        title: "أمن KNX Secure",
-        body: "إرشادات تصميم آمنة وفق KNX Data Secure وKNX IP Secure.",
-      },
-      {
-        title: "اعتماد مهني",
-        body: "إرشاد للحصول على شهادات KNX Partner وKNX Tutor.",
       },
     ],
   },
@@ -336,14 +328,14 @@ const en: Dict = {
     secondaryCta: "Learn more",
   },
   stats: [
-    { label: "Engineers & integrators", value: "150+" },
-    { label: "Workshops per year", value: "12" },
-    { label: "Partner companies", value: "30+" },
-    { label: "Years of collective experience", value: "20" },
+    { label: "Engineers & integrators", value: "38+" },
+    { label: "Workshops", value: "20+" },
+    { label: "Partner companies", value: "7+" },
+    { label: "Years of experience our partners bring", value: "+12" },
   ],
   about: {
     eyebrow: "About",
-    title: "A professional community for smart systems in Jordan",
+    title: "A professional community for KNX systems in Jordan",
     body:
       "We are a non-profit community of KNX professionals advancing the adoption of building automation across the Kingdom through training, knowledge sharing, and joint projects.",
     pillars: [
@@ -367,7 +359,7 @@ const en: Dict = {
     brief: "Training, meetups, joint projects, and a resource library. Tap to see full details.",
     items: [
       {
-        title: "ETS training",
+        title: "Training workshops",
         body: "Hands-on ETS6 workshops from beginner to advanced level.",
       },
       {
@@ -381,14 +373,6 @@ const en: Dict = {
       {
         title: "Resource library",
         body: "Technical guides, design documents, and templates in Arabic and English.",
-      },
-      {
-        title: "KNX Secure",
-        body: "Secure design guidelines following KNX Data Secure and KNX IP Secure.",
-      },
-      {
-        title: "Certification",
-        body: "Guidance on becoming a KNX Partner or KNX Tutor.",
       },
     ],
   },
@@ -442,7 +426,7 @@ const en: Dict = {
   },
   members: {
     eyebrow: "Club members",
-    title: "The people powering KNX Jordan",
+    title: "The professionals behind KNX Jordan",
     brief: "Engineers, integrators, architects, and trainers driving smart-building adoption across the country.",
     boardLabel: "Founding board",
     partnersLabel: "Partner companies",

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { getDict, isLocale, type Locale } from "@/lib/i18n";
+import { isLocale, type Locale } from "@/lib/i18n";
 import { getPublicContent } from "@/lib/db";
+import { getSiteDict } from "@/lib/site-content";
 import { Logo } from "./components/Logo";
 import { HomeSections } from "./components/HomeSections";
 
@@ -14,7 +15,7 @@ export default async function Page({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const L = locale as Locale;
-  const dict = getDict(L);
+  const dict = await getSiteDict(L);
   const content = await getPublicContent();
 
   return (
