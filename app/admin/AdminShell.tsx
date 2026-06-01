@@ -7,8 +7,6 @@ import { useState } from "react";
 const NAV = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/site", label: "Homepage content" },
-  { href: "/admin/members", label: "Members" },
-  { href: "/admin/visitors", label: "Visitors" },
   { href: "/admin/communications", label: "Communications" },
   { href: "/admin/content/news", label: "News" },
   { href: "/admin/content/videos", label: "Videos" },
@@ -46,6 +44,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           />
           <p className="text-lg font-bold">Admin</p>
         </div>
+        <Link
+          href="/"
+          className="mb-4 flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-sm font-medium text-ink-muted transition hover:border-ink hover:text-ink"
+        >
+          ← View site
+        </Link>
         <nav className="flex flex-col gap-1 text-sm">
           {NAV.map((item) => {
             const active =

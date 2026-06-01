@@ -41,6 +41,8 @@ export function ensureSchema(): Promise<void> {
         created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    // Read/unread tracking for the admin inbox (added later — keep idempotent).
+    await sql`ALTER TABLE communications ADD COLUMN IF NOT EXISTS read BOOLEAN NOT NULL DEFAULT FALSE`;
     await sql`
       CREATE TABLE IF NOT EXISTS news (
         id          BIGSERIAL PRIMARY KEY,

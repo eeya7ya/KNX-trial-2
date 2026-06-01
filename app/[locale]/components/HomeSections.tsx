@@ -250,31 +250,41 @@ export function HomeSections({
           dir={dict.dir}
         >
           {content && content.team.length > 0 && (
-            <ul className="mt-6 grid w-full max-w-4xl grid-cols-2 gap-3 md:grid-cols-3">
-              {content.team.slice(0, 3).map((m) => (
+            <ul className="mt-6 grid w-full max-w-5xl grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {content.team.slice(0, 20).map((m) => (
                 <li
                   key={m.id}
-                  className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 text-start"
+                  className="flex items-center gap-2 rounded-xl border border-line bg-white p-2 text-start"
                 >
                   {m.photo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={m.photo_url}
                       alt={m.name}
-                      className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+                      className="h-9 w-9 flex-shrink-0 rounded-full object-cover object-top"
                       loading="lazy"
                     />
                   ) : (
                     <Avatar name={m.name} />
                   )}
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-ink">{m.name}</p>
+                    <p className="truncate text-xs font-semibold text-ink">{m.name}</p>
                     {m.role && (
-                      <p className="truncate text-xs text-ink-muted">{m.role}</p>
+                      <p className="truncate text-[10px] text-ink-muted">{m.role}</p>
                     )}
                   </div>
                 </li>
               ))}
+              {content.team.length > 20 && (
+                <li>
+                  <Link
+                    href={`/${locale}/members`}
+                    className="flex h-full items-center justify-center rounded-xl border border-dashed border-line bg-white p-2 text-sm font-semibold text-knx-700 transition hover:border-knx"
+                  >
+                    +{content.team.length - 20}
+                  </Link>
+                </li>
+              )}
             </ul>
           )}
         </BriefCard>
