@@ -7,10 +7,19 @@ type UploadKind = "image" | "video" | "file";
 type Field = {
   name: string;
   label: string;
-  type: "text" | "textarea" | "url" | "checkbox";
+  type: "text" | "textarea" | "url" | "checkbox" | "datetime" | "select";
   required?: boolean;
   upload?: { kind: UploadKind; accept: string };
+  options?: { value: string; label: string }[];
 };
+
+// Format a stored timestamp into the value a datetime-local input expects.
+function toLocalInput(s: string): string {
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return "";
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
 type Row = {
   id: number;
   title: string;
@@ -60,7 +69,10 @@ export function ContentManager({
       Object.fromEntries(
         fields
           .filter((f) => f.type !== "checkbox")
-          .map((f) => [f.name, row[f.name] == null ? "" : String(row[f.name])]),
+          .map((f) => {
+            const raw = row[f.name] == null ? "" : String(row[f.name]);
+            return [f.name, f.type === "datetime" && raw ? toLocalInput(raw) : raw];
+          }),
       ),
     );
     setBools(
@@ -158,6 +170,31 @@ export function ContentManager({
                 <textarea
                   required={f.required}
                   rows={4}
+                  value={values[f.name]}
+                  onChange={(e) =>
+                    setValues((v) => ({ ...v, [f.name]: e.target.value }))
+                  }
+                  className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none transition focus:border-knx"
+                />
+              ) : f.type === "select" ? (
+                <select
+                  value={values[f.name]}
+                  onChange={(e) =>
+                    setValues((v) => ({ ...v, [f.name]: e.target.value }))
+                  }
+                  className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none transition focus:border-knx"
+                >
+                  <option value="">— none —</option>
+                  {f.options?.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              ) : f.type === "datetime" ? (
+                <input
+                  type="datetime-local"
+                  required={f.required}
                   value={values[f.name]}
                   onChange={(e) =>
                     setValues((v) => ({ ...v, [f.name]: e.target.value }))

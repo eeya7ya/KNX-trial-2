@@ -6,16 +6,16 @@ import { ContentManager } from "./ContentManager";
 
 export const dynamic = "force-dynamic";
 
-const META: Record<ContentTable, {
+type FieldMeta = {
+  name: string;
   label: string;
-  fields: {
-    name: string;
-    label: string;
-    type: "text" | "textarea" | "url" | "checkbox";
-    required?: boolean;
-    upload?: { kind: "image" | "video" | "file"; accept: string };
-  }[];
-}> = {
+  type: "text" | "textarea" | "url" | "checkbox" | "datetime" | "select";
+  required?: boolean;
+  upload?: { kind: "image" | "video" | "file"; accept: string };
+  options?: { value: string; label: string }[];
+};
+
+const META: Record<ContentTable, { label: string; fields: FieldMeta[] }> = {
   news: {
     label: "News",
     fields: [
@@ -23,10 +23,11 @@ const META: Record<ContentTable, {
       { name: "body", label: "Body", type: "textarea", required: true },
       {
         name: "image_url",
-        label: "Image URL",
+        label: "Cover image",
         type: "url",
         upload: { kind: "image", accept: "image/*" },
       },
+      { name: "event_date", label: "Event date", type: "datetime" },
     ],
   },
   videos: {
@@ -41,6 +42,7 @@ const META: Record<ContentTable, {
         upload: { kind: "video", accept: "video/*" },
       },
       { name: "description", label: "Description", type: "textarea" },
+      { name: "news_id", label: "Event (appears in gallery 7 days after)", type: "select" },
     ],
   },
   pictures: {
@@ -55,6 +57,7 @@ const META: Record<ContentTable, {
         upload: { kind: "image", accept: "image/*" },
       },
       { name: "description", label: "Description", type: "textarea" },
+      { name: "news_id", label: "Event (appears in gallery 7 days after)", type: "select" },
     ],
   },
   prompts: {
@@ -118,6 +121,16 @@ export default async function ContentPage({
   const meta = META[table];
   const rows = await loadRows(table);
 
+  // Populate the event dropdown for media tables with the available news posts.
+  let fields = meta.fields;
+  if (table === "videos" || table === "pictures") {
+    const newsRows = (await sql`
+      SELECT id, title FROM news ORDER BY COALESCE(event_date, created_at) DESC LIMIT 200
+    `) as { id: number; title: string }[];
+    const options = newsRows.map((n) => ({ value: String(n.id), label: n.title }));
+    fields = meta.fields.map((f) => (f.name === "news_id" ? { ...f, options } : f));
+  }
+
   return (
     <AdminShell>
       <h1 className="text-2xl font-bold tracking-tight">{meta.label}</h1>
@@ -126,7 +139,7 @@ export default async function ContentPage({
       </p>
       <ContentManager
         table={table}
-        fields={meta.fields}
+        fields={fields}
         initialRows={rows.map((r) => ({
           ...r,
           id: r.id,

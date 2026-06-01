@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getDict, isLocale, type Locale } from "@/lib/i18n";
-import { getPublicContent } from "@/lib/db";
+import { getGallery, type GalleryFolder } from "@/lib/db";
 import { youtubeId, isVideoFileUrl } from "@/lib/media";
 import { DetailPageShell } from "../components/DetailPageShell";
 
@@ -15,9 +15,10 @@ export default async function GalleryPage({
   if (!isLocale(locale)) notFound();
   const L = locale as Locale;
   const dict = getDict(L);
-  const { pictures, videos } = await getPublicContent();
+  const folders = await getGallery();
   const t = dict.gallerySection;
-  const isEmpty = pictures.length === 0 && videos.length === 0;
+  const dateLocale = L === "ar" ? "ar-JO" : "en-GB";
+  const generalLabel = L === "ar" ? "عام" : "General";
 
   return (
     <DetailPageShell dict={dict} locale={L}>
@@ -27,19 +28,60 @@ export default async function GalleryPage({
       <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{t.title}</h1>
       <p className="mt-4 max-w-3xl text-base text-ink-muted md:text-lg">{t.body}</p>
 
-      {isEmpty && (
+      {folders.length === 0 && (
         <p className="mt-12 rounded-2xl border border-line bg-white p-8 text-center text-sm text-ink-muted">
           {t.empty}
         </p>
       )}
 
-      {pictures.length > 0 && (
-        <section className="mt-10">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+      <div className="mt-10 space-y-14">
+        {folders.map((folder) => (
+          <GalleryFolderSection
+            key={folder.key}
+            folder={folder}
+            title={folder.title || generalLabel}
+            dateLocale={dateLocale}
+            t={t}
+          />
+        ))}
+      </div>
+    </DetailPageShell>
+  );
+}
+
+function GalleryFolderSection({
+  folder,
+  title,
+  dateLocale,
+  t,
+}: {
+  folder: GalleryFolder;
+  title: string;
+  dateLocale: string;
+  t: { pictures: string; videos: string };
+}) {
+  return (
+    <section>
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line pb-3">
+        <h2 className="text-xl font-bold tracking-tight text-ink">{title}</h2>
+        {folder.date && (
+          <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+            {new Date(folder.date).toLocaleDateString(dateLocale, {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
+        )}
+      </div>
+
+      {folder.pictures.length > 0 && (
+        <>
+          <h3 className="mt-5 text-xs font-semibold uppercase tracking-widest text-ink-muted">
             {t.pictures}
-          </h2>
-          <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {pictures.map((p) => (
+          </h3>
+          <ul className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {folder.pictures.map((p) => (
               <li key={p.id}>
                 <a
                   href={p.url}
@@ -56,26 +98,25 @@ export default async function GalleryPage({
                       loading="lazy"
                     />
                   </div>
-                  <div className="p-4">
-                    <p className="text-sm font-semibold">{p.title}</p>
-                    {p.description && (
-                      <p className="mt-1 line-clamp-2 text-xs text-ink-muted">{p.description}</p>
-                    )}
-                  </div>
+                  {p.title && (
+                    <div className="p-4">
+                      <p className="text-sm font-semibold">{p.title}</p>
+                    </div>
+                  )}
                 </a>
               </li>
             ))}
           </ul>
-        </section>
+        </>
       )}
 
-      {videos.length > 0 && (
-        <section className="mt-12">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+      {folder.videos.length > 0 && (
+        <>
+          <h3 className="mt-6 text-xs font-semibold uppercase tracking-widest text-ink-muted">
             {t.videos}
-          </h2>
-          <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {videos.map((v) => {
+          </h3>
+          <ul className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {folder.videos.map((v) => {
               const yt = youtubeId(v.url);
               const thumb = yt ? `https://img.youtube.com/vi/${yt}/hqdefault.jpg` : null;
               const isFile = isVideoFileUrl(v.url);
@@ -117,21 +158,18 @@ export default async function GalleryPage({
                         )
                       )}
                     </div>
-                    <div className="p-4">
-                      <p className="text-sm font-semibold">{v.title}</p>
-                      {v.description && (
-                        <p className="mt-1 line-clamp-2 text-xs text-ink-muted">
-                          {v.description}
-                        </p>
-                      )}
-                    </div>
+                    {v.title && (
+                      <div className="p-4">
+                        <p className="text-sm font-semibold">{v.title}</p>
+                      </div>
+                    )}
                   </div>
                 </li>
               );
             })}
           </ul>
-        </section>
+        </>
       )}
-    </DetailPageShell>
+    </section>
   );
 }

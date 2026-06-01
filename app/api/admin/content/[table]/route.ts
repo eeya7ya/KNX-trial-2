@@ -45,14 +45,16 @@ export async function POST(req: Request, ctx: { params: Promise<{ table: string 
   await ensureSchema();
 
   if (table === "news") {
-    await sql`INSERT INTO news (title, body, image_url, published)
-      VALUES (${data.title}, ${data.body}, ${data.image_url}, ${data.published})`;
+    await sql`INSERT INTO news (title, body, image_url, event_date, published)
+      VALUES (${data.title}, ${data.body}, ${data.image_url}, ${data.event_date}, ${data.published})`;
   } else if (table === "videos") {
-    await sql`INSERT INTO videos (title, url, description, published)
-      VALUES (${data.title}, ${data.url}, ${data.description}, ${data.published})`;
+    await sql`INSERT INTO videos (title, url, description, news_id, published)
+      VALUES (${data.title}, ${data.url}, ${data.description},
+        ${data.news_id ? Number(data.news_id) : null}, ${data.published})`;
   } else if (table === "pictures") {
-    await sql`INSERT INTO pictures (title, url, description, published)
-      VALUES (${data.title}, ${data.url}, ${data.description}, ${data.published})`;
+    await sql`INSERT INTO pictures (title, url, description, news_id, published)
+      VALUES (${data.title}, ${data.url}, ${data.description},
+        ${data.news_id ? Number(data.news_id) : null}, ${data.published})`;
   } else if (table === "prompts") {
     await sql`INSERT INTO prompts (title, body, tags, published)
       VALUES (${data.title}, ${data.body}, ${data.tags}, ${data.published})`;

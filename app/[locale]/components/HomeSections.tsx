@@ -6,7 +6,9 @@ import { Header } from "./Header";
 import { Logo } from "./Logo";
 import { JoinForm } from "./JoinForm";
 import { Stats } from "./Stats";
-import { IconArrow } from "./Icons";
+import { IconArrow, IconBolt, IconUsers, IconBuilding, IconBook } from "./Icons";
+
+const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook];
 import { Avatar } from "./SectionDetails";
 import type { Dict, Locale } from "@/lib/i18n";
 import type { PublicContent } from "@/lib/db";
@@ -214,16 +216,23 @@ export function HomeSections({
           href={`/${locale}/services`}
           dir={dict.dir}
         >
-          <ul className="mt-6 grid w-full max-w-3xl grid-cols-2 gap-2 text-sm md:grid-cols-3">
-            {dict.services.items.slice(0, 6).map((it) => (
-              <li
-                key={it.title}
-                className="rounded-full border border-line bg-white px-3 py-1.5 text-center text-ink-muted"
-              >
-                {it.title}
-              </li>
-            ))}
-          </ul>
+          <div className="mt-8 grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {dict.services.items.slice(0, 4).map((it, i) => {
+              const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
+              return (
+                <div
+                  key={it.title}
+                  className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5 text-start transition hover:border-knx hover:shadow-sm"
+                >
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-knx-50 text-knx-700">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <p className="text-sm font-semibold text-ink">{it.title}</p>
+                  <p className="text-xs leading-relaxed text-ink-muted">{it.body}</p>
+                </div>
+              );
+            })}
+          </div>
         </BriefCard>
       </Section>
 
@@ -250,31 +259,41 @@ export function HomeSections({
           dir={dict.dir}
         >
           {content && content.team.length > 0 && (
-            <ul className="mt-6 grid w-full max-w-4xl grid-cols-2 gap-3 md:grid-cols-3">
-              {content.team.slice(0, 3).map((m) => (
+            <ul className="mt-6 grid w-full max-w-5xl grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {content.team.slice(0, 20).map((m) => (
                 <li
                   key={m.id}
-                  className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 text-start"
+                  className="flex items-center gap-2 rounded-xl border border-line bg-white p-2 text-start"
                 >
                   {m.photo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={m.photo_url}
                       alt={m.name}
-                      className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+                      className="h-9 w-9 flex-shrink-0 rounded-full object-cover object-top"
                       loading="lazy"
                     />
                   ) : (
                     <Avatar name={m.name} />
                   )}
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-ink">{m.name}</p>
+                    <p className="truncate text-xs font-semibold text-ink">{m.name}</p>
                     {m.role && (
-                      <p className="truncate text-xs text-ink-muted">{m.role}</p>
+                      <p className="truncate text-[10px] text-ink-muted">{m.role}</p>
                     )}
                   </div>
                 </li>
               ))}
+              {content.team.length > 20 && (
+                <li>
+                  <Link
+                    href={`/${locale}/members`}
+                    className="flex h-full items-center justify-center rounded-xl border border-dashed border-line bg-white p-2 text-sm font-semibold text-knx-700 transition hover:border-knx"
+                  >
+                    +{content.team.length - 20}
+                  </Link>
+                </li>
+              )}
             </ul>
           )}
         </BriefCard>
@@ -440,7 +459,7 @@ function LatestNewsSection({
       <article className="mt-10 grid items-stretch gap-0 overflow-hidden rounded-3xl border border-line bg-white shadow-sm md:grid-cols-2">
         <div className="flex flex-col justify-center p-6 md:p-10">
           <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-            {new Date(item.created_at).toLocaleDateString(
+            {new Date(item.event_date ?? item.created_at).toLocaleDateString(
               locale === "ar" ? "ar-JO" : "en-GB",
               { year: "numeric", month: "long", day: "numeric" },
             )}
