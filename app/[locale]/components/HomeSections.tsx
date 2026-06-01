@@ -6,7 +6,9 @@ import { Header } from "./Header";
 import { Logo } from "./Logo";
 import { JoinForm } from "./JoinForm";
 import { Stats } from "./Stats";
-import { IconArrow } from "./Icons";
+import { IconArrow, IconBolt, IconUsers, IconBuilding, IconBook } from "./Icons";
+
+const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook];
 import { Avatar } from "./SectionDetails";
 import type { Dict, Locale } from "@/lib/i18n";
 import type { PublicContent } from "@/lib/db";
@@ -214,16 +216,23 @@ export function HomeSections({
           href={`/${locale}/services`}
           dir={dict.dir}
         >
-          <ul className="mt-6 grid w-full max-w-3xl grid-cols-2 gap-2 text-sm md:grid-cols-3">
-            {dict.services.items.slice(0, 6).map((it) => (
-              <li
-                key={it.title}
-                className="rounded-full border border-line bg-white px-3 py-1.5 text-center text-ink-muted"
-              >
-                {it.title}
-              </li>
-            ))}
-          </ul>
+          <div className="mt-8 grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {dict.services.items.slice(0, 4).map((it, i) => {
+              const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
+              return (
+                <div
+                  key={it.title}
+                  className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5 text-start transition hover:border-knx hover:shadow-sm"
+                >
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-knx-50 text-knx-700">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <p className="text-sm font-semibold text-ink">{it.title}</p>
+                  <p className="text-xs leading-relaxed text-ink-muted">{it.body}</p>
+                </div>
+              );
+            })}
+          </div>
         </BriefCard>
       </Section>
 
