@@ -7,6 +7,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 export const metadata: Metadata = {
   title: "KNX Admin",
   robots: { index: false, follow: false },
+  manifest: "/admin/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "KNX Admin", statusBarStyle: "default" },
 };
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
