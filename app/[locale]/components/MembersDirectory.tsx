@@ -36,7 +36,7 @@ export function MembersDirectory({
                 <img
                   src={m.photo_url}
                   alt={m.name}
-                  className="h-20 w-20 flex-shrink-0 rounded-2xl object-cover"
+                  className="h-20 w-20 flex-shrink-0 rounded-2xl object-cover object-top"
                   loading="lazy"
                 />
               ) : (
@@ -125,7 +125,7 @@ function MemberModal({
               <img
                 src={member.photo_url}
                 alt={member.name}
-                className="h-40 w-40 rounded-2xl object-cover md:h-44 md:w-44"
+                className="h-40 w-40 rounded-2xl object-cover object-top md:h-44 md:w-44"
               />
             ) : (
               <span className="grid h-40 w-40 place-items-center rounded-2xl bg-white text-4xl font-bold text-knx-700 md:h-44 md:w-44">
