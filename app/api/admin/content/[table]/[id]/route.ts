@@ -42,6 +42,9 @@ export async function PATCH(
   } else if (table === "prompts") {
     await sql`UPDATE prompts SET title = ${d.title}, body = ${d.body},
       tags = ${d.tags}, published = ${d.published} WHERE id = ${numId}`;
+  } else if (table === "events") {
+    await sql`UPDATE events SET tag = ${d.tag}, title = ${d.title}, meta = ${d.meta},
+      event_date = ${d.event_date}, published = ${d.published} WHERE id = ${numId}`;
   } else if (table === "team_members") {
     await sql`UPDATE team_members SET name = ${d.name}, role = ${d.role},
       company = ${d.company}, photo_url = ${d.photo_url}, is_partner = ${d.is_partner},
@@ -69,6 +72,7 @@ export async function DELETE(
   else if (table === "videos") await sql`DELETE FROM videos WHERE id = ${numId}`;
   else if (table === "pictures") await sql`DELETE FROM pictures WHERE id = ${numId}`;
   else if (table === "prompts") await sql`DELETE FROM prompts WHERE id = ${numId}`;
+  else if (table === "events") await sql`DELETE FROM events WHERE id = ${numId}`;
   else if (table === "team_members") await sql`DELETE FROM team_members WHERE id = ${numId}`;
   return NextResponse.json({ ok: true });
 }

@@ -68,6 +68,15 @@ const META: Record<ContentTable, { label: string; fields: FieldMeta[] }> = {
       { name: "tags", label: "Tags (comma separated)", type: "text" },
     ],
   },
+  events: {
+    label: "Events",
+    fields: [
+      { name: "tag", label: "Type (e.g. Workshop, Meetup, Conference)", type: "text" },
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "meta", label: "Location & timing (e.g. Amman · Spring 2026)", type: "text" },
+      { name: "event_date", label: "Event date (optional, for ordering)", type: "datetime" },
+    ],
+  },
   team_members: {
     label: "Team",
     fields: [
@@ -107,6 +116,8 @@ async function loadRows(table: ContentTable): Promise<Row[]> {
     return (await sql`SELECT * FROM pictures ORDER BY created_at DESC LIMIT 200`) as Row[];
   if (table === "team_members")
     return (await sql`SELECT * FROM team_members ORDER BY is_partner DESC, created_at ASC LIMIT 200`) as Row[];
+  if (table === "events")
+    return (await sql`SELECT * FROM events ORDER BY COALESCE(event_date, created_at) ASC LIMIT 200`) as Row[];
   return (await sql`SELECT * FROM prompts ORDER BY created_at DESC LIMIT 200`) as Row[];
 }
 

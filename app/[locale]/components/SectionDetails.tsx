@@ -8,7 +8,7 @@ import {
   IconCheck,
 } from "./Icons";
 import type { Dict } from "@/lib/i18n";
-import type { TeamMemberItem } from "@/lib/db";
+import type { TeamMemberItem, EventItem } from "@/lib/db";
 import { MembersDirectory } from "./MembersDirectory";
 
 const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook, IconShield, IconBadge];
@@ -62,7 +62,12 @@ export function ServicesDetail({ dict }: { dict: Dict }) {
   );
 }
 
-export function EventsDetail({ dict }: { dict: Dict }) {
+export function EventsDetail({ dict, events }: { dict: Dict; events?: EventItem[] }) {
+  // Use admin-managed events when present; otherwise fall back to the built-in list.
+  const rows =
+    events && events.length > 0
+      ? events.map((e) => ({ tag: e.tag ?? "", title: e.title, meta: e.meta ?? "" }))
+      : dict.events.rows;
   return (
     <div>
       <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
@@ -71,17 +76,21 @@ export function EventsDetail({ dict }: { dict: Dict }) {
       <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{dict.events.title}</h1>
       <p className="mt-4 max-w-3xl text-base text-ink-muted md:text-lg">{dict.events.body}</p>
       <ul className="mt-8 overflow-hidden rounded-2xl border border-line bg-white">
-        {dict.events.rows.map((row, i) => (
+        {rows.map((row, i) => (
           <li
-            key={row.title}
+            key={`${row.title}-${i}`}
             className={`flex flex-wrap items-center justify-between gap-3 px-6 py-5 transition hover:bg-neutral-50 ${
               i !== 0 ? "border-t border-line" : ""
             }`}
           >
             <div className="flex flex-col">
-              <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">{row.tag}</span>
+              {row.tag && (
+                <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+                  {row.tag}
+                </span>
+              )}
               <span className="mt-1 text-base font-semibold">{row.title}</span>
-              <span className="mt-1 text-sm text-ink-muted">{row.meta}</span>
+              {row.meta && <span className="mt-1 text-sm text-ink-muted">{row.meta}</span>}
             </div>
             <span className="rounded-full border border-line px-3 py-1 text-xs font-medium text-ink-muted">
               {dict.events.soon}

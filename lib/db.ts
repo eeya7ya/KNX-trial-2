@@ -84,6 +84,17 @@ export function ensureSchema(): Promise<void> {
       )
     `;
     await sql`
+      CREATE TABLE IF NOT EXISTS events (
+        id          BIGSERIAL PRIMARY KEY,
+        tag         TEXT,
+        title       TEXT NOT NULL,
+        meta        TEXT,
+        event_date  TIMESTAMPTZ,
+        published   BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`
       CREATE TABLE IF NOT EXISTS team_members (
         id           BIGSERIAL PRIMARY KEY,
         name         TEXT NOT NULL,
@@ -118,7 +129,7 @@ export function ensureSchema(): Promise<void> {
   return schemaReady;
 }
 
-export const CONTENT_TABLES = ["news", "videos", "pictures", "prompts", "team_members"] as const;
+export const CONTENT_TABLES = ["news", "videos", "pictures", "prompts", "events", "team_members"] as const;
 export type ContentTable = (typeof CONTENT_TABLES)[number];
 
 export function isContentTable(value: string): value is ContentTable {
@@ -132,6 +143,7 @@ export const CONTENT_FIELDS: Record<ContentTable, string[]> = {
   videos: ["title", "url", "description", "news_id", "published"],
   pictures: ["title", "url", "description", "news_id", "published"],
   prompts: ["title", "body", "tags", "published"],
+  events: ["tag", "title", "meta", "event_date", "published"],
   team_members: [
     "name",
     "role",
@@ -206,6 +218,29 @@ export type NewsDetail = NewsItem & {
   pictures: PictureItem[];
   videos: VideoItem[];
 };
+export type EventItem = {
+  id: number;
+  tag: string | null;
+  title: string;
+  meta: string | null;
+  event_date: string | null;
+  created_at: string;
+};
+
+/** Published agenda entries, ordered chronologically by event date. */
+export async function getEvents(): Promise<EventItem[]> {
+  try {
+    await ensureSchema();
+    const rows = (await sql`
+      SELECT id, tag, title, meta, event_date, created_at FROM events
+      WHERE published = TRUE ORDER BY COALESCE(event_date, created_at) ASC
+    `) as unknown as EventItem[];
+    return rows;
+  } catch (err) {
+    console.error("getEvents error", err);
+    return [];
+  }
+}
 export type TeamMemberItem = {
   id: number;
   name: string;

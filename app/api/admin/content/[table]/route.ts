@@ -22,6 +22,8 @@ export async function GET(_: Request, ctx: { params: Promise<{ table: string }> 
     rows = await sql`SELECT * FROM pictures ORDER BY created_at DESC LIMIT 200`;
   else if (table === "prompts")
     rows = await sql`SELECT * FROM prompts ORDER BY created_at DESC LIMIT 200`;
+  else if (table === "events")
+    rows = await sql`SELECT * FROM events ORDER BY COALESCE(event_date, created_at) ASC LIMIT 200`;
   else if (table === "team_members")
     rows = await sql`SELECT * FROM team_members ORDER BY is_partner DESC, created_at ASC LIMIT 200`;
   return NextResponse.json({ ok: true, rows });
@@ -58,6 +60,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ table: string 
   } else if (table === "prompts") {
     await sql`INSERT INTO prompts (title, body, tags, published)
       VALUES (${data.title}, ${data.body}, ${data.tags}, ${data.published})`;
+  } else if (table === "events") {
+    await sql`INSERT INTO events (tag, title, meta, event_date, published)
+      VALUES (${data.tag}, ${data.title}, ${data.meta}, ${data.event_date}, ${data.published})`;
   } else if (table === "team_members") {
     await sql`INSERT INTO team_members
         (name, role, company, photo_url, is_partner, experience, phone, email, published)
