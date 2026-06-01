@@ -99,6 +99,10 @@ export function ensureSchema(): Promise<void> {
     await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS experience TEXT`;
     await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS phone TEXT`;
     await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS email TEXT`;
+    // News posts are events with a date; photos/videos can be attached to one.
+    await sql`ALTER TABLE news ADD COLUMN IF NOT EXISTS event_date TIMESTAMPTZ`;
+    await sql`ALTER TABLE pictures ADD COLUMN IF NOT EXISTS news_id BIGINT`;
+    await sql`ALTER TABLE videos ADD COLUMN IF NOT EXISTS news_id BIGINT`;
     // Editable homepage content (stats, about, services) keyed by section.
     await sql`
       CREATE TABLE IF NOT EXISTS site_settings (
@@ -124,9 +128,9 @@ export function isContentTable(value: string): value is ContentTable {
 // Column lists used by the admin create/update API. Keep in sync with the
 // admin form metadata in app/admin/content/[table]/page.tsx.
 export const CONTENT_FIELDS: Record<ContentTable, string[]> = {
-  news: ["title", "body", "image_url", "published"],
-  videos: ["title", "url", "description", "published"],
-  pictures: ["title", "url", "description", "published"],
+  news: ["title", "body", "image_url", "event_date", "published"],
+  videos: ["title", "url", "description", "news_id", "published"],
+  pictures: ["title", "url", "description", "news_id", "published"],
   prompts: ["title", "body", "tags", "published"],
   team_members: [
     "name",
@@ -169,6 +173,7 @@ export type NewsItem = {
   title: string;
   body: string;
   image_url: string | null;
+  event_date: string | null;
   created_at: string;
 };
 export type VideoItem = {
@@ -176,6 +181,7 @@ export type VideoItem = {
   title: string;
   url: string;
   description: string | null;
+  news_id: number | null;
   created_at: string;
 };
 export type PictureItem = {
@@ -183,7 +189,22 @@ export type PictureItem = {
   title: string;
   url: string;
   description: string | null;
+  news_id: number | null;
   created_at: string;
+};
+
+/** A gallery "folder" — an event (news post) with its media, or general media. */
+export type GalleryFolder = {
+  key: string;
+  title: string;
+  date: string | null;
+  pictures: PictureItem[];
+  videos: VideoItem[];
+};
+
+export type NewsDetail = NewsItem & {
+  pictures: PictureItem[];
+  videos: VideoItem[];
 };
 export type TeamMemberItem = {
   id: number;
@@ -210,11 +231,11 @@ export async function getPublicContent(): Promise<PublicContent> {
   try {
     await ensureSchema();
     const [news, videos, pictures, team] = await Promise.all([
-      sql`SELECT id, title, body, image_url, created_at FROM news
-          WHERE published = TRUE ORDER BY created_at DESC LIMIT 12`,
-      sql`SELECT id, title, url, description, created_at FROM videos
+      sql`SELECT id, title, body, image_url, event_date, created_at FROM news
+          WHERE published = TRUE ORDER BY COALESCE(event_date, created_at) DESC LIMIT 12`,
+      sql`SELECT id, title, url, description, news_id, created_at FROM videos
           WHERE published = TRUE ORDER BY created_at DESC LIMIT 24`,
-      sql`SELECT id, title, url, description, created_at FROM pictures
+      sql`SELECT id, title, url, description, news_id, created_at FROM pictures
           WHERE published = TRUE ORDER BY created_at DESC LIMIT 24`,
       sql`SELECT id, name, role, company, photo_url, is_partner,
                  experience, phone, email, created_at
@@ -239,12 +260,81 @@ export async function getNewsById(id: number): Promise<NewsItem | null> {
   try {
     await ensureSchema();
     const rows = (await sql`
-      SELECT id, title, body, image_url, created_at FROM news
+      SELECT id, title, body, image_url, event_date, created_at FROM news
       WHERE id = ${id} AND published = TRUE LIMIT 1
     `) as unknown as NewsItem[];
     return rows[0] ?? null;
   } catch (err) {
     console.error("getNewsById error", err);
     return null;
+  }
+}
+
+/** A single news event with all its attached (published) media. */
+export async function getNewsDetail(id: number): Promise<NewsDetail | null> {
+  try {
+    await ensureSchema();
+    const rows = (await sql`
+      SELECT id, title, body, image_url, event_date, created_at FROM news
+      WHERE id = ${id} AND published = TRUE LIMIT 1
+    `) as unknown as NewsItem[];
+    const item = rows[0];
+    if (!item) return null;
+    const [pics, vids] = await Promise.all([
+      sql`SELECT id, title, url, description, news_id, created_at FROM pictures
+          WHERE news_id = ${id} AND published = TRUE ORDER BY created_at ASC`,
+      sql`SELECT id, title, url, description, news_id, created_at FROM videos
+          WHERE news_id = ${id} AND published = TRUE ORDER BY created_at ASC`,
+    ]);
+    return {
+      ...item,
+      pictures: pics as unknown as PictureItem[],
+      videos: vids as unknown as VideoItem[],
+    };
+  } catch (err) {
+    console.error("getNewsDetail error", err);
+    return null;
+  }
+}
+
+/**
+ * Gallery folders. Media attached to a news event surfaces here only once the
+ * event is at least 7 days old (computed on read — no scheduled job). Media not
+ * attached to any event is always shown under a general folder.
+ */
+export async function getGallery(): Promise<GalleryFolder[]> {
+  try {
+    await ensureSchema();
+    const [events, pics, vids] = await Promise.all([
+      sql`SELECT id, title, COALESCE(event_date, created_at) AS date FROM news
+          WHERE published = TRUE
+            AND COALESCE(event_date, created_at) <= NOW() - INTERVAL '7 days'
+          ORDER BY COALESCE(event_date, created_at) DESC`,
+      sql`SELECT id, title, url, description, news_id, created_at FROM pictures
+          WHERE published = TRUE ORDER BY created_at DESC`,
+      sql`SELECT id, title, url, description, news_id, created_at FROM videos
+          WHERE published = TRUE ORDER BY created_at DESC`,
+    ]);
+    const pictures = pics as unknown as PictureItem[];
+    const videos = vids as unknown as VideoItem[];
+    const eventRows = events as unknown as { id: number; title: string; date: string }[];
+
+    const folders: GalleryFolder[] = [];
+    for (const ev of eventRows) {
+      const fp = pictures.filter((p) => Number(p.news_id) === ev.id);
+      const fv = videos.filter((v) => Number(v.news_id) === ev.id);
+      if (fp.length === 0 && fv.length === 0) continue;
+      folders.push({ key: `e${ev.id}`, title: ev.title, date: ev.date, pictures: fp, videos: fv });
+    }
+    // Unattached media — always visible.
+    const gp = pictures.filter((p) => p.news_id == null);
+    const gv = videos.filter((v) => v.news_id == null);
+    if (gp.length > 0 || gv.length > 0) {
+      folders.push({ key: "general", title: "", date: null, pictures: gp, videos: gv });
+    }
+    return folders;
+  } catch (err) {
+    console.error("getGallery error", err);
+    return [];
   }
 }

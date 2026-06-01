@@ -459,7 +459,7 @@ function LatestNewsSection({
       <article className="mt-10 grid items-stretch gap-0 overflow-hidden rounded-3xl border border-line bg-white shadow-sm md:grid-cols-2">
         <div className="flex flex-col justify-center p-6 md:p-10">
           <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-            {new Date(item.created_at).toLocaleDateString(
+            {new Date(item.event_date ?? item.created_at).toLocaleDateString(
               locale === "ar" ? "ar-JO" : "en-GB",
               { year: "numeric", month: "long", day: "numeric" },
             )}

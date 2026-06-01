@@ -29,13 +29,16 @@ export async function PATCH(
 
   if (table === "news") {
     await sql`UPDATE news SET title = ${d.title}, body = ${d.body},
-      image_url = ${d.image_url}, published = ${d.published} WHERE id = ${numId}`;
+      image_url = ${d.image_url}, event_date = ${d.event_date},
+      published = ${d.published} WHERE id = ${numId}`;
   } else if (table === "videos") {
     await sql`UPDATE videos SET title = ${d.title}, url = ${d.url},
-      description = ${d.description}, published = ${d.published} WHERE id = ${numId}`;
+      description = ${d.description}, news_id = ${d.news_id ? Number(d.news_id) : null},
+      published = ${d.published} WHERE id = ${numId}`;
   } else if (table === "pictures") {
     await sql`UPDATE pictures SET title = ${d.title}, url = ${d.url},
-      description = ${d.description}, published = ${d.published} WHERE id = ${numId}`;
+      description = ${d.description}, news_id = ${d.news_id ? Number(d.news_id) : null},
+      published = ${d.published} WHERE id = ${numId}`;
   } else if (table === "prompts") {
     await sql`UPDATE prompts SET title = ${d.title}, body = ${d.body},
       tags = ${d.tags}, published = ${d.published} WHERE id = ${numId}`;

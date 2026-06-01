@@ -52,7 +52,7 @@ export default async function NewsListPage({
                 </div>
                 <div className="flex flex-1 flex-col p-5">
                   <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-                    {new Date(n.created_at).toLocaleDateString(dateLocale, {
+                    {new Date(n.event_date ?? n.created_at).toLocaleDateString(dateLocale, {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
