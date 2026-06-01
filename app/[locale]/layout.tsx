@@ -98,7 +98,7 @@ export async function generateMetadata({
         "max-snippet": -1,
       },
     },
-    icons: { icon: "/KNX_logo.svg.png" },
+    // Icons are generated as square tiles by app/icon.tsx & app/apple-icon.tsx.
   };
 }
 
