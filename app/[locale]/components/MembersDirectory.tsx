@@ -155,9 +155,9 @@ function MemberModal({
                 href={member.phone ? `tel:${member.phone.replace(/\s+/g, "")}` : undefined}
               />
               <Detail
-                label="Contact email"
+                label="URL"
                 value={member.email}
-                href={member.email ? `mailto:${member.email}` : undefined}
+                href={member.email ?? undefined}
               />
             </dl>
           </div>

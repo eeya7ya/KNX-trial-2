@@ -90,7 +90,7 @@ export function HomeSections({
     }
 
     function onKey(e: KeyboardEvent) {
-      if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
+      if (e.key === "ArrowDown" || e.key === "PageDown") {
         e.preventDefault();
         if (!locked) goTo(activeIndex + 1);
       } else if (e.key === "ArrowUp" || e.key === "PageUp") {
