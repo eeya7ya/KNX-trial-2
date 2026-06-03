@@ -6,6 +6,7 @@ import { Header } from "./Header";
 import { Logo } from "./Logo";
 import { JoinForm } from "./JoinForm";
 import { Stats } from "./Stats";
+import { Globe } from "./Globe";
 import { IconArrow, IconBolt, IconUsers, IconBuilding, IconBook } from "./Icons";
 
 const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook];
@@ -217,16 +218,35 @@ export function HomeSections({
         <Stats items={dict.stats} className="mt-6 md:mt-8" />
       </section>
 
-      {/* ABOUT — brief */}
+      {/* ABOUT — brief, with an interactive 3D globe on the right */}
       <Section id="about">
-        <BriefCard
-          eyebrow={dict.about.eyebrow}
-          title={dict.about.title}
-          body={dict.about.body}
-          cta={dict.detailCta}
-          href={`/${locale}/about`}
-          dir={dict.dir}
-        />
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-6 md:gap-14 lg:grid-cols-2">
+          <div className="text-center rtl:lg:order-2 lg:text-start">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-knx-700">
+              <span className="h-px w-8 bg-knx-700" />
+              {dict.about.eyebrow}
+            </span>
+            <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+              {dict.about.title}
+            </h2>
+            <p className="mx-auto mt-5 max-w-xl text-base text-ink-muted md:text-lg lg:mx-0">
+              {dict.about.body}
+            </p>
+            <Link
+              href={`/${locale}/about`}
+              className="group mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-knx-700"
+            >
+              {dict.detailCta}
+              <IconArrow
+                className="h-4 w-4 transition group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
+                dir={dict.dir}
+              />
+            </Link>
+          </div>
+          <div className="flex justify-center rtl:lg:order-1">
+            <Globe />
+          </div>
+        </div>
       </Section>
 
       {/* SERVICES — brief */}
