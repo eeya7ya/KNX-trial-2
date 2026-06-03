@@ -7,21 +7,39 @@ import {
   IconBadge,
   IconCheck,
 } from "./Icons";
+import type { ReactNode } from "react";
 import type { Dict } from "@/lib/i18n";
 import type { TeamMemberItem } from "@/lib/db";
 import { MembersDirectory } from "./MembersDirectory";
 
 const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook, IconShield, IconBadge];
 
-export function AboutDetail({ dict }: { dict: Dict }) {
+export function AboutDetail({
+  dict,
+  globe,
+}: {
+  dict: Dict;
+  globe?: ReactNode;
+}) {
   return (
     <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
-        {dict.about.eyebrow}
-      </span>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{dict.about.title}</h1>
-      <p className="mt-4 max-w-3xl text-base text-ink-muted md:text-lg">{dict.about.body}</p>
-      <ul className="mt-10 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
+      <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
+        {/* Text — left-hand side */}
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+            {dict.about.eyebrow}
+          </span>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+            {dict.about.title}
+          </h1>
+          <p className="mt-4 text-base text-ink-muted md:text-lg">{dict.about.body}</p>
+        </div>
+        {/* 3D Earth — right-hand side */}
+        {globe && (
+          <div className="flex justify-center lg:justify-end">{globe}</div>
+        )}
+      </div>
+      <ul className="mt-12 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
         {dict.about.pillars.map((p) => (
           <li key={p.title} className="bg-white p-6">
             <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-knx-50 text-knx-700">
