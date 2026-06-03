@@ -6,6 +6,7 @@ import { Header } from "./Header";
 import { Logo } from "./Logo";
 import { JoinForm } from "./JoinForm";
 import { Stats } from "./Stats";
+import { Globe } from "./Globe";
 import { IconArrow, IconBolt, IconUsers, IconBuilding, IconBook } from "./Icons";
 
 const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook];
@@ -37,18 +38,30 @@ export function HomeSections({
     );
     if (pages.length === 0) return;
 
+    // Hide page content until it is first revealed — see globals.css. This is
+    // what removes the swap flicker, so only opt in once the controller runs.
+    root.classList.add("knx-snap-js");
+
     let activeIndex = 0;
     let locked = false;
     let unlockTimer: ReturnType<typeof setTimeout> | null = null;
 
-    function setActive(i: number) {
-      if (i === activeIndex) return;
-      pages[activeIndex]?.classList.remove("knx-page-active");
-      pages[i]?.classList.add("knx-page-active");
-      activeIndex = i;
+    // Each page animates in exactly once; revisiting it never re-triggers the
+    // entrance animation (which is what used to flash on every swap).
+    const revealed = new Set<number>();
+    function reveal(i: number) {
+      if (i < 0 || i >= pages.length || revealed.has(i)) return;
+      revealed.add(i);
+      pages[i].classList.add("knx-page-active");
     }
 
-    pages[0].classList.add("knx-page-active");
+    function setActive(i: number) {
+      if (i === activeIndex) return;
+      activeIndex = i;
+      reveal(i);
+    }
+
+    reveal(0);
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -65,6 +78,15 @@ export function HomeSections({
       { root, threshold: [0.5] },
     );
     pages.forEach((p) => io.observe(p));
+
+    // Keyboard users tabbing into a not-yet-revealed section should see it.
+    function onFocusIn(e: FocusEvent) {
+      const page = (e.target as HTMLElement | null)?.closest<HTMLElement>(
+        ".knx-snap-page",
+      );
+      if (page) reveal(pages.indexOf(page));
+    }
+    root.addEventListener("focusin", onFocusIn);
 
     function lock(ms: number) {
       locked = true;
@@ -119,6 +141,8 @@ export function HomeSections({
 
     return () => {
       io.disconnect();
+      root.classList.remove("knx-snap-js");
+      root.removeEventListener("focusin", onFocusIn);
       root.removeEventListener("wheel", onWheel);
       root.removeEventListener("touchstart", onTouchStart);
       root.removeEventListener("touchend", onTouchEnd);
@@ -194,16 +218,35 @@ export function HomeSections({
         <Stats items={dict.stats} className="mt-6 md:mt-8" />
       </section>
 
-      {/* ABOUT — brief */}
+      {/* ABOUT — brief, with an interactive 3D globe on the right */}
       <Section id="about">
-        <BriefCard
-          eyebrow={dict.about.eyebrow}
-          title={dict.about.title}
-          body={dict.about.body}
-          cta={dict.detailCta}
-          href={`/${locale}/about`}
-          dir={dict.dir}
-        />
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-6 md:gap-14 lg:grid-cols-2">
+          <div className="text-center rtl:lg:order-2 lg:text-start">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-knx-700">
+              <span className="h-px w-8 bg-knx-700" />
+              {dict.about.eyebrow}
+            </span>
+            <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+              {dict.about.title}
+            </h2>
+            <p className="mx-auto mt-5 max-w-xl text-base text-ink-muted md:text-lg lg:mx-0">
+              {dict.about.body}
+            </p>
+            <Link
+              href={`/${locale}/about`}
+              className="group mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-knx-700"
+            >
+              {dict.detailCta}
+              <IconArrow
+                className="h-4 w-4 transition group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
+                dir={dict.dir}
+              />
+            </Link>
+          </div>
+          <div className="flex justify-center rtl:lg:order-1">
+            <Globe />
+          </div>
+        </div>
       </Section>
 
       {/* SERVICES — brief */}

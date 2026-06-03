@@ -114,9 +114,16 @@ html[dir="ltr"] body {
   }
 }
 
-.knx-page-active > * {
+/* The snap controller adds `.knx-snap-js` to the root once it mounts. Until a
+   page is revealed (the first time it becomes active) its content stays hidden,
+   so a fully-rendered section never flashes visible → hidden → fade-in as it
+   animates in mid-scroll. Without JS, content is shown normally. */
+.knx-snap-js .knx-snap-page > * {
+  opacity: 0;
+}
+
+.knx-snap-js .knx-snap-page.knx-page-active > * {
   animation: knx-page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-  will-change: opacity, transform;
 }
 
 @supports not (height: 100svh) {
@@ -132,7 +139,9 @@ html[dir="ltr"] body {
   .knx-snap-root {
     scroll-behavior: auto;
   }
-  .knx-page-active > * {
+  .knx-snap-js .knx-snap-page > *,
+  .knx-snap-js .knx-snap-page.knx-page-active > * {
+    opacity: 1;
     animation: none;
   }
 }
