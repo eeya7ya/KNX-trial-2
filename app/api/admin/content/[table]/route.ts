@@ -23,7 +23,7 @@ export async function GET(_: Request, ctx: { params: Promise<{ table: string }> 
   else if (table === "prompts")
     rows = await sql`SELECT * FROM prompts ORDER BY created_at DESC LIMIT 200`;
   else if (table === "team_members")
-    rows = await sql`SELECT * FROM team_members ORDER BY is_partner DESC, created_at ASC LIMIT 200`;
+    rows = await sql`SELECT * FROM team_members ORDER BY sort_order ASC NULLS LAST, created_at ASC LIMIT 200`;
   return NextResponse.json({ ok: true, rows });
 }
 
