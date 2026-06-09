@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type {
   LocalizedAbout,
+  LocalizedFaq,
   LocalizedServices,
   LocalizedStats,
 } from "@/lib/site-content";
@@ -12,10 +13,12 @@ type Initial = {
   stats: LocalizedStats;
   about: LocalizedAbout;
   services: LocalizedServices;
+  faq: LocalizedFaq;
 };
 
 type StatRow = { value_en: string; label_en: string; value_ar: string; label_ar: string };
 type ServiceRow = { title_en: string; body_en: string; title_ar: string; body_ar: string };
+type FaqRow = { q_en: string; a_en: string; q_ar: string; a_ar: string };
 
 export function SiteContentEditor({ initial }: { initial: Initial }) {
   const router = useRouter();
@@ -47,6 +50,15 @@ export function SiteContentEditor({ initial }: { initial: Initial }) {
     })),
   );
 
+  const [faq, setFaq] = useState<FaqRow[]>(() =>
+    initial.faq.en.map((f, i) => ({
+      q_en: f.q,
+      a_en: f.a,
+      q_ar: initial.faq.ar[i]?.q ?? "",
+      a_ar: initial.faq.ar[i]?.a ?? "",
+    })),
+  );
+
   function updateStat(i: number, key: keyof StatRow, v: string) {
     setStats((rows) => rows.map((r, j) => (j === i ? { ...r, [key]: v } : r)));
   }
@@ -58,6 +70,15 @@ export function SiteContentEditor({ initial }: { initial: Initial }) {
   }
   function removeService(i: number) {
     setServices((rows) => rows.filter((_, j) => j !== i));
+  }
+  function updateFaq(i: number, key: keyof FaqRow, v: string) {
+    setFaq((rows) => rows.map((r, j) => (j === i ? { ...r, [key]: v } : r)));
+  }
+  function addFaq() {
+    setFaq((rows) => [...rows, { q_en: "", a_en: "", q_ar: "", a_ar: "" }]);
+  }
+  function removeFaq(i: number) {
+    setFaq((rows) => rows.filter((_, j) => j !== i));
   }
 
   async function save() {
@@ -79,6 +100,14 @@ export function SiteContentEditor({ initial }: { initial: Initial }) {
         ar: services
           .filter((s) => s.title_en.trim() || s.title_ar.trim())
           .map((s) => ({ title: s.title_ar, body: s.body_ar })),
+      },
+      faq: {
+        en: faq
+          .filter((f) => f.q_en.trim() || f.q_ar.trim())
+          .map((f) => ({ q: f.q_en, a: f.a_en })),
+        ar: faq
+          .filter((f) => f.q_en.trim() || f.q_ar.trim())
+          .map((f) => ({ q: f.q_ar, a: f.a_ar })),
       },
     };
     try {
@@ -256,6 +285,78 @@ export function SiteContentEditor({ initial }: { initial: Initial }) {
           ))}
           {services.length === 0 && (
             <p className="text-sm text-ink-muted">No services. Add one above.</p>
+          )}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="rounded-2xl border border-line bg-white p-5 md:p-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">FAQ</h2>
+          <button
+            type="button"
+            onClick={addFaq}
+            className="rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-ink transition hover:border-ink"
+          >
+            + Add question
+          </button>
+        </div>
+        <p className="mt-1 text-sm text-ink-muted">
+          Questions and answers shown on the homepage FAQ section and the FAQ page.
+        </p>
+        <div className="mt-4 space-y-4">
+          {faq.map((f, i) => (
+            <div key={i} className="rounded-xl border border-line p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                  Question {i + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeFaq(i)}
+                  className="rounded-full border border-line px-3 py-1 text-xs text-ink-muted transition hover:border-red-400 hover:text-red-600"
+                >
+                  Remove
+                </button>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <Field label="Question (EN)">
+                  <input
+                    value={f.q_en}
+                    onChange={(e) => updateFaq(i, "q_en", e.target.value)}
+                    className={inputCls}
+                  />
+                </Field>
+                <Field label="Question (AR)">
+                  <input
+                    dir="rtl"
+                    value={f.q_ar}
+                    onChange={(e) => updateFaq(i, "q_ar", e.target.value)}
+                    className={inputCls}
+                  />
+                </Field>
+                <Field label="Answer (EN)">
+                  <textarea
+                    rows={3}
+                    value={f.a_en}
+                    onChange={(e) => updateFaq(i, "a_en", e.target.value)}
+                    className={inputCls}
+                  />
+                </Field>
+                <Field label="Answer (AR)">
+                  <textarea
+                    dir="rtl"
+                    rows={3}
+                    value={f.a_ar}
+                    onChange={(e) => updateFaq(i, "a_ar", e.target.value)}
+                    className={inputCls}
+                  />
+                </Field>
+              </div>
+            </div>
+          ))}
+          {faq.length === 0 && (
+            <p className="text-sm text-ink-muted">No questions. Add one above.</p>
           )}
         </div>
       </section>

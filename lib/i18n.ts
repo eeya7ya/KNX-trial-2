@@ -238,7 +238,11 @@ const ar: Dict = {
     items: [
       {
         q: "هل العضوية مدفوعة؟",
-        a: "العضوية الأساسية مجانية حالياً، مع خيارات للعضوية المهنية لاحقاً.",
+        a: "نعم، العضوية مدفوعة كون نشاطات النادي بتمويل ذاتي من اشتراكات الأعضاء، وتختلف قيمة الاشتراك حسب نوعية العضوية: عضوية الشركات، عضوية الطلاب، وعضوية الأفراد.",
+      },
+      {
+        q: "هل النادي تابع لشركة معينة؟",
+        a: "لا، النادي جهة مستقلة غير ربحية تهدف لنشر تقنية KNX في الأردن.",
       },
       {
         q: "هل يجب أن أكون شريك KNX معتمداً؟",
@@ -412,7 +416,11 @@ const en: Dict = {
     items: [
       {
         q: "Is membership paid?",
-        a: "Basic membership is currently free, with paid professional tiers planned later.",
+        a: "Yes — membership is paid, as the club's activities are self-funded through member subscriptions. The fee depends on the membership type: corporate, student, or individual.",
+      },
+      {
+        q: "Is the club affiliated with a specific company?",
+        a: "No. The club is an independent non-profit body that aims to spread KNX technology in Jordan.",
       },
       {
         q: "Do I need to be a certified KNX Partner?",

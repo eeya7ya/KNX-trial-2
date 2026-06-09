@@ -14,8 +14,8 @@ export default async function SiteContentPage() {
     <AdminShell>
       <h1 className="text-2xl font-bold tracking-tight">Homepage content</h1>
       <p className="mt-2 text-sm text-ink-muted">
-        Edit the homepage stats, the About section, and the Services cards. Changes apply to
-        both the English and Arabic sites.
+        Edit the homepage stats, the About section, the Services cards, and the FAQ. Changes
+        apply to both the English and Arabic sites.
       </p>
       <SiteContentEditor initial={content} />
     </AdminShell>

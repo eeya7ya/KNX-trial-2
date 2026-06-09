@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 /**
  * Upsert one or more editable homepage sections. Body may contain any of the
- * keys in SITE_SETTING_KEYS (stats, about, services); each present key is
+ * keys in SITE_SETTING_KEYS (stats, about, services, faq); each present key is
  * stored as JSON and overrides the static i18n defaults.
  */
 export async function POST(req: Request) {

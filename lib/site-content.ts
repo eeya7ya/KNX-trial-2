@@ -10,18 +10,21 @@ import { getDict, locales, type Dict, type Locale } from "./i18n";
 export type StatEntry = { value: string; label: string };
 export type AboutEntry = { title: string; body: string };
 export type ServiceEntry = { title: string; body: string };
+export type FaqEntry = { q: string; a: string };
 
 export type LocalizedStats = Record<Locale, StatEntry[]>;
 export type LocalizedAbout = Record<Locale, AboutEntry>;
 export type LocalizedServices = Record<Locale, ServiceEntry[]>;
+export type LocalizedFaq = Record<Locale, FaqEntry[]>;
 
 export type SiteSettings = {
   stats?: LocalizedStats;
   about?: LocalizedAbout;
   services?: LocalizedServices;
+  faq?: LocalizedFaq;
 };
 
-export const SITE_SETTING_KEYS = ["stats", "about", "services"] as const;
+export const SITE_SETTING_KEYS = ["stats", "about", "services", "faq"] as const;
 export type SiteSettingKey = (typeof SITE_SETTING_KEYS)[number];
 
 export function isSiteSettingKey(value: string): value is SiteSettingKey {
@@ -41,6 +44,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       if (r.key === "stats") out.stats = r.value as LocalizedStats;
       else if (r.key === "about") out.about = r.value as LocalizedAbout;
       else if (r.key === "services") out.services = r.value as LocalizedServices;
+      else if (r.key === "faq") out.faq = r.value as LocalizedFaq;
     }
     return out;
   } catch (err) {
@@ -58,6 +62,7 @@ export function applySiteSettings(
   const stats = settings.stats?.[locale];
   const about = settings.about?.[locale];
   const services = settings.services?.[locale];
+  const faq = settings.faq?.[locale];
   return {
     ...dict,
     stats: stats && stats.length ? stats : dict.stats,
@@ -72,6 +77,7 @@ export function applySiteSettings(
       services && services.length
         ? { ...dict.services, items: services }
         : dict.services,
+    faq: faq && faq.length ? { ...dict.faq, items: faq } : dict.faq,
   };
 }
 
@@ -89,11 +95,13 @@ export async function getEditableContent(): Promise<{
   stats: LocalizedStats;
   about: LocalizedAbout;
   services: LocalizedServices;
+  faq: LocalizedFaq;
 }> {
   const settings = await getSiteSettings();
   const stats = {} as LocalizedStats;
   const about = {} as LocalizedAbout;
   const services = {} as LocalizedServices;
+  const faq = {} as LocalizedFaq;
   for (const locale of locales) {
     const dict = applySiteSettings(getDict(locale), locale, settings);
     stats[locale] = dict.stats.map((s) => ({ value: s.value, label: s.label }));
@@ -102,6 +110,7 @@ export async function getEditableContent(): Promise<{
       title: s.title,
       body: s.body,
     }));
+    faq[locale] = dict.faq.items.map((f) => ({ q: f.q, a: f.a }));
   }
-  return { stats, about, services };
+  return { stats, about, services, faq };
 }

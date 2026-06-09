@@ -156,8 +156,8 @@ function MemberModal({
               />
               <Detail
                 label="URL"
-                value={member.email}
-                href={member.email ?? undefined}
+                value={memberLink(member.email)?.display ?? member.email}
+                href={memberLink(member.email)?.href}
               />
             </dl>
           </div>
@@ -165,6 +165,22 @@ function MemberModal({
       </div>
     </div>
   );
+}
+
+// Profile links pasted from apps carry tracking params (utm_*) that bloat the
+// visible URL; strip them and show only host + path.
+function memberLink(raw: string | null): { href: string; display: string } | null {
+  if (!raw || !/^(https?:\/\/|www\.)/i.test(raw.trim())) return null;
+  try {
+    const url = new URL(raw.trim().startsWith("http") ? raw.trim() : `https://${raw.trim()}`);
+    for (const key of [...url.searchParams.keys()]) {
+      if (key.startsWith("utm_")) url.searchParams.delete(key);
+    }
+    const display = `${url.hostname.replace(/^www\./, "")}${url.pathname.replace(/\/$/, "")}`;
+    return { href: url.toString(), display };
+  } catch {
+    return null;
+  }
 }
 
 function Detail({
@@ -177,12 +193,18 @@ function Detail({
   href?: string;
 }) {
   if (!value) return null;
+  const external = href?.startsWith("http");
   return (
     <div>
       <dt className="text-xs font-semibold uppercase tracking-widest text-knx-700">{label}</dt>
-      <dd className="mt-1 text-ink">
+      <dd className="mt-1 break-all text-ink">
         {href ? (
-          <a href={href} className="font-medium text-ink hover:text-knx-700">
+          <a
+            href={href}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noopener noreferrer" : undefined}
+            className="font-medium text-ink hover:text-knx-700"
+          >
             {value}
           </a>
         ) : (
