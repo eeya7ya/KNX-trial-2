@@ -33,9 +33,20 @@ export function DetailPageShell({
       </main>
       <footer className="border-t border-line bg-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">
-          <p className="text-xs text-ink-muted md:text-sm">
-            © {new Date().getFullYear()} KNX Club Jordan. {dict.footer.rights}
-          </p>
+          <div>
+            <p className="text-xs text-ink-muted md:text-sm">
+              © {new Date().getFullYear()} KNX Club Jordan. {dict.footer.rights}
+            </p>
+            <a
+              href="https://espark.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              dir="ltr"
+              className="mt-1 block text-[10px] text-ink-muted/50 transition hover:text-ink-muted"
+            >
+              Designed by espark.dev
+            </a>
+          </div>
           <Logo className="h-7 w-auto" />
         </div>
       </footer>
