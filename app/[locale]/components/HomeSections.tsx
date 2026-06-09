@@ -31,6 +31,15 @@ export function HomeSections({
     const root = rootRef.current;
     if (!root) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Touch / small screens scroll naturally — never hijack their swipes. The
+    // matching CSS (globals.css) disables snap there too. Keeping the wheel/
+    // touch controller desktop-only is what fixes the trapped-button problem
+    // and the janky mobile/iOS scrolling.
+    if (
+      window.matchMedia("(max-width: 1023px)").matches ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches
+    )
+      return;
 
     const pages = Array.from(
       root.querySelectorAll<HTMLElement>(".knx-snap-page"),

@@ -191,6 +191,99 @@ export async function sendAutoReply(opts: {
   }
 }
 
+function renderCustomHtml(subject: string, body: string, logoUrl: string): string {
+  // Auto-detect direction so Arabic and English both render naturally.
+  const rtl = /[؀-ۿ]/.test(body + subject);
+  const dir = rtl ? "rtl" : "ltr";
+  const align = rtl ? "right" : "left";
+  const bodyHtml = escapeHtml(body).replace(/\r?\n/g, "<br />");
+  return `<!DOCTYPE html>
+<html lang="${rtl ? "ar" : "en"}" dir="${dir}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>${escapeHtml(subject)}</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f6f6f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,Arial,sans-serif;color:#1a1a1a;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f6f6f4;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #ececea;">
+            <tr>
+              <td style="padding:36px 36px 8px 36px;direction:${dir};text-align:${align};">
+                <p style="margin:0 0 14px 0;font-size:16px;line-height:1.7;color:#1a1a1a;">
+                  ${bodyHtml}
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:0 36px;">
+                <hr style="border:none;border-top:1px solid #ececea;margin:0;" />
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:24px 36px 32px 36px;">
+                <img src="${logoUrl}" alt="KNX Club Jordan" width="120" style="display:block;max-width:120px;height:auto;border:0;outline:none;text-decoration:none;" />
+                <p style="margin:14px 0 0 0;font-size:12px;line-height:1.6;color:#8a8a86;">
+                  KNX Club Jordan — Amman, Jordan
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+/**
+ * Send a one-off email composed in the admin panel. Throws on failure so the
+ * caller can record the error. Returns the Resend message id on success.
+ */
+export async function sendEmail(opts: {
+  to: string;
+  subject: string;
+  body: string;
+  replyTo?: string;
+}): Promise<{ id: string | null }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM;
+  if (!apiKey || !from) {
+    throw new Error("RESEND_API_KEY or RESEND_FROM is not set");
+  }
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://knx-jordan-club.com";
+  const logoUrl = process.env.EMAIL_LOGO_URL || `${siteUrl}/KNX_logo.svg.png`;
+
+  const html = renderCustomHtml(opts.subject, opts.body, logoUrl);
+
+  const res = await fetch(RESEND_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [opts.to],
+      reply_to: opts.replyTo || process.env.ADMIN_EMAIL || undefined,
+      subject: opts.subject,
+      html,
+      text: opts.body,
+    }),
+  });
+
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => "");
+    throw new Error(`Resend error ${res.status}: ${errBody}`);
+  }
+
+  const data = (await res.json().catch(() => null)) as { id?: string } | null;
+  return { id: data?.id ?? null };
+}
+
 export type AdminNotificationField = { label: string; value: string };
 
 function renderAdminHtml(opts: {
