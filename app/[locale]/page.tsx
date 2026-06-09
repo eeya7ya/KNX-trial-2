@@ -35,9 +35,10 @@ export default async function Page({
                 target="_blank"
                 rel="noopener noreferrer"
                 dir="ltr"
-                className="mt-1 block text-[10px] text-ink-muted/50 transition hover:text-ink-muted"
+                className="mt-1 block text-xs text-ink-muted/70 transition hover:text-ink-muted"
               >
-                Designed by espark.dev
+                Designed by{" "}
+                <span className="font-semibold text-knx-700">espark.dev</span>
               </a>
             </div>
             <Logo className="h-7 w-auto" />
