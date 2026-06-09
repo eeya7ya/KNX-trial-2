@@ -135,6 +135,35 @@ html[dir="ltr"] body {
   }
 }
 
+/* Mobile / touch devices: turn OFF the full-page snap entirely and let the
+   document scroll naturally. Mandatory snapping + a fixed-height scroll
+   container traps any section taller than the viewport (e.g. the "view
+   details" CTA at the bottom of a section becomes unreachable), and iOS
+   Safari's dynamic toolbar makes a fixed 100vh container jump around. Natural
+   flow scrolling is reliable everywhere. The JS controller also bails out on
+   these screens (see HomeSections), so touch swipes are never hijacked. */
+@media (max-width: 1023px), (hover: none) and (pointer: coarse) {
+  .knx-snap-root {
+    position: static;
+    height: auto;
+    overflow-x: clip;
+    overflow-y: visible;
+    scroll-snap-type: none;
+    overscroll-behavior: auto;
+  }
+  .knx-snap-page {
+    min-height: 100svh;
+    height: auto;
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
+  }
+  /* Content is never hidden on mobile (the reveal controller doesn't run). */
+  .knx-snap-page > * {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .knx-snap-root {
     scroll-behavior: auto;

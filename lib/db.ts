@@ -126,6 +126,19 @@ export function ensureSchema(): Promise<void> {
         updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    // Log of one-off emails sent from the admin composer.
+    await sql`
+      CREATE TABLE IF NOT EXISTS emails_sent (
+        id          BIGSERIAL PRIMARY KEY,
+        to_email    TEXT NOT NULL,
+        subject     TEXT,
+        body        TEXT NOT NULL,
+        status      TEXT NOT NULL DEFAULT 'sent',
+        error       TEXT,
+        provider_id TEXT,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
   })().catch((err) => {
     schemaReady = null;
     throw err;
