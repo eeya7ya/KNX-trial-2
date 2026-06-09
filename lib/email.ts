@@ -281,7 +281,7 @@ function renderCustomHtml(subject: string, body: string, logoUrl: string): strin
             <tr>
               <td align="center" style="padding:22px 36px 30px 36px;">
                 <p style="margin:0;font-size:12px;line-height:1.6;color:#8a8a86;">
-                  نادي KNX الأردني — KNX Club Jordan · Amman, Jordan
+                  KNX Club Jordan · Amman, Jordan
                 </p>
                 <p style="margin:6px 0 0 0;font-size:12px;line-height:1.6;">
                   <a href="https://www.knx-jordan-club.com" style="color:${KNX_GREEN_DARK};text-decoration:none;">www.knx-jordan-club.com</a>

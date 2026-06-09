@@ -24,7 +24,7 @@ export type EmailTemplate = {
   complimentaryNote?: string;
 };
 
-export const MEMBERS_URL = "https://www.knx-jordan-club.com/ar/members";
+export const MEMBERS_URL = "https://www.knx-jordan-club.com/en/members";
 
 export const EMAIL_TEMPLATES: EmailTemplate[] = [
   {
@@ -32,7 +32,7 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
     label: "Welcome — standard (25 / 20 JOD)",
     description:
       "Standard welcome letter: 25 JOD annual subscription + 20 JOD one-time joining fee.",
-    subject: "مرحباً بكم في نادي KNX الأردني — KNX Club Jordan",
+    subject: "Welcome to KNX Club Jordan",
     annualFee: 25,
     joiningFee: 20,
   },
@@ -41,7 +41,7 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
     label: "Welcome — university student (10 / 20 JOD)",
     description:
       "Student welcome letter: discounted 10 JOD annual subscription + 20 JOD one-time joining fee.",
-    subject: "مرحباً بكم في نادي KNX الأردني — KNX Club Jordan",
+    subject: "Welcome to KNX Club Jordan",
     annualFee: 10,
     joiningFee: 20,
   },
@@ -50,11 +50,11 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
     label: "Welcome — honorary (no fees)",
     description:
       "Complimentary / honorary membership welcome letter with no fees shown.",
-    subject: "مرحباً بكم في نادي KNX الأردني — KNX Club Jordan",
+    subject: "Welcome to KNX Club Jordan",
     annualFee: null,
     joiningFee: null,
     complimentaryNote:
-      "ويسعدنا أن نمنحكم عضوية فخرية في النادي دون أي رسوم، تقديراً لدوركم ومساهمتكم.",
+      "We are also pleased to grant you an honorary membership in the club at no cost, in appreciation of your role and contribution.",
   },
 ];
 
@@ -63,39 +63,39 @@ export function getTemplate(id: string): EmailTemplate | undefined {
 }
 
 /**
- * Build the plain-text Arabic body for a template, inserting the recipient's
- * name into the greeting when provided. The body uses `* ` bullets and blank
- * lines between paragraphs; the email renderer turns these into a styled list,
+ * Build the plain-text body for a template, inserting the recipient's name into
+ * the greeting when provided. The body uses `* ` bullets and blank lines
+ * between paragraphs; the email renderer turns these into a styled list,
  * paragraphs, and a clickable button.
  */
 export function buildBody(template: EmailTemplate, name: string): string {
   const trimmed = name.trim();
-  const greeting = trimmed ? `مرحباً ${trimmed}،\n\n` : "";
+  const greeting = trimmed ? `Dear ${trimmed},\n\n` : "";
 
   const feesBlock =
     template.annualFee != null && template.joiningFee != null
-      ? `أما بخصوص الرسوم، فهي كالتالي:
-* رسوم الاشتراك والمشاركة السنوية: ${template.annualFee} ديناراً أردنياً سنوياً.
-* رسوم انتساب لمرة واحدة عند الانضمام لأول مرة: ${template.joiningFee} ديناراً أردنياً.`
+      ? `Regarding the fees, they are as follows:
+* Annual subscription and participation fee: ${template.annualFee} JOD per year.
+* One-time joining fee for first-time members: ${template.joiningFee} JOD.`
       : (template.complimentaryNote ?? "");
 
-  return `${greeting}شكراً لاهتمامكم بنادي KNX الأردني (KNX Club Jordan).
+  return `${greeting}Thank you for your interest in KNX Club Jordan.
 
-يسعدنا انضمامكم إلى النادي، الذي يوفّر لأعضائه مجموعة من الخدمات المتكاملة، من أبرزها:
+We are delighted to welcome you to the club, which offers its members a range of integrated services, most notably:
 
-* ورش تدريبية عملية على برنامج ETS6 لجميع المستويات من المبتدئ إلى المتقدّم.
-* لقاءات شهرية مفتوحة لتبادل الخبرات بين المهندسين والمختصّين والاستشاريين.
-* فرص للتعاون في مشاريع مشتركة ضمن القطاعين العام والخاص.
-* مكتبة موارد تقنية تضمّ أدلة ووثائق تصميم ونماذج باللغتين العربية والإنجليزية.
+* Hands-on ETS6 training workshops for all levels, from beginner to advanced.
+* Open monthly meetups to exchange expertise among engineers, specialists, and consultants.
+* Opportunities to collaborate on joint projects across the public and private sectors.
+* A technical resource library with guides, design documents, and templates in both Arabic and English.
 
-ويمكنكم الاطلاع على كامل التفاصيل والخدمات عبر الرابط التالي:
+You can view all the details and services at the following link:
 
 ${MEMBERS_URL}
 
 ${feesBlock}
 
-يسعدنا انضمامكم، ونبقى على استعداد للإجابة عن أي استفسار.
+We are glad to have you with us and remain ready to answer any questions.
 
-مع خالص التقدير،
-نادي KNX الأردني`;
+Best regards,
+KNX Club Jordan`;
 }

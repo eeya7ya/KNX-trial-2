@@ -101,7 +101,7 @@ export function EmailComposer({ initialSent }: { initialSent: SentEmail[] }) {
             type="text"
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
-            placeholder="e.g. م. أحمد"
+            placeholder="e.g. Eng. Ahmad"
             className="rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-ink"
           />
           {selectedTemplate && (
