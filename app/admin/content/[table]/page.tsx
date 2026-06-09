@@ -106,7 +106,7 @@ async function loadRows(table: ContentTable): Promise<Row[]> {
   if (table === "pictures")
     return (await sql`SELECT * FROM pictures ORDER BY created_at DESC LIMIT 200`) as Row[];
   if (table === "team_members")
-    return (await sql`SELECT * FROM team_members ORDER BY is_partner DESC, created_at ASC LIMIT 200`) as Row[];
+    return (await sql`SELECT * FROM team_members ORDER BY sort_order ASC NULLS LAST, created_at ASC LIMIT 200`) as Row[];
   return (await sql`SELECT * FROM prompts ORDER BY created_at DESC LIMIT 200`) as Row[];
 }
 
@@ -140,6 +140,7 @@ export default async function ContentPage({
       <ContentManager
         table={table}
         fields={fields}
+        reorderable={table === "team_members"}
         initialRows={rows.map((r) => ({
           ...r,
           id: r.id,

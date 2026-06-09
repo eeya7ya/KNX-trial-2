@@ -99,6 +99,21 @@ export function ensureSchema(): Promise<void> {
     await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS experience TEXT`;
     await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS phone TEXT`;
     await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS email TEXT`;
+    // Manual display order for team members (added later — keep idempotent).
+    await sql`ALTER TABLE team_members ADD COLUMN IF NOT EXISTS sort_order INTEGER`;
+    // One-time backfill: seed the order from the previous default (partners
+    // first, then oldest first) so nothing visibly jumps. No-op once any row
+    // has an explicit order, so admin reordering is never overwritten.
+    await sql`
+      WITH ordered AS (
+        SELECT id, ROW_NUMBER() OVER (ORDER BY is_partner DESC, created_at ASC) AS rn
+        FROM team_members
+      )
+      UPDATE team_members t SET sort_order = ordered.rn
+      FROM ordered
+      WHERE t.id = ordered.id
+        AND NOT EXISTS (SELECT 1 FROM team_members WHERE sort_order IS NOT NULL)
+    `;
     // News posts are events with a date; photos/videos can be attached to one.
     await sql`ALTER TABLE news ADD COLUMN IF NOT EXISTS event_date TIMESTAMPTZ`;
     await sql`ALTER TABLE pictures ADD COLUMN IF NOT EXISTS news_id BIGINT`;
@@ -240,7 +255,7 @@ export async function getPublicContent(): Promise<PublicContent> {
       sql`SELECT id, name, role, company, photo_url, is_partner,
                  experience, phone, email, created_at
           FROM team_members WHERE published = TRUE
-          ORDER BY is_partner DESC, created_at ASC LIMIT 50`,
+          ORDER BY sort_order ASC NULLS LAST, created_at ASC LIMIT 50`,
     ]);
     const newsList = news as unknown as NewsItem[];
     return {

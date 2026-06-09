@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type UploadKind = "image" | "video" | "file";
 type Field = {
@@ -32,13 +32,20 @@ export function ContentManager({
   table,
   fields,
   initialRows,
+  reorderable = false,
 }: {
   table: string;
   fields: Field[];
   initialRows: Row[];
+  reorderable?: boolean;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  // Local copy of the list so reordering is reflected instantly; kept in sync
+  // when the server data is refreshed after edits/deletes.
+  const [rows, setRows] = useState<Row[]>(initialRows);
+  useEffect(() => setRows(initialRows), [initialRows]);
+  const [reordering, setReordering] = useState(false);
   const [err, setErr] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [values, setValues] = useState<Record<string, string>>(() =>
@@ -139,6 +146,36 @@ export function ContentManager({
       router.refresh();
     } finally {
       setBusy(false);
+    }
+  }
+
+  // Move a row up (dir = -1) or down (dir = +1) and persist the new order.
+  async function move(index: number, dir: -1 | 1) {
+    const target = index + dir;
+    if (target < 0 || target >= rows.length || reordering) return;
+    const next = [...rows];
+    [next[index], next[target]] = [next[target], next[index]];
+    setRows(next);
+    setReordering(true);
+    setErr("");
+    try {
+      const res = await fetch(`/api/admin/content/${table}/reorder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: next.map((r) => r.id) }),
+      });
+      const body = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !body.ok) {
+        setErr(body.error || "Failed to save order");
+        setRows(rows); // revert
+        return;
+      }
+      router.refresh();
+    } catch {
+      setErr("Network error");
+      setRows(rows); // revert
+    } finally {
+      setReordering(false);
     }
   }
 
@@ -277,16 +314,41 @@ export function ContentManager({
 
       <div className="rounded-2xl border border-line bg-white">
         <div className="flex items-center justify-between border-b border-line px-5 py-3">
-          <p className="text-sm font-semibold">Existing ({initialRows.length})</p>
+          <p className="text-sm font-semibold">Existing ({rows.length})</p>
+          {reorderable && rows.length > 1 && (
+            <p className="text-xs text-ink-muted">Use ↑ ↓ to set the order shown on the site</p>
+          )}
         </div>
         <ul className="divide-y divide-line">
-          {initialRows.map((r) => (
+          {rows.map((r, i) => (
             <li
               key={r.id}
               className={`flex items-center justify-between gap-3 px-5 py-3 ${
                 editingId === r.id ? "bg-knx-50" : ""
               }`}
             >
+              {reorderable && (
+                <div className="flex flex-col">
+                  <button
+                    type="button"
+                    onClick={() => move(i, -1)}
+                    disabled={i === 0 || reordering || busy}
+                    aria-label="Move up"
+                    className="grid h-5 w-6 place-items-center rounded text-ink-muted transition hover:bg-knx-50 hover:text-ink disabled:opacity-30"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => move(i, 1)}
+                    disabled={i === rows.length - 1 || reordering || busy}
+                    aria-label="Move down"
+                    className="grid h-5 w-6 place-items-center rounded text-ink-muted transition hover:bg-knx-50 hover:text-ink disabled:opacity-30"
+                  >
+                    ↓
+                  </button>
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{r.title}</p>
                 <p className="text-xs text-ink-muted" dir="ltr">
@@ -314,7 +376,7 @@ export function ContentManager({
               </div>
             </li>
           ))}
-          {initialRows.length === 0 && (
+          {rows.length === 0 && (
             <li className="px-5 py-8 text-center text-sm text-ink-muted">No entries yet.</li>
           )}
         </ul>
