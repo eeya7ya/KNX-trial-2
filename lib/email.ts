@@ -191,25 +191,22 @@ export async function sendAutoReply(opts: {
   }
 }
 
-// KNX brand green, matching the site theme (--color-knx).
-const KNX_GREEN = "#00965e";
-const KNX_GREEN_DARK = "#007a4d";
-
 function linkify(escaped: string): string {
-  // Turn bare http(s) URLs into styled links. Runs on already-escaped text.
+  // Turn bare http(s) URLs into links. Runs on already-escaped text. Uses the
+  // same neutral ink color as the rest of the email — no accent color.
   return escaped.replace(
     /(https?:\/\/[^\s<]+)/g,
     (url) =>
-      `<a href="${url}" style="color:${KNX_GREEN_DARK};text-decoration:underline;word-break:break-all;">${url}</a>`,
+      `<a href="${url}" style="color:#1a1a1a;text-decoration:underline;word-break:break-all;">${url}</a>`,
   );
 }
 
 /**
  * Render a plain-text body into rich, email-safe HTML. Blank lines separate
- * paragraphs; lines starting with `* ` or `- ` become a bullet list; a line
- * that is only a URL becomes a centered call-to-action button.
+ * paragraphs; lines starting with `* ` or `- ` become a bullet list. URLs are
+ * turned into simple inline links.
  */
-function renderBody(body: string, dir: "rtl" | "ltr", align: string): string {
+function renderBody(body: string, align: string): string {
   const blocks = body.replace(/\r\n/g, "\n").trim().split(/\n\s*\n/);
   const listPad = align === "right" ? "padding-right:22px;" : "padding-left:22px;";
 
@@ -229,16 +226,7 @@ function renderBody(body: string, dir: "rtl" | "ltr", align: string): string {
         return `<ul style="margin:0 0 18px 0;${listPad}list-style-type:disc;">${items}</ul>`;
       }
 
-      // Standalone URL -> button
-      if (lines.length === 1 && /^https?:\/\/\S+$/.test(lines[0])) {
-        const url = escapeHtml(lines[0]);
-        const label = dir === "rtl" ? "عرض التفاصيل" : "View details";
-        return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 22px 0;"><tr><td style="border-radius:10px;background:${KNX_GREEN};">
-          <a href="${url}" style="display:inline-block;padding:12px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">${label}</a>
-        </td></tr></table>`;
-      }
-
-      // Paragraph
+      // Paragraph (standalone URLs become inline links via linkify)
       const html = linkify(escapeHtml(raw.trim())).replace(/\n/g, "<br />");
       return `<p style="margin:0 0 18px 0;font-size:16px;line-height:1.8;color:#1a1a1a;">${html}</p>`;
     })
@@ -250,7 +238,7 @@ function renderCustomHtml(subject: string, body: string, logoUrl: string): strin
   const rtl = /[؀-ۿ]/.test(body + subject);
   const dir = rtl ? "rtl" : "ltr";
   const align = rtl ? "right" : "left";
-  const bodyHtml = renderBody(body, dir, align);
+  const bodyHtml = renderBody(body, align);
   return `<!DOCTYPE html>
 <html lang="${rtl ? "ar" : "en"}" dir="${dir}">
   <head>
@@ -264,12 +252,7 @@ function renderCustomHtml(subject: string, body: string, logoUrl: string): strin
         <td align="center">
           <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #ececea;">
             <tr>
-              <td align="center" style="background:${KNX_GREEN};padding:28px 36px;">
-                <img src="${logoUrl}" alt="KNX Club Jordan" width="132" style="display:block;max-width:132px;height:auto;border:0;outline:none;text-decoration:none;" />
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:34px 36px 10px 36px;direction:${dir};text-align:${align};">
+              <td style="padding:36px 36px 8px 36px;direction:${dir};text-align:${align};">
                 ${bodyHtml}
               </td>
             </tr>
@@ -279,12 +262,10 @@ function renderCustomHtml(subject: string, body: string, logoUrl: string): strin
               </td>
             </tr>
             <tr>
-              <td align="center" style="padding:22px 36px 30px 36px;">
-                <p style="margin:0;font-size:12px;line-height:1.6;color:#8a8a86;">
-                  نادي KNX الأردني — KNX Club Jordan · Amman, Jordan
-                </p>
-                <p style="margin:6px 0 0 0;font-size:12px;line-height:1.6;">
-                  <a href="https://www.knx-jordan-club.com" style="color:${KNX_GREEN_DARK};text-decoration:none;">www.knx-jordan-club.com</a>
+              <td align="center" style="padding:24px 36px 32px 36px;">
+                <img src="${logoUrl}" alt="KNX Club Jordan" width="120" style="display:block;max-width:120px;height:auto;border:0;outline:none;text-decoration:none;" />
+                <p style="margin:14px 0 0 0;font-size:12px;line-height:1.6;color:#8a8a86;">
+                  KNX Club Jordan — Amman, Jordan
                 </p>
               </td>
             </tr>
