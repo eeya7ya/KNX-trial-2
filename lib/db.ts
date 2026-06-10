@@ -139,6 +139,16 @@ export function ensureSchema(): Promise<void> {
         created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    // Proceed / Cancel responses from recipients of welcome emails.
+    await sql`
+      CREATE TABLE IF NOT EXISTS join_responses (
+        id          BIGSERIAL PRIMARY KEY,
+        name        TEXT,
+        email       TEXT NOT NULL,
+        action      TEXT NOT NULL,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
   })().catch((err) => {
     schemaReady = null;
     throw err;

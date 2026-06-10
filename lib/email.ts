@@ -1,3 +1,5 @@
+import { encodeJoinToken } from "./join-actions";
+
 type AutoReplyKind = "join" | "contact";
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
@@ -233,12 +235,48 @@ function renderBody(body: string, align: string): string {
     .join("\n");
 }
 
-function renderCustomHtml(subject: string, body: string, logoUrl: string): string {
+export type EmailActions = { proceedUrl: string; cancelUrl: string };
+
+function renderActions(actions: EmailActions, align: string): string {
+  // Two buttons — Cancel (neutral) on the left, Proceed (green) always on the
+  // right — plus a professional disclaimer.
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 4px 0;">
+  <tr>
+    <td style="padding:0 10px 0 0;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:10px;border:1px solid #d6d6d3;">
+        <a href="${actions.cancelUrl}" style="display:inline-block;padding:11px 25px;font-size:15px;font-weight:600;color:#525252;text-decoration:none;border-radius:10px;">Cancel Joining</a>
+      </td></tr></table>
+    </td>
+    <td>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-radius:10px;background:#00965e;">
+        <a href="${actions.proceedUrl}" style="display:inline-block;padding:12px 26px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">Proceed Joining</a>
+      </td></tr></table>
+    </td>
+  </tr>
+</table>
+<p style="margin:14px 0 0 0;font-size:13px;line-height:1.7;color:#8a8a86;text-align:${align};">
+  If you received this email by mistake or are unsure why it reached you, please disregard it entirely — no action is required on your part.
+</p>`;
+}
+
+function renderCustomHtml(
+  subject: string,
+  body: string,
+  logoUrl: string,
+  actions?: EmailActions,
+): string {
   // Auto-detect direction so Arabic and English both render naturally.
   const rtl = /[؀-ۿ]/.test(body + subject);
   const dir = rtl ? "rtl" : "ltr";
   const align = rtl ? "right" : "left";
   const bodyHtml = renderBody(body, align);
+  const actionsRow = actions
+    ? `<tr>
+              <td style="padding:6px 36px 22px 36px;direction:${dir};text-align:${align};">
+                ${renderActions(actions, align)}
+              </td>
+            </tr>`
+    : "";
   return `<!DOCTYPE html>
 <html lang="${rtl ? "ar" : "en"}" dir="${dir}">
   <head>
@@ -256,6 +294,7 @@ function renderCustomHtml(subject: string, body: string, logoUrl: string): strin
                 ${bodyHtml}
               </td>
             </tr>
+            ${actionsRow}
             <tr>
               <td style="padding:0 36px;">
                 <hr style="border:none;border-top:1px solid #ececea;margin:0;" />
@@ -286,6 +325,8 @@ export async function sendEmail(opts: {
   subject: string;
   body: string;
   replyTo?: string;
+  /** When set, adds Proceed / Cancel joining buttons for this recipient. */
+  joinActions?: { name: string };
 }): Promise<{ id: string | null }> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM;
@@ -297,7 +338,17 @@ export async function sendEmail(opts: {
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://knx-jordan-club.com";
   const logoUrl = process.env.EMAIL_LOGO_URL || `${siteUrl}/KNX_logo.svg.png`;
 
-  const html = renderCustomHtml(opts.subject, opts.body, logoUrl);
+  let actions: EmailActions | undefined;
+  if (opts.joinActions) {
+    const token = await encodeJoinToken({ name: opts.joinActions.name, email: opts.to });
+    const t = encodeURIComponent(token);
+    actions = {
+      proceedUrl: `${siteUrl}/api/join-response?action=proceed&t=${t}`,
+      cancelUrl: `${siteUrl}/api/join-response?action=cancel&t=${t}`,
+    };
+  }
+
+  const html = renderCustomHtml(opts.subject, opts.body, logoUrl, actions);
 
   const res = await fetch(RESEND_ENDPOINT, {
     method: "POST",
@@ -449,5 +500,66 @@ export async function notifyAdmin(opts: {
   if (!res.ok) {
     const errBody = await res.text().catch(() => "");
     throw new Error(`Resend admin error ${res.status}: ${errBody}`);
+  }
+}
+
+/**
+ * Notify the admin inbox when a welcome-email recipient clicks Proceed or
+ * Cancel. Best-effort: logs and returns if Resend/admin env is not configured.
+ */
+export async function notifyJoinResponse(opts: {
+  name: string;
+  email: string;
+  action: "proceed" | "cancel";
+}): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM;
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!apiKey || !from || !adminEmail) {
+    console.warn(
+      "notifyJoinResponse: RESEND_API_KEY, RESEND_FROM or ADMIN_EMAIL not set; skipping.",
+    );
+    return;
+  }
+
+  const proceed = opts.action === "proceed";
+  const who = opts.name || opts.email;
+  const title = proceed
+    ? "Member chose to proceed with joining — KNX Club Jordan"
+    : "Member chose to cancel joining — KNX Club Jordan";
+  const intro = proceed
+    ? "A welcome-email recipient confirmed they would like to proceed with joining."
+    : "A welcome-email recipient indicated they do not wish to proceed at this time.";
+
+  const fields: AdminNotificationField[] = [
+    { label: "Name", value: opts.name },
+    { label: "Email", value: opts.email },
+    { label: "Decision", value: proceed ? "Proceed joining" : "Cancel joining" },
+  ];
+  const submittedAt = new Date().toISOString();
+  const subjectLine = `[KNX] ${who} — ${proceed ? "Proceed" : "Cancel"} joining`;
+
+  const html = renderAdminHtml({ title, intro, fields, submittedAt });
+  const text = renderAdminText({ title, intro, fields, submittedAt });
+
+  const res = await fetch(RESEND_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: adminEmail.split(",").map((s) => s.trim()).filter(Boolean),
+      reply_to: opts.email,
+      subject: subjectLine,
+      html,
+      text,
+    }),
+  });
+
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => "");
+    throw new Error(`Resend join-response error ${res.status}: ${errBody}`);
   }
 }
