@@ -53,7 +53,7 @@ export function EmailComposer({ initialSent }: { initialSent: SentEmail[] }) {
       const res = await fetch("/api/admin/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to, subject, body }),
+        body: JSON.stringify({ to, subject, body, name, joinActions: !!templateId }),
       });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (res.ok && data.ok) {
@@ -107,7 +107,10 @@ export function EmailComposer({ initialSent }: { initialSent: SentEmail[] }) {
           {selectedTemplate && (
             <span className="text-xs text-ink-muted">
               Inserted into the greeting. The subject and message below are filled
-              automatically — edit them if needed before sending.
+              automatically — edit them if needed before sending. The email will
+              include “Proceed Joining” and “Cancel Joining” buttons; the
+              recipient&apos;s choice is emailed to you and listed under{" "}
+              <span className="font-medium">Join responses</span>.
             </span>
           )}
         </label>

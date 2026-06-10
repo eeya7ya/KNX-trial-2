@@ -11,9 +11,15 @@ export async function POST(req: Request) {
   if (!(await isAdminAuthenticated()))
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
 
-  let body: { to?: string; subject?: string; body?: string };
+  let body: {
+    to?: string;
+    subject?: string;
+    body?: string;
+    name?: string;
+    joinActions?: boolean;
+  };
   try {
-    body = (await req.json()) as { to?: string; subject?: string; body?: string };
+    body = (await req.json()) as typeof body;
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
@@ -21,6 +27,8 @@ export async function POST(req: Request) {
   const to = (body.to ?? "").trim();
   const subject = (body.subject ?? "").trim();
   const message = (body.body ?? "").trim();
+  const name = (body.name ?? "").trim();
+  const joinActions = body.joinActions ? { name } : undefined;
 
   if (!EMAIL_RE.test(to))
     return NextResponse.json({ ok: false, error: "Enter a valid recipient email." }, { status: 400 });
@@ -32,7 +40,7 @@ export async function POST(req: Request) {
   await ensureSchema();
 
   try {
-    const { id } = await sendEmail({ to, subject, body: message });
+    const { id } = await sendEmail({ to, subject, body: message, joinActions });
     await sql`
       INSERT INTO emails_sent (to_email, subject, body, status, provider_id)
       VALUES (${to}, ${subject}, ${message}, 'sent', ${id})
