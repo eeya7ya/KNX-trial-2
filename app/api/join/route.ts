@@ -5,9 +5,19 @@ import { notifyAdmin, sendAutoReply } from "@/lib/email";
 export const runtime = "edge";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Optional leading +, then digits separated by spaces, dashes, dots, or
+// parentheses. The actual digit count is checked separately so the field can't
+// be satisfied with separators alone.
+const PHONE_RE = /^\+?[\d\s().-]{6,40}$/;
 
 export async function POST(req: Request) {
-  let body: { name?: unknown; email?: unknown; role?: unknown; locale?: unknown };
+  let body: {
+    name?: unknown;
+    email?: unknown;
+    phone?: unknown;
+    role?: unknown;
+    locale?: unknown;
+  };
   try {
     body = await req.json();
   } catch {
@@ -16,6 +26,7 @@ export async function POST(req: Request) {
 
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+  const phone = typeof body.phone === "string" ? body.phone.trim() : "";
   const role = typeof body.role === "string" ? body.role.trim() : "";
   const locale = typeof body.locale === "string" ? body.locale : "ar";
 
@@ -25,6 +36,12 @@ export async function POST(req: Request) {
   if (!EMAIL_RE.test(email) || email.length > 200) {
     return NextResponse.json({ ok: false, error: "Please enter a valid email." }, { status: 400 });
   }
+  if (!PHONE_RE.test(phone) || phone.replace(/\D/g, "").length < 7) {
+    return NextResponse.json(
+      { ok: false, error: "Please enter a valid contact number." },
+      { status: 400 },
+    );
+  }
   if (role.length > 120) {
     return NextResponse.json({ ok: false, error: "Role is too long." }, { status: 400 });
   }
@@ -32,16 +49,17 @@ export async function POST(req: Request) {
   try {
     await ensureSchema();
     await sql`
-      INSERT INTO members (name, email, role)
-      VALUES (${name}, ${email}, ${role || null})
-      ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role
+      INSERT INTO members (name, email, phone, role)
+      VALUES (${name}, ${email}, ${phone}, ${role || null})
+      ON CONFLICT (email) DO UPDATE SET
+        name = EXCLUDED.name, phone = EXCLUDED.phone, role = EXCLUDED.role
     `;
 
     await Promise.all([
       sendAutoReply({ to: email, name, kind: "join", locale }).catch((err) =>
         console.error("join auto-reply email failed", err),
       ),
-      notifyAdmin({ kind: "join", name, email, role, locale }).catch((err) =>
+      notifyAdmin({ kind: "join", name, email, phone, role, locale }).catch((err) =>
         console.error("join admin notification failed", err),
       ),
     ]);

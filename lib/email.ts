@@ -438,6 +438,7 @@ export async function notifyAdmin(opts: {
   kind: AutoReplyKind;
   name: string;
   email: string;
+  phone?: string;
   role?: string;
   subject?: string;
   message?: string;
@@ -466,6 +467,7 @@ export async function notifyAdmin(opts: {
     { label: "Email", value: opts.email },
   ];
   if (isJoin) {
+    fields.push({ label: "Phone", value: opts.phone ?? "" });
     fields.push({ label: "Role / interest", value: opts.role ?? "" });
   } else {
     fields.push({ label: "Subject", value: opts.subject ?? "" });

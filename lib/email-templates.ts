@@ -29,21 +29,21 @@ export const MEMBERS_URL = "https://www.knx-jordan-club.com/en/members";
 export const EMAIL_TEMPLATES: EmailTemplate[] = [
   {
     id: "welcome-standard",
-    label: "Welcome — standard (25 / 20 JOD)",
+    label: "Welcome — standard (35 / 10 JOD)",
     description:
-      "Standard welcome letter: 25 JOD annual subscription + 20 JOD one-time joining fee.",
+      "Standard welcome letter: 35 JOD annual subscription + 10 JOD one-time joining fee.",
     subject: "Welcome to KNX Club Jordan",
-    annualFee: 25,
-    joiningFee: 20,
+    annualFee: 35,
+    joiningFee: 10,
   },
   {
     id: "welcome-student",
-    label: "Welcome — university student (10 / 20 JOD)",
+    label: "Welcome — university student (10 / 5 JOD)",
     description:
-      "Student welcome letter: discounted 10 JOD annual subscription + 20 JOD one-time joining fee.",
+      "Student welcome letter: discounted 10 JOD annual subscription + 5 JOD one-time joining fee.",
     subject: "Welcome to KNX Club Jordan",
     annualFee: 10,
-    joiningFee: 20,
+    joiningFee: 5,
   },
   {
     id: "welcome-honorary",
