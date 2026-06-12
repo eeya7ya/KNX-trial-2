@@ -20,6 +20,8 @@ export function ensureSchema(): Promise<void> {
         created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    // Contact number from the join form (added later — keep idempotent).
+    await sql`ALTER TABLE members ADD COLUMN IF NOT EXISTS phone TEXT`;
     await sql`
       CREATE TABLE IF NOT EXISTS visitors (
         id          BIGSERIAL PRIMARY KEY,

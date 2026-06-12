@@ -19,6 +19,7 @@ export function JoinForm({ dict, locale }: { dict: Dict; locale: string }) {
     const payload = {
       name: String(data.get("name") ?? "").trim(),
       email: String(data.get("email") ?? "").trim(),
+      phone: String(data.get("phone") ?? "").trim(),
       role: String(data.get("role") ?? "").trim(),
       locale,
     };
@@ -67,14 +68,27 @@ export function JoinForm({ dict, locale }: { dict: Dict; locale: string }) {
           />
         </Field>
       </div>
-      <Field label={dict.join.role}>
-        <input
-          name="role"
-          maxLength={120}
-          placeholder={dict.join.rolePlaceholder}
-          className="w-full border-0 border-b border-line bg-transparent px-0 py-3 text-base outline-none transition placeholder:text-neutral-400 focus:border-knx"
-        />
-      </Field>
+      <div className="grid gap-5 md:grid-cols-2">
+        <Field label={dict.join.phone}>
+          <input
+            type="tel"
+            name="phone"
+            required
+            maxLength={40}
+            dir="ltr"
+            placeholder={dict.join.phonePlaceholder}
+            className="w-full border-0 border-b border-line bg-transparent px-0 py-3 text-base outline-none transition placeholder:text-neutral-400 focus:border-knx"
+          />
+        </Field>
+        <Field label={dict.join.role}>
+          <input
+            name="role"
+            maxLength={120}
+            placeholder={dict.join.rolePlaceholder}
+            className="w-full border-0 border-b border-line bg-transparent px-0 py-3 text-base outline-none transition placeholder:text-neutral-400 focus:border-knx"
+          />
+        </Field>
+      </div>
       <div className="mt-3 flex flex-wrap items-center gap-6">
         <button
           type="submit"

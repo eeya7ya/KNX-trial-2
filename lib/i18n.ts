@@ -72,6 +72,8 @@ export type Dict = {
     body: string;
     name: string;
     email: string;
+    phone: string;
+    phonePlaceholder: string;
     role: string;
     rolePlaceholder: string;
     submit: string;
@@ -80,6 +82,7 @@ export type Dict = {
     networkError: string;
     invalidName: string;
     invalidEmail: string;
+    invalidPhone: string;
     invalidRole: string;
     serverError: string;
     invalidJson: string;
@@ -219,6 +222,8 @@ const ar: Dict = {
     body: "اترك بياناتك وسنعلمك بأقرب الفعاليات والفرص التدريبية.",
     name: "الاسم الكامل",
     email: "البريد الإلكتروني",
+    phone: "رقم التواصل",
+    phonePlaceholder: "+962 7X XXX XXXX",
     role: "التخصص (اختياري)",
     rolePlaceholder: "مكامل، مهندس، معماري، طالب…",
     submit: "سجّلني",
@@ -227,6 +232,7 @@ const ar: Dict = {
     networkError: "تعذّر الاتصال بالخادم. حاول مجدداً.",
     invalidName: "الرجاء إدخال الاسم.",
     invalidEmail: "الرجاء إدخال بريد إلكتروني صحيح.",
+    invalidPhone: "الرجاء إدخال رقم تواصل صحيح.",
     invalidRole: "حقل التخصص طويل جداً.",
     serverError: "حدث خطأ في الخادم. حاول لاحقاً.",
     invalidJson: "بيانات غير صالحة.",
@@ -397,6 +403,8 @@ const en: Dict = {
     body: "Leave your details and we'll keep you posted on training and events.",
     name: "Full name",
     email: "Email",
+    phone: "Contact number",
+    phonePlaceholder: "+962 7X XXX XXXX",
     role: "Role (optional)",
     rolePlaceholder: "Integrator, engineer, architect, student…",
     submit: "Sign me up",
@@ -405,6 +413,7 @@ const en: Dict = {
     networkError: "Network error. Please try again.",
     invalidName: "Please enter your name.",
     invalidEmail: "Please enter a valid email.",
+    invalidPhone: "Please enter a valid contact number.",
     invalidRole: "Role is too long.",
     serverError: "Server error. Please try again later.",
     invalidJson: "Invalid request.",
