@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { ThemeCord } from "./ThemeCord";
 import type { Dict, Locale } from "@/lib/i18n";
 
 export function Header({ dict, locale }: { dict: Dict; locale: Locale }) {
@@ -55,6 +56,15 @@ export function Header({ dict, locale }: { dict: Dict; locale: Locale }) {
           >
             {dict.nav.join}
           </Link>
+        </div>
+      </div>
+      {/* The pull hangs from the header's bottom edge, aligned with the
+          inline-end of the same content column the Join button sits in — so it
+          belongs to the header instead of floating at the edge of the window,
+          and it mirrors with the language for free. */}
+      <div className="pointer-events-none absolute inset-x-0 top-full">
+        <div className="mx-auto flex max-w-7xl justify-end px-6">
+          <ThemeCord labels={dict.theme} />
         </div>
       </div>
     </header>

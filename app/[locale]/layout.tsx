@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 import "../globals.css";
 import { notFound } from "next/navigation";
 import { getDict, isLocale, type Locale } from "@/lib/i18n";
-import { ThemeCord } from "./components/ThemeCord";
 
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://knx-jordan-club.com"
@@ -171,7 +170,6 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         {children}
-        <ThemeCord labels={dict.theme} />
       </body>
     </html>
   );
