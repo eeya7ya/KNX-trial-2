@@ -16,7 +16,7 @@ export type ThemeCordLabels = {
    scaled by CSS, so the cord shortens with it on small screens. */
 const AX = 30;
 const AY = -16;
-const N = 24;
+const N = 27;
 const L0 = 8;
 const GRAV = 0.3;
 const DAMP = 0.995;
@@ -381,22 +381,22 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
           {/* the fitting the cord drops out of, sitting on the header's edge */}
           <rect
             className="knx-cord-mount"
-            x="21"
-            y="-4"
-            width="18"
-            height="5"
-            rx="2.5"
+            x="19"
+            y="-5"
+            width="22"
+            height="6"
+            rx="3"
           />
           {/* A wider copy of the chain in the opposite tone. Invisible against
               the page, it is what keeps the cord readable where it crosses the
               one high-contrast panel on the site. */}
-          <path className="knx-cord-halo" ref={haloRef} d="M30 -16 L30 168" />
-          <path className="knx-cord-chain" ref={chainRef} d="M30 -16 L30 168" />
-          <g ref={knobRef} transform="translate(30 168)">
-            <circle className="knx-cord-glow" cx="0" cy="14" r="34" fill="url(#knxCordGlow)" />
-            <rect className="knx-cord-knob" x="-2" y="0" width="4" height="8" rx="2" />
-            <ellipse className="knx-cord-knob" cx="0" cy="15" rx="5.5" ry="8.5" />
-            <ellipse className="knx-cord-knob-hl" cx="-2" cy="11" rx="1.5" ry="2.6" />
+          <path className="knx-cord-halo" ref={haloRef} d="M30 -16 L30 192" />
+          <path className="knx-cord-chain" ref={chainRef} d="M30 -16 L30 192" />
+          <g ref={knobRef} transform="translate(30 192)">
+            <circle className="knx-cord-glow" cx="0" cy="16" r="42" fill="url(#knxCordGlow)" />
+            <rect className="knx-cord-knob" x="-2.6" y="0" width="5.2" height="9" rx="2.6" />
+            <ellipse className="knx-cord-knob" cx="0" cy="17" rx="7" ry="10.5" />
+            <ellipse className="knx-cord-knob-hl" cx="-2.5" cy="12.5" rx="2" ry="3.4" />
           </g>
         </svg>
       </button>
