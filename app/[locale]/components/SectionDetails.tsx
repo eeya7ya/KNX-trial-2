@@ -16,15 +16,15 @@ const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook, IconShield, 
 export function AboutDetail({ dict }: { dict: Dict }) {
   return (
     <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+      <span className="text-xs font-semibold uppercase tracking-widest text-accent">
         {dict.about.eyebrow}
       </span>
       <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{dict.about.title}</h1>
       <p className="mt-4 max-w-3xl text-base text-ink-muted md:text-lg">{dict.about.body}</p>
       <ul className="mt-10 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
         {dict.about.pillars.map((p) => (
-          <li key={p.title} className="bg-white p-6">
-            <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-knx-50 text-knx-700">
+          <li key={p.title} className="bg-card p-6">
+            <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent-soft text-accent">
               <IconCheck className="h-4 w-4" />
             </div>
             <h3 className="font-semibold">{p.title}</h3>
@@ -39,7 +39,7 @@ export function AboutDetail({ dict }: { dict: Dict }) {
 export function ServicesDetail({ dict }: { dict: Dict }) {
   return (
     <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+      <span className="text-xs font-semibold uppercase tracking-widest text-accent">
         {dict.services.eyebrow}
       </span>
       <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{dict.services.title}</h1>
@@ -48,8 +48,8 @@ export function ServicesDetail({ dict }: { dict: Dict }) {
         {dict.services.items.map((item, i) => {
           const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
           return (
-            <div key={item.title} className="bg-white p-6">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-ink text-white">
+            <div key={item.title} className="bg-card p-6">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-cta text-cta-ink">
                 <Icon className="h-5 w-5" />
               </div>
               <h3 className="text-base font-semibold">{item.title}</h3>
@@ -65,21 +65,21 @@ export function ServicesDetail({ dict }: { dict: Dict }) {
 export function EventsDetail({ dict }: { dict: Dict }) {
   return (
     <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+      <span className="text-xs font-semibold uppercase tracking-widest text-accent">
         {dict.events.eyebrow}
       </span>
       <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{dict.events.title}</h1>
       <p className="mt-4 max-w-3xl text-base text-ink-muted md:text-lg">{dict.events.body}</p>
-      <ul className="mt-8 overflow-hidden rounded-2xl border border-line bg-white">
+      <ul className="mt-8 overflow-hidden rounded-2xl border border-line bg-card">
         {dict.events.rows.map((row, i) => (
           <li
             key={row.title}
-            className={`flex flex-wrap items-center justify-between gap-3 px-6 py-5 transition hover:bg-neutral-50 ${
+            className={`flex flex-wrap items-center justify-between gap-3 px-6 py-5 transition hover:bg-subtle ${
               i !== 0 ? "border-t border-line" : ""
             }`}
           >
             <div className="flex flex-col">
-              <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">{row.tag}</span>
+              <span className="text-xs font-semibold uppercase tracking-widest text-accent">{row.tag}</span>
               <span className="mt-1 text-base font-semibold">{row.title}</span>
               <span className="mt-1 text-sm text-ink-muted">{row.meta}</span>
             </div>
@@ -102,13 +102,13 @@ export function MembersDetail({
 }) {
   return (
     <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+      <span className="text-xs font-semibold uppercase tracking-widest text-accent">
         {dict.members.eyebrow}
       </span>
       <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{dict.members.title}</h1>
       <p className="mt-4 max-w-3xl text-base text-ink-muted md:text-lg">{dict.members.brief}</p>
 
-      <p className="mt-10 text-xs font-semibold uppercase tracking-widest text-knx-700">
+      <p className="mt-10 text-xs font-semibold uppercase tracking-widest text-accent">
         {dict.members.boardLabel}
       </p>
 
@@ -120,7 +120,7 @@ export function MembersDetail({
 export function FaqDetail({ dict }: { dict: Dict }) {
   return (
     <div>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+      <span className="text-xs font-semibold uppercase tracking-widest text-accent">
         {dict.faq.eyebrow}
       </span>
       <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{dict.faq.title}</h1>
@@ -153,7 +153,7 @@ export function Avatar({ name, size = "md" }: { name: string; size?: "md" | "lg"
   return (
     <span
       aria-hidden="true"
-      className={`grid ${dim} flex-shrink-0 place-items-center rounded-full bg-knx-50 font-bold text-knx-700`}
+      className={`grid ${dim} flex-shrink-0 place-items-center rounded-full bg-accent-soft font-bold text-accent`}
     >
       {initials || "·"}
     </span>

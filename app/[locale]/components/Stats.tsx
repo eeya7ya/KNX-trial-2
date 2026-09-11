@@ -118,8 +118,8 @@ function StatCard({
       role="listitem"
       aria-pressed={active}
       onClick={onActivate}
-      className={`group relative flex flex-col items-center justify-center gap-2 bg-white px-4 py-8 text-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-knx md:gap-3 md:py-12 ${
-        active ? "bg-knx-50" : "hover:bg-knx-50/60"
+      className={`group relative flex flex-col items-center justify-center gap-2 bg-card px-4 py-8 text-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-knx md:gap-3 md:py-12 ${
+        active ? "bg-accent-soft" : "hover:bg-accent-soft/60"
       }`}
     >
       <span

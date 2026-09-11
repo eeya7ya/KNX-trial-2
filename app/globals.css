@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 @theme {
+  /* --- KNX brand scale --------------------------------------------------
+     The green stays the green in both themes; only the few steps that are
+     used as *text* or as a *tint behind text* get re-pointed for dark. */
   --color-knx: #00965e;
   --color-knx-50: #ecfdf5;
   --color-knx-100: #d1fae5;
@@ -10,11 +13,72 @@
   --color-knx-700: #007a4d;
   --color-knx-800: #065f3c;
   --color-knx-900: #064e34;
-  --color-ink: #0a0a0a;
-  --color-ink-muted: #525252;
-  --color-line: #e7e7e7;
+
+  /* --- Semantic tokens ---------------------------------------------------
+     These hold the LIGHT values. `html.dark` further down re-points the very
+     same names, so every utility built on them — bg-canvas, bg-card, text-ink,
+     text-ink-muted, border-line, text-accent, bg-cta … — flips in one step.
+     Nothing in the markup needs a `dark:` variant. */
+  --color-ink: #0a0a0a; /* primary text */
+  --color-ink-muted: #525252; /* secondary text */
+  --color-line: #e7e7e7; /* hairlines, dividers, grid gaps */
+  --color-canvas: #ffffff; /* the page itself */
+  --color-card: #ffffff; /* a surface raised off the page */
+  --color-subtle: #f5f5f5; /* image wells, hover fills */
+  --color-accent: #007a4d; /* brand green as *text* on the canvas */
+  --color-accent-strong: #065f3c; /* its hover */
+  --color-accent-soft: #ecfdf5; /* brand tint behind an icon or badge */
+  --color-cta: #0a0a0a; /* primary button fill */
+  --color-cta-ink: #ffffff; /* primary button label */
+  --color-cta-hover: #007a4d; /* primary button hover fill */
+  --color-invert: #0a0a0a; /* the one high-contrast panel (Join) */
+  --color-invert-ink: #ffffff; /* text on that panel */
+  --color-invert-muted: #d4d4d4; /* secondary text on that panel */
+  --color-scrim: rgba(10, 10, 10, 0.5); /* modal backdrop */
+  --color-danger: #dc2626;
+
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-arabic: var(--font-cairo), "Segoe UI", Tahoma, sans-serif;
+}
+
+/* --- Dark theme ---------------------------------------------------------
+   Class-driven, never `prefers-color-scheme` directly: the inline boot script
+   in the locale layout resolves the system preference (or the saved choice)
+   into this class before first paint. Keeping it class-only is also what stops
+   the admin panel — a separate <html> that never gets the class — from being
+   dragged into dark mode.
+
+   Values are a green-tinted near-black rather than pure #000, so the KNX green
+   reads as part of the surface instead of floating on top of it. */
+html.dark {
+  color-scheme: dark;
+
+  --color-ink: #e9efec;
+  --color-ink-muted: #97a5a0;
+  --color-line: #242e2c;
+  --color-canvas: #0a0f0e;
+  --color-card: #111817;
+  --color-subtle: #161f1d;
+  --color-accent: #3ddc97;
+  --color-accent-strong: #7cebba;
+  --color-accent-soft: #10261f;
+  --color-cta: #00b070;
+  --color-cta-ink: #04130d;
+  --color-cta-hover: #2fd493;
+  --color-invert: #053026;
+  --color-invert-ink: #eafaf3;
+  --color-invert-muted: #a7c4b8;
+  --color-scrim: rgba(0, 0, 0, 0.72);
+  --color-danger: #f87171;
+
+  /* Safety net for the raw brand steps that survive in the markup: the dot in
+     the hero eyebrow, focus rings, the rule beside a section eyebrow. */
+  --color-knx: #00c47c;
+  --color-knx-50: #10261f;
+  --color-knx-700: #3ddc97;
+  --color-knx-800: #7cebba;
+
+  scrollbar-color: #2f3b38 transparent;
 }
 
 :root {
@@ -23,7 +87,7 @@
 
 html,
 body {
-  background: #ffffff;
+  background: var(--color-canvas);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -40,6 +104,11 @@ html[dir="ltr"] body {
 ::selection {
   background: var(--color-knx);
   color: #ffffff;
+}
+
+html.dark ::selection {
+  background: var(--color-knx);
+  color: #04130d;
 }
 
 .hairline {
@@ -62,7 +131,7 @@ html[dir="ltr"] body {
 }
 
 .knx-animated-bg {
-  background-color: #ffffff;
+  background-color: var(--color-canvas);
   background-image:
     radial-gradient(45% 45% at 15% 20%, rgba(0, 176, 112, 0.16), transparent 70%),
     radial-gradient(40% 40% at 85% 80%, rgba(0, 122, 77, 0.14), transparent 70%),
@@ -70,9 +139,95 @@ html[dir="ltr"] body {
   background-attachment: local;
 }
 
+/* Same three washes, dialled down so they read as a glow in a dark room
+   instead of three grey clouds. */
+html.dark .knx-animated-bg {
+  background-image:
+    radial-gradient(45% 45% at 15% 20%, rgba(0, 196, 124, 0.13), transparent 70%),
+    radial-gradient(40% 40% at 85% 80%, rgba(0, 150, 94, 0.11), transparent 70%),
+    radial-gradient(35% 35% at 50% 50%, rgba(0, 176, 112, 0.06), transparent 70%);
+}
+
+/* --- Imagery in the dark ------------------------------------------------
+   Photographs and uploaded artwork are authored against white; dropped onto a
+   near-black page they glare. A small brightness cut settles them into the
+   surface without washing out detail. The KNX mark is exempt and handled
+   below — it needs lifting, not dimming. Anything that must stay untouched
+   can opt out with `data-no-dim`. */
+html.dark img:not(.knx-logo):not([data-no-dim]) {
+  filter: brightness(0.92) contrast(1.03);
+}
+
+/* The mark is green + mid-grey + a fairly dark blue. The grey and the green
+   hold up on a dark ground; the blue "X" sinks, so lift the whole mark a
+   little and give it a faint green halo to separate it from the page. */
+html.dark .knx-logo {
+  filter: brightness(1.16) saturate(1.08)
+    drop-shadow(0 0 12px rgba(0, 196, 124, 0.18));
+}
+
+html.dark .knx-logo-hero {
+  filter: brightness(1.16) saturate(1.08)
+    drop-shadow(0 10px 46px rgba(0, 196, 124, 0.26));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rise {
     animation: none;
+  }
+}
+
+/* --- Theme swap ---------------------------------------------------------
+   Browsers with the View Transitions API get the circular wipe driven from
+   ThemeCord (the light spreads out from the knob you just pulled). The old and
+   new snapshots must not cross-fade underneath it, and which of the two sits
+   on top depends on the direction: turning the lights ON grows the new (lit)
+   layer over the dark one, turning them OFF shrinks the old (lit) layer away. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+html.knx-lights-out::view-transition-old(root) {
+  z-index: 2;
+}
+
+html.knx-lights-out::view-transition-new(root) {
+  z-index: 1;
+}
+
+/* Fallback for browsers without view transitions (and the only path used when
+   the visitor prefers reduced motion, where it is switched off entirely).
+   Added for the length of the swap only, so nothing carries a transition it
+   did not ask for during normal browsing. */
+.knx-theme-fade,
+.knx-theme-fade *,
+.knx-theme-fade *::before,
+.knx-theme-fade *::after {
+  transition:
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    color 0.4s ease,
+    fill 0.4s ease,
+    stroke 0.4s ease !important;
+  transition-delay: 0ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knx-theme-fade,
+  .knx-theme-fade *,
+  .knx-theme-fade *::before,
+  .knx-theme-fade *::after {
+    transition: none !important;
   }
 }
 
@@ -172,5 +327,204 @@ html[dir="ltr"] body {
   .knx-snap-js .knx-snap-page.knx-page-active > * {
     opacity: 1;
     animation: none;
+  }
+}
+
+/* --- The pull cord ------------------------------------------------------
+   A light pull hanging off the underside of the header. It is pinned to the
+   *inline-end* edge, so it lives on the right in English and swaps itself to
+   the left in Arabic with no JS and no mirrored copy of the markup.
+
+   Total footprint is kept under 40px wide because that is exactly the gutter
+   the page keeps outside its content column (section px-4 + container px-6) at
+   every breakpoint — so the cord never lands on top of a word. */
+.knx-cord {
+  position: fixed;
+  top: var(--knx-header-h);
+  inset-inline-end: 3px;
+  z-index: 40;
+  width: 34px;
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+}
+
+.knx-cord-pull {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+  line-height: 0;
+  display: block;
+  cursor: grab;
+  border-radius: 14px;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.knx-cord-pull.is-grabbing {
+  cursor: grabbing;
+}
+
+.knx-cord-pull:focus-visible {
+  outline: 2px solid var(--color-knx);
+  outline-offset: 4px;
+}
+
+.knx-cord svg {
+  display: block;
+  width: 34px;
+  height: auto;
+  overflow: visible;
+}
+
+.knx-cord-chain {
+  fill: none;
+  stroke: #9aa3a0;
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 6.4;
+  transition:
+    stroke 0.4s ease,
+    opacity 0.3s ease;
+}
+
+.knx-cord-mount {
+  fill: var(--color-line);
+  transition: fill 0.4s ease;
+}
+
+.knx-cord-halo {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 7.5;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 6.4;
+  transition: stroke 0.4s ease;
+}
+
+.knx-cord-knob {
+  fill: #8f9895;
+  stroke-width: 1;
+  transition:
+    fill 0.4s ease,
+    stroke 0.4s ease;
+}
+
+.knx-cord-knob-hl {
+  fill: rgba(255, 255, 255, 0.45);
+}
+
+/* Lights on: the pull reads as a dark fitting against a bright room. */
+html:not(.dark) .knx-cord-chain {
+  stroke: #a2aba8;
+}
+
+html:not(.dark) .knx-cord-halo {
+  stroke: rgba(255, 255, 255, 0.55);
+}
+
+html:not(.dark) .knx-cord-knob {
+  fill: var(--color-ink);
+  stroke: rgba(255, 255, 255, 0.6);
+}
+
+html:not(.dark) .knx-cord-knob-hl {
+  fill: rgba(255, 255, 255, 0.38);
+}
+
+/* Lights off: the fitting is what little the room reflects, and the bead
+   carries a faint warm glint so the control is still findable. */
+html.dark .knx-cord-chain {
+  stroke: #626f6b;
+}
+
+html.dark .knx-cord-halo {
+  stroke: rgba(0, 0, 0, 0.5);
+}
+
+html.dark .knx-cord-knob {
+  fill: #cfd8d4;
+  stroke: rgba(0, 0, 0, 0.45);
+}
+
+html.dark .knx-cord-knob-hl {
+  fill: rgba(255, 255, 255, 0.55);
+}
+
+.knx-cord-glow {
+  transition: opacity 0.5s ease;
+}
+
+html:not(.dark) .knx-cord-glow {
+  opacity: 0;
+}
+
+html.dark .knx-cord-glow {
+  opacity: 0.6;
+}
+
+.knx-cord-hint {
+  position: absolute;
+  top: 64px;
+  inset-inline-end: calc(100% + 6px);
+  margin: 0;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  background: var(--color-card);
+  color: var(--color-ink-muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+  pointer-events: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+html.dark .knx-cord-hint {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.knx-cord-hint.is-shown,
+.knx-cord-pull:hover + .knx-cord-hint,
+.knx-cord-pull:focus-visible + .knx-cord-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.knx-cord.is-grabbing .knx-cord-hint {
+  opacity: 0;
+}
+
+@media (max-width: 767px) {
+  .knx-cord {
+    width: 26px;
+    inset-inline-end: 2px;
+  }
+  .knx-cord svg {
+    width: 26px;
+  }
+  .knx-cord-hint {
+    top: 48px;
+    font-size: 11px;
+  }
+}
+
+/* No motion wanted: the rope never animates, so render it as a short static
+   pull and let the button behave like an ordinary toggle. */
+@media (prefers-reduced-motion: reduce) {
+  .knx-cord-chain,
+  .knx-cord-halo,
+  .knx-cord-mount,
+  .knx-cord-knob,
+  .knx-cord-hint,
+  .knx-cord-glow {
+    transition: none;
   }
 }

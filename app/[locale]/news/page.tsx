@@ -21,14 +21,14 @@ export default async function NewsListPage({
 
   return (
     <DetailPageShell dict={dict} locale={L}>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+      <span className="text-xs font-semibold uppercase tracking-widest text-accent">
         {t.eyebrow}
       </span>
       <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{t.title}</h1>
       <p className="mt-4 max-w-3xl text-base text-ink-muted md:text-lg">{t.body}</p>
 
       {news.length === 0 ? (
-        <p className="mt-12 rounded-2xl border border-line bg-white p-8 text-center text-sm text-ink-muted">
+        <p className="mt-12 rounded-2xl border border-line bg-card p-8 text-center text-sm text-ink-muted">
           {t.empty}
         </p>
       ) : (
@@ -37,9 +37,9 @@ export default async function NewsListPage({
             <li key={n.id}>
               <Link
                 href={`/${L}/news/${n.id}`}
-                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white transition hover:border-ink"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-card transition hover:border-ink"
               >
-                <div className="relative aspect-[16/9] bg-neutral-100">
+                <div className="relative aspect-[16/9] bg-subtle">
                   {n.image_url && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -51,7 +51,7 @@ export default async function NewsListPage({
                   )}
                 </div>
                 <div className="flex flex-1 flex-col p-5">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-accent">
                     {new Date(n.event_date ?? n.created_at).toLocaleDateString(dateLocale, {
                       year: "numeric",
                       month: "long",

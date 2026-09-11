@@ -15,7 +15,7 @@ export function MembersDirectory({
 
   if (team.length === 0) {
     return (
-      <p className="mt-3 rounded-2xl border border-line bg-white p-8 text-center text-sm text-ink-muted">
+      <p className="mt-3 rounded-2xl border border-line bg-card p-8 text-center text-sm text-ink-muted">
         —
       </p>
     );
@@ -29,7 +29,7 @@ export function MembersDirectory({
             <button
               type="button"
               onClick={() => setSelected(m)}
-              className="flex w-full flex-wrap items-center gap-5 rounded-2xl border border-line bg-white p-5 text-start transition hover:border-ink hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-knx md:p-6"
+              className="flex w-full flex-wrap items-center gap-5 rounded-2xl border border-line bg-card p-5 text-start transition hover:border-ink hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-knx md:p-6"
             >
               {m.photo_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -42,7 +42,7 @@ export function MembersDirectory({
               ) : (
                 <span
                   aria-hidden="true"
-                  className="grid h-20 w-20 flex-shrink-0 place-items-center rounded-2xl bg-knx-50 text-xl font-bold text-knx-700"
+                  className="grid h-20 w-20 flex-shrink-0 place-items-center rounded-2xl bg-accent-soft text-xl font-bold text-accent"
                 >
                   {initials(m.name)}
                 </span>
@@ -53,10 +53,10 @@ export function MembersDirectory({
                 {m.company && <p className="mt-1 text-xs text-ink-muted">{m.company}</p>}
               </div>
               {m.is_partner && (
-                <div className="flex items-center gap-2 rounded-full border border-line bg-knx-50 px-3 py-1.5">
+                <div className="flex items-center gap-2 rounded-full border border-line bg-accent-soft px-3 py-1.5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/KNX_logo.svg.png" alt="KNX partner" className="h-6 w-auto" />
-                  <span className="text-xs font-semibold text-knx-700">
+                  <span className="text-xs font-semibold text-accent">
                     {dict.membersSection.partnerLabel}
                   </span>
                 </div>
@@ -102,24 +102,24 @@ function MemberModal({
       aria-label={member.name}
       dir="ltr"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-scrim p-4 backdrop-blur-sm"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-line bg-white shadow-2xl"
+        className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-line bg-card shadow-2xl"
       >
         <button
           type="button"
           onClick={onClose}
           aria-label={closeLabel}
-          className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full border border-line bg-white/90 text-ink-muted transition hover:border-ink hover:text-ink"
+          className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full border border-line bg-card/90 text-ink-muted transition hover:border-ink hover:text-ink"
         >
           ✕
         </button>
 
         <div className="grid gap-0 md:grid-cols-[220px_1fr]">
           {/* Photo — left-hand side */}
-          <div className="flex items-center justify-center bg-knx-50 p-6 md:p-8">
+          <div className="flex items-center justify-center bg-accent-soft p-6 md:p-8">
             {member.photo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -128,7 +128,7 @@ function MemberModal({
                 className="h-40 w-40 rounded-2xl object-cover object-top md:h-44 md:w-44"
               />
             ) : (
-              <span className="grid h-40 w-40 place-items-center rounded-2xl bg-white text-4xl font-bold text-knx-700 md:h-44 md:w-44">
+              <span className="grid h-40 w-40 place-items-center rounded-2xl bg-card text-4xl font-bold text-accent md:h-44 md:w-44">
                 {initials(member.name)}
               </span>
             )}
@@ -138,7 +138,7 @@ function MemberModal({
           <div className="p-6 md:p-8">
             <h2 className="text-2xl font-bold tracking-tight text-ink">{member.name}</h2>
             {member.is_partner && (
-              <span className="mt-2 inline-flex items-center gap-2 rounded-full border border-line bg-knx-50 px-3 py-1 text-xs font-semibold text-knx-700">
+              <span className="mt-2 inline-flex items-center gap-2 rounded-full border border-line bg-accent-soft px-3 py-1 text-xs font-semibold text-accent">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/KNX_logo.svg.png" alt="KNX partner" className="h-4 w-auto" />
                 KNX partner
@@ -196,14 +196,14 @@ function Detail({
   const external = href?.startsWith("http");
   return (
     <div>
-      <dt className="text-xs font-semibold uppercase tracking-widest text-knx-700">{label}</dt>
+      <dt className="text-xs font-semibold uppercase tracking-widest text-accent">{label}</dt>
       <dd className="mt-1 break-all text-ink">
         {href ? (
           <a
             href={href}
             target={external ? "_blank" : undefined}
             rel={external ? "noopener noreferrer" : undefined}
-            className="font-medium text-ink hover:text-knx-700"
+            className="font-medium text-ink hover:text-accent"
           >
             {value}
           </a>

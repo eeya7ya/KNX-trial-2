@@ -77,7 +77,7 @@ export function JoinForm({ dict, locale }: { dict: Dict; locale: string }) {
             maxLength={40}
             dir="ltr"
             placeholder={dict.join.phonePlaceholder}
-            className="w-full border-0 border-b border-line bg-transparent px-0 py-3 text-base outline-none transition placeholder:text-neutral-400 focus:border-knx"
+            className="w-full border-0 border-b border-line bg-transparent px-0 py-3 text-base outline-none transition placeholder:text-ink-muted/70 focus:border-knx"
           />
         </Field>
         <Field label={dict.join.role}>
@@ -85,7 +85,7 @@ export function JoinForm({ dict, locale }: { dict: Dict; locale: string }) {
             name="role"
             maxLength={120}
             placeholder={dict.join.rolePlaceholder}
-            className="w-full border-0 border-b border-line bg-transparent px-0 py-3 text-base outline-none transition placeholder:text-neutral-400 focus:border-knx"
+            className="w-full border-0 border-b border-line bg-transparent px-0 py-3 text-base outline-none transition placeholder:text-ink-muted/70 focus:border-knx"
           />
         </Field>
       </div>
@@ -93,7 +93,7 @@ export function JoinForm({ dict, locale }: { dict: Dict; locale: string }) {
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="group inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-knx-700 disabled:opacity-60"
+          className="group inline-flex items-center gap-2 rounded-full bg-cta px-7 py-3.5 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover disabled:opacity-60"
         >
           <span>
             {status === "submitting" ? dict.join.submitting : dict.join.submit}
@@ -103,10 +103,10 @@ export function JoinForm({ dict, locale }: { dict: Dict; locale: string }) {
           </span>
         </button>
         {status === "success" && (
-          <p className="text-sm text-knx-700">{message}</p>
+          <p className="text-sm text-accent">{message}</p>
         )}
         {status === "error" && (
-          <p className="text-sm text-red-600">{message}</p>
+          <p className="text-sm text-danger">{message}</p>
         )}
       </div>
     </form>
