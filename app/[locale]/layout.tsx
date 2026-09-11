@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Cairo } from "next/font/google";
 import { headers } from "next/headers";
 import "../globals.css";
 import { notFound } from "next/navigation";
 import { getDict, isLocale, type Locale } from "@/lib/i18n";
+import { ThemeCord } from "./components/ThemeCord";
 
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://knx-jordan-club.com"
@@ -20,6 +21,24 @@ const cairo = Cairo({
   variable: "--font-cairo",
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  // Kept as a single tag so the boot script below — and the cord, later — can
+  // rewrite it in place when the theme changes.
+  themeColor: "#ffffff",
+};
+
+/**
+ * Resolves the theme before the first paint: an explicit saved choice wins,
+ * otherwise the OS preference decides. Inlined as the first thing in <body> so
+ * a visitor who prefers dark never sees a white page flash first.
+ */
+const THEME_BOOT = `(function(){try{var s=localStorage.getItem("knx-theme");\
+var d=s==="dark"||(s!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);\
+var r=document.documentElement;if(d)r.classList.add("dark");\
+r.style.colorScheme=d?"dark":"light";\
+var m=document.querySelector('meta[name="theme-color"]');\
+if(m)m.content=d?"#0a0f0e":"#ffffff";}catch(e){}})();`;
 
 export async function generateMetadata({
   params,
@@ -124,7 +143,11 @@ export default async function LocaleLayout({
     name: "KNX Club Jordan",
     alternateName: ["نادي KNX الأردني", "KNX Jordan Club", "KNX Jordan"],
     url: `${SITE_URL}/${locale}`,
-    logo: `${SITE_URL}/KNX_logo.svg.png`,
+    // Google renders this in search results and the knowledge panel, where a
+    // 2.1:1 strip is shown tiny. The generated square tile reads far better,
+    // and the wide original stays available as the general-purpose image.
+    logo: `${SITE_URL}/icon-512`,
+    image: `${SITE_URL}/KNX_logo.svg.png`,
     description: isAr
       ? "المجتمع المهني الأردني لمعيار KNX لأتمتة المباني والمنازل الذكية."
       : "The professional Jordanian community for the KNX building and home automation standard.",
@@ -137,13 +160,18 @@ export default async function LocaleLayout({
       lang={dict.htmlLang}
       dir={dict.dir}
       className={`${inter.variable} ${cairo.variable}`}
+      // THEME_BOOT puts `dark` + a color-scheme on this element before React
+      // hydrates, which is the whole point of it — tell React to expect that.
+      suppressHydrationWarning
     >
-      <body className="bg-white text-ink">
+      <body className="bg-canvas text-ink">
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         {children}
+        <ThemeCord labels={dict.theme} />
       </body>
     </html>
   );

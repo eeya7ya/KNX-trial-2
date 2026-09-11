@@ -22,14 +22,14 @@ export default async function GalleryPage({
 
   return (
     <DetailPageShell dict={dict} locale={L}>
-      <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+      <span className="text-xs font-semibold uppercase tracking-widest text-accent">
         {t.eyebrow}
       </span>
       <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{t.title}</h1>
       <p className="mt-4 max-w-3xl text-base text-ink-muted md:text-lg">{t.body}</p>
 
       {folders.length === 0 && (
-        <p className="mt-12 rounded-2xl border border-line bg-white p-8 text-center text-sm text-ink-muted">
+        <p className="mt-12 rounded-2xl border border-line bg-card p-8 text-center text-sm text-ink-muted">
           {t.empty}
         </p>
       )}
@@ -65,7 +65,7 @@ function GalleryFolderSection({
       <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line pb-3">
         <h2 className="text-xl font-bold tracking-tight text-ink">{title}</h2>
         {folder.date && (
-          <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+          <span className="text-xs font-semibold uppercase tracking-widest text-accent">
             {new Date(folder.date).toLocaleDateString(dateLocale, {
               year: "numeric",
               month: "long",
@@ -87,9 +87,9 @@ function GalleryFolderSection({
                   href={p.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="group block overflow-hidden rounded-2xl border border-line bg-white"
+                  className="group block overflow-hidden rounded-2xl border border-line bg-card"
                 >
-                  <div className="relative aspect-[4/3] bg-neutral-100">
+                  <div className="relative aspect-[4/3] bg-subtle">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={p.url}
@@ -122,8 +122,8 @@ function GalleryFolderSection({
               const isFile = isVideoFileUrl(v.url);
               return (
                 <li key={v.id}>
-                  <div className="overflow-hidden rounded-2xl border border-line bg-white">
-                    <div className="relative aspect-video bg-neutral-100">
+                  <div className="overflow-hidden rounded-2xl border border-line bg-card">
+                    <div className="relative aspect-video bg-subtle">
                       {yt ? (
                         <iframe
                           src={`https://www.youtube.com/embed/${yt}`}

@@ -21,7 +21,7 @@ export function DetailPageShell({
       <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10 md:py-16">
         <Link
           href={`/${locale}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-knx-700 transition hover:text-knx-800"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:text-accent-strong"
         >
           <IconArrow
             className="h-4 w-4"
@@ -31,7 +31,7 @@ export function DetailPageShell({
         </Link>
         <div className="mt-8">{children}</div>
       </main>
-      <footer className="border-t border-line bg-white">
+      <footer className="border-t border-line bg-canvas">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">
           <div>
             <p className="text-xs text-ink-muted md:text-sm">
@@ -45,7 +45,7 @@ export function DetailPageShell({
               className="mt-1 block text-xs text-ink-muted/70 transition hover:text-ink-muted"
             >
               Designed by{" "}
-              <span className="font-semibold text-knx-700">espark.dev</span>
+              <span className="font-semibold text-accent">espark.dev</span>
             </a>
           </div>
           <Logo className="h-7 w-auto" />

@@ -28,12 +28,12 @@ export default async function NewsDetailPage({
     <DetailPageShell dict={dict} locale={L}>
       <Link
         href={`/${L}/news`}
-        className="text-sm font-semibold text-knx-700 transition hover:text-knx-800"
+        className="text-sm font-semibold text-accent transition hover:text-accent-strong"
       >
         ← {t.backToList}
       </Link>
       <article className="mt-6">
-        <p className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+        <p className="text-xs font-semibold uppercase tracking-widest text-accent">
           {new Date(item.event_date ?? item.created_at).toLocaleDateString(dateLocale, {
             year: "numeric",
             month: "long",
@@ -44,7 +44,7 @@ export default async function NewsDetailPage({
           {item.title}
         </h1>
         {item.image_url && (
-          <div className="mt-8 overflow-hidden rounded-2xl border border-line bg-neutral-100">
+          <div className="mt-8 overflow-hidden rounded-2xl border border-line bg-subtle">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.image_url}
@@ -59,7 +59,7 @@ export default async function NewsDetailPage({
 
         {item.pictures.length > 0 && (
           <section className="mt-12">
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-accent">
               {g.pictures}
             </h2>
             <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -69,9 +69,9 @@ export default async function NewsDetailPage({
                     href={p.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="group block overflow-hidden rounded-2xl border border-line bg-white"
+                    className="group block overflow-hidden rounded-2xl border border-line bg-card"
                   >
-                    <div className="relative aspect-[4/3] bg-neutral-100">
+                    <div className="relative aspect-[4/3] bg-subtle">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={p.url}
@@ -89,7 +89,7 @@ export default async function NewsDetailPage({
 
         {item.videos.length > 0 && (
           <section className="mt-12">
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-accent">
               {g.videos}
             </h2>
             <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -98,7 +98,7 @@ export default async function NewsDetailPage({
                 const isFile = isVideoFileUrl(v.url);
                 return (
                   <li key={v.id}>
-                    <div className="relative aspect-video overflow-hidden rounded-2xl border border-line bg-neutral-100">
+                    <div className="relative aspect-video overflow-hidden rounded-2xl border border-line bg-subtle">
                       {yt ? (
                         <iframe
                           src={`https://www.youtube.com/embed/${yt}`}
@@ -119,7 +119,7 @@ export default async function NewsDetailPage({
                           href={v.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="absolute inset-0 grid place-items-center text-sm text-knx-700"
+                          className="absolute inset-0 grid place-items-center text-sm text-accent"
                         >
                           {v.title}
                         </a>

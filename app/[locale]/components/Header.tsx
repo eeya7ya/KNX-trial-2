@@ -6,7 +6,7 @@ export function Header({ dict, locale }: { dict: Dict; locale: Locale }) {
   const otherLocale: Locale = locale === "ar" ? "en" : "ar";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href={`/${locale}`} className="flex items-center gap-3">
           <Logo className="h-8 w-auto" />
@@ -51,7 +51,7 @@ export function Header({ dict, locale }: { dict: Dict; locale: Locale }) {
           </Link>
           <Link
             href={`/${locale}#join`}
-            className="hidden rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white transition hover:bg-knx-700 sm:inline-block"
+            className="hidden rounded-full bg-cta px-4 py-2 text-xs font-semibold text-cta-ink transition hover:bg-cta-hover sm:inline-block"
           >
             {dict.nav.join}
           </Link>

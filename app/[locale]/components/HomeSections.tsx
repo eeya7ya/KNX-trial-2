@@ -184,13 +184,13 @@ export function HomeSections({
         <div className="flex w-full flex-1 items-center">
           <div className="mx-auto grid w-full max-w-7xl items-center gap-6 px-6 md:grid-cols-12 md:gap-10">
             <div className="md:col-span-7 rise">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted">
+              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-card px-3 py-1 text-xs font-medium text-ink-muted">
                 <span className="h-1.5 w-1.5 rounded-full bg-knx" />
                 {dict.hero.eyebrow}
               </span>
               <h1 className="mt-4 text-[2.1rem] font-extrabold leading-[1.15] tracking-tight md:text-[3.25rem] md:leading-[1.08] lg:text-[3.75rem]">
                 <span className="block">{dict.hero.titleA}</span>
-                <span className="mt-1 block text-knx-700">{dict.hero.titleAccent}</span>
+                <span className="mt-1 block text-accent">{dict.hero.titleAccent}</span>
                 <span className="mt-1 block">{dict.hero.titleB}</span>
               </h1>
               <p className="mt-5 max-w-xl text-base leading-relaxed text-ink-muted md:mt-6 md:text-lg">
@@ -199,7 +199,7 @@ export function HomeSections({
               <div className="mt-7 flex flex-wrap items-center gap-3">
                 <a
                   href="#join"
-                  className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-knx-700"
+                  className="group inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover"
                 >
                   {dict.hero.primaryCta}
                   <IconArrow
@@ -217,7 +217,7 @@ export function HomeSections({
             </div>
             <div className="md:col-span-5">
               <div className="relative mx-auto grid aspect-square w-full max-w-sm place-items-center md:max-w-md lg:max-w-lg">
-                <Logo className="h-44 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-56 lg:h-64" />
+                <Logo className="knx-logo-hero h-44 w-auto drop-shadow-[0_18px_40px_rgba(0,150,94,0.18)] md:h-56 lg:h-64" />
               </div>
             </div>
           </div>
@@ -254,9 +254,9 @@ export function HomeSections({
               return (
                 <div
                   key={it.title}
-                  className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5 text-start transition hover:border-knx hover:shadow-sm"
+                  className="flex flex-col gap-3 rounded-2xl border border-line bg-card p-5 text-start transition hover:border-knx hover:shadow-sm"
                 >
-                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-knx-50 text-knx-700">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-accent-soft text-accent">
                     <Icon className="h-6 w-6" />
                   </span>
                   <p className="text-sm font-semibold text-ink">{it.title}</p>
@@ -295,7 +295,7 @@ export function HomeSections({
               {content.team.slice(0, 20).map((m) => (
                 <li
                   key={m.id}
-                  className="flex items-center gap-2 rounded-xl border border-line bg-white p-2 text-start"
+                  className="flex items-center gap-2 rounded-xl border border-line bg-card p-2 text-start"
                 >
                   {m.photo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -320,7 +320,7 @@ export function HomeSections({
                 <li>
                   <Link
                     href={`/${locale}/members`}
-                    className="flex h-full items-center justify-center rounded-xl border border-dashed border-line bg-white p-2 text-sm font-semibold text-knx-700 transition hover:border-knx"
+                    className="flex h-full items-center justify-center rounded-xl border border-dashed border-line bg-card p-2 text-sm font-semibold text-accent transition hover:border-knx"
                   >
                     +{content.team.length - 20}
                   </Link>
@@ -343,7 +343,7 @@ export function HomeSections({
       )}
 
       {/* JOIN — full action */}
-      <Section id="join" className="bg-ink text-white">
+      <Section id="join" className="bg-invert text-invert-ink">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 md:grid-cols-12">
           <div className="md:col-span-5">
             <span className="text-xs font-semibold uppercase tracking-widest text-knx-200">
@@ -352,10 +352,10 @@ export function HomeSections({
             <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight md:text-5xl">
               {dict.join.title}
             </h2>
-            <p className="mt-5 max-w-md text-neutral-300">{dict.join.body}</p>
+            <p className="mt-5 max-w-md text-invert-muted">{dict.join.body}</p>
           </div>
           <div className="md:col-span-7">
-            <div className="rounded-2xl bg-white p-6 text-ink shadow-2xl md:p-8">
+            <div className="rounded-2xl border border-line bg-card p-6 text-ink shadow-2xl md:p-8">
               <JoinForm dict={dict} locale={locale} />
             </div>
           </div>
@@ -377,12 +377,12 @@ export function HomeSections({
       {/* CONTACT — hero on top, footer pinned to bottom */}
       <section
         id="contact-page"
-        className="knx-snap-page snap-start !flex-col border-t border-line bg-white"
+        className="knx-snap-page snap-start !flex-col border-t border-line bg-canvas"
       >
         <div className="flex flex-1 items-center justify-center px-6">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-knx-700">
-              <span className="h-px w-8 bg-knx-700" />
+            <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-accent">
+              <span className="h-px w-8 bg-accent" />
               {dict.footer.contact}
             </span>
             <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight md:text-5xl">
@@ -390,7 +390,7 @@ export function HomeSections({
             </h2>
             <a
               href="mailto:hello@support.knx-jordan-club.com"
-              className="mt-8 inline-block text-2xl font-semibold text-ink hover:text-knx-700 md:text-3xl"
+              className="mt-8 inline-block text-2xl font-semibold text-ink hover:text-accent md:text-3xl"
               dir="ltr"
             >
               hello@support.knx-jordan-club.com
@@ -444,8 +444,8 @@ function BriefCard({
 }) {
   return (
     <div className="mx-auto flex max-w-4xl flex-col items-center px-4 text-center">
-      <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-knx-700">
-        <span className="h-px w-8 bg-knx-700" />
+      <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-accent">
+        <span className="h-px w-8 bg-accent" />
         {eyebrow}
       </span>
       <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight md:text-5xl">{title}</h2>
@@ -453,7 +453,7 @@ function BriefCard({
       {children}
       <Link
         href={href}
-        className="group mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-knx-700"
+        className="group mt-8 inline-flex items-center gap-2 rounded-full bg-cta px-7 py-3.5 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover"
       >
         {cta}
         <IconArrow
@@ -478,8 +478,8 @@ function LatestNewsSection({
   return (
     <div className="mx-auto w-full max-w-7xl px-6">
       <div className="text-center">
-        <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-knx-700">
-          <span className="h-px w-8 bg-knx-700" />
+        <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-accent">
+          <span className="h-px w-8 bg-accent" />
           {t.eyebrow}
         </span>
         <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight md:text-5xl">
@@ -488,9 +488,9 @@ function LatestNewsSection({
         <p className="mx-auto mt-4 max-w-2xl text-base text-ink-muted md:text-lg">{t.body}</p>
       </div>
 
-      <article className="mt-10 grid items-stretch gap-0 overflow-hidden rounded-3xl border border-line bg-white shadow-sm md:grid-cols-2">
+      <article className="mt-10 grid items-stretch gap-0 overflow-hidden rounded-3xl border border-line bg-card shadow-sm md:grid-cols-2">
         <div className="flex flex-col justify-center p-6 md:p-10">
-          <span className="text-xs font-semibold uppercase tracking-widest text-knx-700">
+          <span className="text-xs font-semibold uppercase tracking-widest text-accent">
             {new Date(item.event_date ?? item.created_at).toLocaleDateString(
               locale === "ar" ? "ar-JO" : "en-GB",
               { year: "numeric", month: "long", day: "numeric" },
@@ -505,7 +505,7 @@ function LatestNewsSection({
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Link
               href={`/${locale}/news/${item.id}`}
-              className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-knx-700"
+              className="group inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover"
             >
               {t.readMore}
               <IconArrow
@@ -521,7 +521,7 @@ function LatestNewsSection({
             </Link>
           </div>
         </div>
-        <div className="relative min-h-[260px] bg-neutral-100 md:min-h-[420px]">
+        <div className="relative min-h-[260px] bg-subtle md:min-h-[420px]">
           {item.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

@@ -109,6 +109,11 @@ export type Dict = {
   };
   detailCta: string;
   close: string;
+  theme: {
+    toDark: string;
+    toLight: string;
+    hint: string;
+  };
 };
 
 const ar: Dict = {
@@ -290,6 +295,11 @@ const ar: Dict = {
   },
   detailCta: "اعرض التفاصيل",
   close: "إغلاق",
+  theme: {
+    toDark: "التبديل إلى الوضع الداكن",
+    toLight: "التبديل إلى الوضع الفاتح",
+    hint: "اسحب الحبل",
+  },
 };
 
 const en: Dict = {
@@ -471,6 +481,11 @@ const en: Dict = {
   },
   detailCta: "View details",
   close: "Close",
+  theme: {
+    toDark: "Switch to dark mode",
+    toLight: "Switch to light mode",
+    hint: "Pull the cord",
+  },
 };
 
 const dictionaries: Record<Locale, Dict> = { ar, en };

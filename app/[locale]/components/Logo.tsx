@@ -10,7 +10,7 @@ export function Logo({ className = "h-9 w-auto", variant = "mark" }: LogoProps) 
       src="/KNX_logo.svg.png"
       alt="KNX Club Jordan"
       data-variant={variant}
-      className={className}
+      className={`knx-logo ${className}`}
       draggable={false}
     />
   );
