@@ -8,24 +8,28 @@ export type ThemeCordLabels = {
   hint: string;
 };
 
-/* ---- rope ---------------------------------------------------------------
-   24 beads, verlet integration, distance constraints solved with alternating
-   sweeps. The chain is inextensible and hangs straight; the swing, the stretch
+/* ---- cord ---------------------------------------------------------------
+   11 beads, verlet integration, distance constraints solved with alternating
+   sweeps. The cord is inextensible and hangs straight; the swing, the stretch
    under a pull and the recoil on release all fall out of the physics rather
-   than being keyframed. Units are viewBox units, not pixels — the SVG is
-   scaled by CSS, so the cord shortens with it on small screens. */
-const AX = 30;
-const AY = -16;
-const N = 22;
-const L0 = 10;
+   than being keyframed.
+
+   It hangs off the underside of the header, aligned with the inline-end of the
+   content column — the same column the Join button sits in — so it reads as
+   part of the header rather than as something stranded at the edge of the
+   window. Units are viewBox units and the SVG renders 1:1, so these are px. */
+const AX = 13;
+const AY = 0;
+const N = 11;
+const L0 = 7;
 const GRAV = 0.3;
 const DAMP = 0.978;
 const ITER = 5;
 const SUB = 2;
-const MAXPULL = 70; // how far past taut the chain will stretch, asymptotically
-const THRESH = 26; // pull past this on release and the switch throws
-const SLEEP_EPS = 0.09; // viewBox units of movement below which the rope is "still"
-const MAX_RUN_MS = 4000; // hard ceiling on one run of the loop, whatever the physics says
+const MAXPULL = 34; // how far past taut it will stretch, asymptotically
+const THRESH = 12; // pull past this on release and the switch throws
+const SLEEP_EPS = 0.06; // movement below which the cord counts as "still"
+const MAX_RUN_MS = 4000; // hard ceiling on one run of the loop
 
 const STORAGE_KEY = "knx-theme";
 const SEEN_KEY = "knx-cord-seen";
@@ -40,7 +44,7 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
   const cordRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const chainRef = useRef<SVGPathElement>(null);
+  const lineRef = useRef<SVGPathElement>(null);
   const haloRef = useRef<SVGPathElement>(null);
   const knobRef = useRef<SVGGElement>(null);
   const hintRef = useRef<HTMLParagraphElement>(null);
@@ -73,11 +77,11 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
     const cord = cordRef.current;
     const btn = btnRef.current;
     const svg = svgRef.current;
-    const chain = chainRef.current;
+    const line = lineRef.current;
     const halo = haloRef.current;
     const knob = knobRef.current;
     const hint = hintRef.current;
-    if (!cord || !btn || !svg || !chain || !knob) return;
+    if (!cord || !btn || !svg || !line || !knob) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -109,22 +113,19 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
     function throwSwitch() {
       const next: Theme = currentTheme() === "dark" ? "light" : "dark";
       const r = knob!.getBoundingClientRect();
-      commitTheme(next, {
-        x: r.left + r.width / 2,
-        y: r.top + r.height / 2,
-      });
+      commitTheme(next, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
       setIsDark(next === "dark");
       clack(next === "light");
       markSeen();
     }
 
     if (reduce) {
-      // No rope, no yank — the chain is drawn straight by the static markup and
+      // No rope, no yank — the cord is drawn straight by the static markup and
       // the button behaves like any other toggle.
-      const onClick = () => throwSwitch();
-      btn.addEventListener("click", onClick);
+      const onClickReduced = () => throwSwitch();
+      btn.addEventListener("click", onClickReduced);
       return () => {
-        btn.removeEventListener("click", onClick);
+        btn.removeEventListener("click", onClickReduced);
         if (hintTimer) clearTimeout(hintTimer);
       };
     }
@@ -167,7 +168,7 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
       }
     }
 
-    function step(wind: number) {
+    function step() {
       for (let s = 0; s < SUB; s++) {
         for (let i = 1; i < N; i++) {
           if (dragging && i === N - 1) continue;
@@ -176,7 +177,7 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
           const vy = (p.y - p.py) * DAMP;
           p.px = p.x;
           p.py = p.y;
-          p.x += vx + wind * (i / N);
+          p.x += vx;
           p.y += vy + GRAV;
         }
         if (dragging) {
@@ -195,9 +196,9 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
       }
     }
 
-    // Let it settle, then record how far the bead naturally hangs. Everything
-    // downstream (resistance, throw threshold) is measured against this.
-    for (let w = 0; w < 400; w++) step(0);
+    // Let it settle, then record how far the pendant naturally hangs.
+    // Everything downstream (resistance, throw threshold) measures against it.
+    for (let w = 0; w < 300; w++) step();
     restDist = Math.hypot(last.x - AX, last.y - AY);
 
     function draw() {
@@ -210,7 +211,7 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
         )} ${((p.y + q.y) / 2).toFixed(1)}`;
       }
       d += ` L${last.x.toFixed(1)} ${last.y.toFixed(1)}`;
-      chain!.setAttribute("d", d);
+      line!.setAttribute("d", d);
       halo?.setAttribute("d", d);
 
       const pv = pts[N - 2];
@@ -244,7 +245,7 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
       const dy = y - AY;
       const raw = Math.hypot(dx, dy) || 1e-4;
       let d = raw;
-      // Once the chain is taut it stops giving; the remaining travel decays so
+      // Once the cord is taut it stops giving; the remaining travel decays so
       // it feels like a spring rather than a rubber band.
       if (raw > restDist) {
         d = restDist + MAXPULL * (1 - Math.exp(-(raw - restDist) / MAXPULL));
@@ -257,6 +258,30 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
       last.y = pinY;
     }
 
+    /* ---- loop ----------------------------------------------------------
+       The cord only runs while something is actually happening. A cord that
+       nobody is touching is a still image, so once it has settled the frame
+       loop stops dead and costs the page nothing until it is next touched. */
+    let raf = 0;
+    let running = false;
+    let stillFrames = 0;
+    let runStartedAt = 0;
+    const prev = new Float64Array(N * 2);
+
+    function movedSinceLastFrame() {
+      let m = 0;
+      for (let i = 0; i < N; i++) {
+        m = Math.max(
+          m,
+          Math.abs(pts[i].x - prev[i * 2]),
+          Math.abs(pts[i].y - prev[i * 2 + 1]),
+        );
+        prev[i * 2] = pts[i].x;
+        prev[i * 2 + 1] = pts[i].y;
+      }
+      return m;
+    }
+
     let moved = false;
     let yankT = 0;
     let downX = 0;
@@ -264,6 +289,52 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
     let grabX = 0;
     let grabY = 0;
 
+    function frame(now: number) {
+      if (yankT) {
+        const e = (now - yankT) / 150;
+        if (e >= 1) {
+          yankT = 0;
+          dragging = false;
+          throwSwitch();
+        } else {
+          setPin(AX, AY + restDist + 26 * e * e);
+        }
+      }
+      step();
+      draw();
+
+      const idle = !dragging && !yankT;
+      if (idle && movedSinceLastFrame() < SLEEP_EPS) stillFrames++;
+      else stillFrames = 0;
+
+      // Sleep once it is visibly still — or unconditionally after MAX_RUN_MS,
+      // so no combination of shoves can leave the loop spinning.
+      if (idle && (stillFrames > 2 || now - runStartedAt > MAX_RUN_MS)) {
+        running = false;
+        raf = 0;
+        return;
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    function wake() {
+      if (running || document.hidden) return;
+      running = true;
+      stillFrames = 0;
+      runStartedAt = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+
+    // A sideways shove on the lower half; physics carries it from there and
+    // the loop puts itself back to sleep a second or so later.
+    function nudge(force: number) {
+      for (let i = Math.floor(N * 0.35); i < N; i++) {
+        pts[i].px -= force * (i / N);
+      }
+      wake();
+    }
+
+    /* ---- input ---- */
     function onPointerDown(e: PointerEvent) {
       const p = toSvg(e);
       dragging = true;
@@ -304,8 +375,8 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
       if (moved && t > THRESH) throwSwitch();
     }
 
-    // Tap, Enter or Space: yank it on their behalf, so a keyboard user sees the
-    // same chain travel a mouse user does.
+    // Tap, Enter or Space: yank it on their behalf, so a keyboard user sees
+    // the same travel a mouse user does.
     function onClick() {
       if (moved) {
         moved = false;
@@ -316,86 +387,10 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
       wake();
     }
 
-    btn.addEventListener("pointerdown", onPointerDown);
-    btn.addEventListener("pointermove", onPointerMove);
-    btn.addEventListener("pointerup", endDrag);
-    btn.addEventListener("pointercancel", endDrag);
-    btn.addEventListener("click", onClick);
-
-    /* ---- loop ----------------------------------------------------------
-       The rope only runs while something is actually happening. A hanging
-       chain that nobody is touching is a still image, so once it has settled
-       the frame loop stops dead and the cord costs the page nothing until it
-       is next touched. (It used to carry an idle sway, which meant a verlet
-       solve plus two path rewrites every frame, on every page, forever.) */
-    let raf = 0;
-    let running = false;
-    let stillFrames = 0;
-    let runStartedAt = 0;
-    const prev = new Float64Array(N * 2);
-
-    function movedSinceLastFrame() {
-      let m = 0;
-      for (let i = 0; i < N; i++) {
-        m = Math.max(
-          m,
-          Math.abs(pts[i].x - prev[i * 2]),
-          Math.abs(pts[i].y - prev[i * 2 + 1]),
-        );
-        prev[i * 2] = pts[i].x;
-        prev[i * 2 + 1] = pts[i].y;
-      }
-      return m;
-    }
-
-    function frame(now: number) {
-      if (yankT) {
-        const e = (now - yankT) / 160;
-        if (e >= 1) {
-          yankT = 0;
-          dragging = false;
-          throwSwitch();
-        } else {
-          setPin(AX, AY + restDist + 54 * e * e);
-        }
-      }
-      step(0);
-      draw();
-
-      const idle = !dragging && !yankT;
-      if (idle && movedSinceLastFrame() < SLEEP_EPS) stillFrames++;
-      else stillFrames = 0;
-
-      // Sleep once it is visibly still — or unconditionally after MAX_RUN_MS,
-      // so no combination of shoves can leave the loop spinning.
-      if (idle && (stillFrames > 2 || now - runStartedAt > MAX_RUN_MS)) {
-        running = false;
-        raf = 0;
-        return;
-      }
-      raf = requestAnimationFrame(frame);
-    }
-
-    function wake() {
-      if (running || document.hidden) return;
-      running = true;
-      stillFrames = 0;
-      runStartedAt = performance.now();
-      raf = requestAnimationFrame(frame);
-    }
-
-    // A sideways shove on the lower half; physics carries it from there and
-    // the loop puts itself back to sleep a second or so later.
-    function nudge(force: number) {
-      for (let i = Math.floor(N * 0.35); i < N; i++) {
-        pts[i].px -= force * (i / N);
-      }
-      wake();
-    }
-
     function onEnter() {
-      if (!dragging) nudge(0.6);
+      if (!dragging) nudge(0.45);
     }
+
     function onVisibility() {
       if (document.hidden && raf) {
         cancelAnimationFrame(raf);
@@ -403,11 +398,17 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
         running = false;
       }
     }
+
     btn.addEventListener("pointerenter", onEnter);
+    btn.addEventListener("pointerdown", onPointerDown);
+    btn.addEventListener("pointermove", onPointerMove);
+    btn.addEventListener("pointerup", endDrag);
+    btn.addEventListener("pointercancel", endDrag);
+    btn.addEventListener("click", onClick);
     document.addEventListener("visibilitychange", onVisibility);
 
     // One gentle settle on arrival so the cord announces itself, then silence.
-    nudge(0.7);
+    nudge(0.55);
 
     return () => {
       if (raf) cancelAnimationFrame(raf);
@@ -436,7 +437,7 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
       >
         <svg
           ref={svgRef}
-          viewBox="0 0 60 250"
+          viewBox="0 0 26 112"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
           focusable="false"
@@ -448,24 +449,20 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
             </radialGradient>
           </defs>
           {/* the fitting the cord drops out of, sitting on the header's edge */}
-          <rect
-            className="knx-cord-mount"
-            x="19"
-            y="-5"
-            width="22"
-            height="6"
-            rx="3"
-          />
-          {/* A wider copy of the chain in the opposite tone. Invisible against
+          <rect className="knx-cord-mount" x="7" y="-3" width="12" height="4" rx="2" />
+          {/* A wider copy of the cord in the opposite tone. Invisible against
               the page, it is what keeps the cord readable where it crosses the
               one high-contrast panel on the site. */}
-          <path className="knx-cord-halo" ref={haloRef} d="M30 -16 L30 194" />
-          <path className="knx-cord-chain" ref={chainRef} d="M30 -16 L30 194" />
-          <g ref={knobRef} transform="translate(30 194)">
-            <circle className="knx-cord-glow" cx="0" cy="16" r="42" fill="url(#knxCordGlow)" />
-            <rect className="knx-cord-knob" x="-2.6" y="0" width="5.2" height="9" rx="2.6" />
-            <ellipse className="knx-cord-knob" cx="0" cy="17" rx="7" ry="10.5" />
-            <ellipse className="knx-cord-knob-hl" cx="-2.5" cy="12.5" rx="2" ry="3.4" />
+          <path className="knx-cord-halo" ref={haloRef} d="M13 0 L13 70" />
+          <path className="knx-cord-line" ref={lineRef} d="M13 0 L13 70" />
+          <g ref={knobRef} transform="translate(13 70)">
+            <circle className="knx-cord-glow" cx="0" cy="12" r="26" fill="url(#knxCordGlow)" />
+            {/* weighted teardrop pendant, point upward into the cord */}
+            <path
+              className="knx-cord-knob"
+              d="M0 0 C3.4 5.6 5.6 9.6 5.6 12.4 C5.6 16.1 3.1 18.6 0 18.6 C-3.1 18.6 -5.6 16.1 -5.6 12.4 C-5.6 9.6 -3.4 5.6 0 0 Z"
+            />
+            <ellipse className="knx-cord-knob-hl" cx="-1.9" cy="11.6" rx="1.5" ry="2.6" />
           </g>
         </svg>
       </button>

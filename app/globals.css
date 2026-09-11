@@ -331,41 +331,15 @@ html.knx-lights-out::view-transition-new(root) {
 }
 
 /* --- The pull cord ------------------------------------------------------
-   A light pull hanging off the underside of the header. It is pinned to the
-   *inline-start* edge, so it lives on the left in English and swaps itself to
-   the right in Arabic with no JS and no mirrored copy of the markup — the
-   leading edge, away from the scrollbar and the header's own controls.
-
-   Width is capped at the gutter the page keeps outside its content column
-   (section px-4 + container px-6 = 40px at the tightest breakpoints), so the
-   cord never lands on top of a word. Wide viewports have far more gutter than
-   that, so it gets to grow there. */
+   Hangs from the underside of the header, aligned with the inline-end of the
+   content column — the same column the Join button sits in. That makes it part
+   of the header rather than something stranded at the edge of the window, and
+   it mirrors with the language for free: right in English, left in Arabic.
+   Positioning comes from the header markup; this is just how it looks. */
 .knx-cord {
-  position: fixed;
-  top: var(--knx-header-h);
-  inset-inline-start: 0;
-  z-index: 40;
-  width: 40px;
-  display: grid;
-  justify-items: center;
-  pointer-events: none;
-}
-
-.knx-cord svg {
-  display: block;
-  width: 40px;
-  height: auto;
-  overflow: visible;
-}
-
-@media (min-width: 1400px) {
-  .knx-cord {
-    width: 56px;
-    inset-inline-start: 10px;
-  }
-  .knx-cord svg {
-    width: 56px;
-  }
+  position: relative;
+  width: 26px;
+  flex: none;
 }
 
 .knx-cord-pull {
@@ -374,10 +348,10 @@ html.knx-lights-out::view-transition-new(root) {
   background: none;
   padding: 0;
   margin: 0;
-  line-height: 0;
   display: block;
+  line-height: 0;
   cursor: grab;
-  border-radius: 14px;
+  border-radius: 12px;
   touch-action: none;
   pointer-events: auto;
 }
@@ -388,26 +362,31 @@ html.knx-lights-out::view-transition-new(root) {
 
 .knx-cord-pull:focus-visible {
   outline: 2px solid var(--color-knx);
-  outline-offset: 4px;
+  outline-offset: 3px;
 }
 
-.knx-cord-chain {
+.knx-cord svg {
+  display: block;
+  width: 26px;
+  height: auto;
+  overflow: visible;
+}
+
+.knx-cord-line {
   fill: none;
-  stroke-width: 6;
+  stroke-width: 2.2;
   stroke-linecap: round;
-  stroke-dasharray: 0.1 8;
   transition: stroke 0.4s ease;
 }
 
-/* A wider copy of the chain in the opposite tone, drawn underneath. Invisible
+/* A wider copy of the cord in the opposite tone, drawn underneath. Invisible
    against the page, it is what keeps the cord readable where it crosses the
    one high-contrast panel on the site. */
 .knx-cord-halo {
   fill: none;
   stroke: transparent;
-  stroke-width: 10.5;
+  stroke-width: 5;
   stroke-linecap: round;
-  stroke-dasharray: 0.1 8;
   transition: stroke 0.4s ease;
 }
 
@@ -417,34 +396,34 @@ html.knx-lights-out::view-transition-new(root) {
 }
 
 .knx-cord-knob {
-  stroke-width: 1.1;
+  stroke-width: 1;
   transition:
     fill 0.4s ease,
     stroke 0.4s ease;
 }
 
-/* Lights on: a dark fitting on a bright wall. */
-html:not(.dark) .knx-cord-chain {
-  stroke: #6f7876;
+/* Lights on: a dark pendant on a light cord. */
+html:not(.dark) .knx-cord-line {
+  stroke: #8a918e;
 }
 
 html:not(.dark) .knx-cord-halo {
-  stroke: rgba(255, 255, 255, 0.7);
+  stroke: rgba(255, 255, 255, 0.75);
 }
 
 html:not(.dark) .knx-cord-knob {
   fill: var(--color-ink);
-  stroke: rgba(255, 255, 255, 0.65);
+  stroke: rgba(255, 255, 255, 0.6);
 }
 
 html:not(.dark) .knx-cord-knob-hl {
-  fill: rgba(255, 255, 255, 0.42);
+  fill: rgba(255, 255, 255, 0.4);
 }
 
-/* Lights off: the fitting catches what little the room reflects, and the bead
-   carries a faint warm glint so the control is still findable. */
-html.dark .knx-cord-chain {
-  stroke: #8c9894;
+/* Lights off: the pendant catches what little the room reflects, and carries a
+   faint warm glint so the control is still findable. */
+html.dark .knx-cord-line {
+  stroke: #7e8b86;
 }
 
 html.dark .knx-cord-halo {
@@ -457,7 +436,7 @@ html.dark .knx-cord-knob {
 }
 
 html.dark .knx-cord-knob-hl {
-  fill: rgba(255, 255, 255, 0.6);
+  fill: rgba(255, 255, 255, 0.55);
 }
 
 .knx-cord-glow {
@@ -469,13 +448,13 @@ html:not(.dark) .knx-cord-glow {
 }
 
 html.dark .knx-cord-glow {
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 .knx-cord-hint {
   position: absolute;
-  top: 104px;
-  inset-inline-start: calc(100% + 8px);
+  top: 58px;
+  inset-inline-end: calc(100% + 10px);
   margin: 0;
   padding: 5px 11px;
   border-radius: 999px;
@@ -509,23 +488,10 @@ html.dark .knx-cord-hint {
   opacity: 0;
 }
 
-@media (max-width: 767px) {
-  .knx-cord {
-    width: 34px;
-  }
-  .knx-cord svg {
-    width: 34px;
-  }
-  .knx-cord-hint {
-    top: 88px;
-    font-size: 11px;
-  }
-}
-
-/* No motion wanted: the rope never animates, so render it as a short static
-   pull and let the button behave like an ordinary toggle. */
+/* No motion wanted: the cord never animates, so it renders as a static pull
+   and the button behaves like an ordinary toggle. */
 @media (prefers-reduced-motion: reduce) {
-  .knx-cord-chain,
+  .knx-cord-line,
   .knx-cord-halo,
   .knx-cord-mount,
   .knx-cord-knob,

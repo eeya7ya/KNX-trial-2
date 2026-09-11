@@ -109,7 +109,10 @@ export function HomeSections({
       if (target === activeIndex) return;
       pages[target].scrollIntoView({ behavior: "smooth", block: "start" });
       setActive(target);
-      lock(800);
+      // Just long enough for the smooth scroll to land. It used to be 800ms,
+      // which swallowed most of a second of input after every notch and read
+      // as the page lagging.
+      lock(420);
     }
 
     function onWheel(e: WheelEvent) {
