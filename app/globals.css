@@ -332,21 +332,40 @@ html.knx-lights-out::view-transition-new(root) {
 
 /* --- The pull cord ------------------------------------------------------
    A light pull hanging off the underside of the header. It is pinned to the
-   *inline-end* edge, so it lives on the right in English and swaps itself to
-   the left in Arabic with no JS and no mirrored copy of the markup.
+   *inline-start* edge, so it lives on the left in English and swaps itself to
+   the right in Arabic with no JS and no mirrored copy of the markup — the
+   leading edge, away from the scrollbar and the header's own controls.
 
-   Total footprint is kept under 40px wide because that is exactly the gutter
-   the page keeps outside its content column (section px-4 + container px-6) at
-   every breakpoint — so the cord never lands on top of a word. */
+   Width is capped at the gutter the page keeps outside its content column
+   (section px-4 + container px-6 = 40px at the tightest breakpoints), so the
+   cord never lands on top of a word. Wide viewports have far more gutter than
+   that, so it gets to grow there. */
 .knx-cord {
   position: fixed;
   top: var(--knx-header-h);
-  inset-inline-end: 3px;
+  inset-inline-start: 0;
   z-index: 40;
-  width: 34px;
+  width: 40px;
   display: grid;
   justify-items: center;
   pointer-events: none;
+}
+
+.knx-cord svg {
+  display: block;
+  width: 40px;
+  height: auto;
+  overflow: visible;
+}
+
+@media (min-width: 1400px) {
+  .knx-cord {
+    width: 56px;
+    inset-inline-start: 10px;
+  }
+  .knx-cord svg {
+    width: 56px;
+  }
 }
 
 .knx-cord-pull {
@@ -372,22 +391,24 @@ html.knx-lights-out::view-transition-new(root) {
   outline-offset: 4px;
 }
 
-.knx-cord svg {
-  display: block;
-  width: 34px;
-  height: auto;
-  overflow: visible;
-}
-
 .knx-cord-chain {
   fill: none;
-  stroke: #9aa3a0;
-  stroke-width: 4.2;
+  stroke-width: 6;
   stroke-linecap: round;
-  stroke-dasharray: 0.1 6.4;
-  transition:
-    stroke 0.4s ease,
-    opacity 0.3s ease;
+  stroke-dasharray: 0.1 8;
+  transition: stroke 0.4s ease;
+}
+
+/* A wider copy of the chain in the opposite tone, drawn underneath. Invisible
+   against the page, it is what keeps the cord readable where it crosses the
+   one high-contrast panel on the site. */
+.knx-cord-halo {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 10.5;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 8;
+  transition: stroke 0.4s ease;
 }
 
 .knx-cord-mount {
@@ -395,62 +416,48 @@ html.knx-lights-out::view-transition-new(root) {
   transition: fill 0.4s ease;
 }
 
-.knx-cord-halo {
-  fill: none;
-  stroke: transparent;
-  stroke-width: 7.5;
-  stroke-linecap: round;
-  stroke-dasharray: 0.1 6.4;
-  transition: stroke 0.4s ease;
-}
-
 .knx-cord-knob {
-  fill: #8f9895;
-  stroke-width: 1;
+  stroke-width: 1.1;
   transition:
     fill 0.4s ease,
     stroke 0.4s ease;
 }
 
-.knx-cord-knob-hl {
-  fill: rgba(255, 255, 255, 0.45);
-}
-
-/* Lights on: the pull reads as a dark fitting against a bright room. */
+/* Lights on: a dark fitting on a bright wall. */
 html:not(.dark) .knx-cord-chain {
-  stroke: #a2aba8;
+  stroke: #6f7876;
 }
 
 html:not(.dark) .knx-cord-halo {
-  stroke: rgba(255, 255, 255, 0.55);
+  stroke: rgba(255, 255, 255, 0.7);
 }
 
 html:not(.dark) .knx-cord-knob {
   fill: var(--color-ink);
-  stroke: rgba(255, 255, 255, 0.6);
+  stroke: rgba(255, 255, 255, 0.65);
 }
 
 html:not(.dark) .knx-cord-knob-hl {
-  fill: rgba(255, 255, 255, 0.38);
+  fill: rgba(255, 255, 255, 0.42);
 }
 
-/* Lights off: the fitting is what little the room reflects, and the bead
+/* Lights off: the fitting catches what little the room reflects, and the bead
    carries a faint warm glint so the control is still findable. */
 html.dark .knx-cord-chain {
-  stroke: #626f6b;
+  stroke: #8c9894;
 }
 
 html.dark .knx-cord-halo {
-  stroke: rgba(0, 0, 0, 0.5);
+  stroke: rgba(0, 0, 0, 0.6);
 }
 
 html.dark .knx-cord-knob {
-  fill: #cfd8d4;
-  stroke: rgba(0, 0, 0, 0.45);
+  fill: #e6ede9;
+  stroke: rgba(0, 0, 0, 0.5);
 }
 
 html.dark .knx-cord-knob-hl {
-  fill: rgba(255, 255, 255, 0.55);
+  fill: rgba(255, 255, 255, 0.6);
 }
 
 .knx-cord-glow {
@@ -467,8 +474,8 @@ html.dark .knx-cord-glow {
 
 .knx-cord-hint {
   position: absolute;
-  top: 64px;
-  inset-inline-end: calc(100% + 6px);
+  top: 104px;
+  inset-inline-start: calc(100% + 8px);
   margin: 0;
   padding: 5px 11px;
   border-radius: 999px;
@@ -504,14 +511,13 @@ html.dark .knx-cord-hint {
 
 @media (max-width: 767px) {
   .knx-cord {
-    width: 26px;
-    inset-inline-end: 2px;
+    width: 34px;
   }
   .knx-cord svg {
-    width: 26px;
+    width: 34px;
   }
   .knx-cord-hint {
-    top: 48px;
+    top: 88px;
     font-size: 11px;
   }
 }
