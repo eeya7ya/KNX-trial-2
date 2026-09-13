@@ -9,10 +9,15 @@ export type ThemeCordLabels = {
 };
 
 /* ---- cord ---------------------------------------------------------------
-   11 beads, verlet integration, distance constraints solved with alternating
-   sweeps. The cord is inextensible and hangs straight; the swing, the stretch
-   under a pull and the recoil on release all fall out of the physics rather
-   than being keyframed.
+   22 nodes, verlet integration, distance constraints solved with alternating
+   sweeps. Everything it does — the swing, the stretch under a pull, the recoil
+   on release — falls out of the physics rather than being keyframed.
+
+   Tuned to read as soft string rather than stiff wire: short segments so it
+   bends smoothly, low gravity so it swings slowly, only three constraint passes
+   so it gives a little instead of behaving like a rod, and a constant sliver of
+   sideways force (LEAN) so even at rest it hangs with a slight natural curve
+   instead of dead vertical.
 
    It hangs off the underside of the header, aligned with the inline-end of the
    content column — the same column the Join button sits in — so it reads as
@@ -20,15 +25,17 @@ export type ThemeCordLabels = {
    window. Units are viewBox units and the SVG renders 1:1, so these are px. */
 const AX = 13;
 const AY = 0;
-const N = 11;
-const L0 = 7;
-const GRAV = 0.3;
-const DAMP = 0.978;
-const ITER = 5;
+const N = 22;
+const L0 = 3.4;
+const GRAV = 0.16; // slow, languid swing
+const DAMP = 0.986; // decays gracefully over ~2.5s rather than snapping still
+const ITER = 3; // fewer passes => the cord gives slightly, like string
 const SUB = 2;
+const LEAN = 0.014; // a breath of still air, stronger toward the free end, so
+// the cord bows a few px instead of hanging as a dead-straight rod
 const MAXPULL = 34; // how far past taut it will stretch, asymptotically
 const THRESH = 12; // pull past this on release and the switch throws
-const SLEEP_EPS = 0.06; // movement below which the cord counts as "still"
+const SLEEP_EPS = 0.05; // movement below which the cord counts as "still"
 const MAX_RUN_MS = 4000; // hard ceiling on one run of the loop
 
 const STORAGE_KEY = "knx-theme";
@@ -84,6 +91,10 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
     if (!cord || !btn || !svg || !line || !knob) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // The cord sits at the inline-end of the content column, so bow it toward
+    // the page rather than out toward the window edge.
+    const leanDir =
+      getComputedStyle(document.documentElement).direction === "rtl" ? 1 : -1;
 
     /* ---- show the hint once, to the first-time visitor only ---- */
     let hintTimer: ReturnType<typeof setTimeout> | null = null;
@@ -177,7 +188,7 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
           const vy = (p.y - p.py) * DAMP;
           p.px = p.x;
           p.py = p.y;
-          p.x += vx;
+          p.x += vx + leanDir * LEAN * (i / N);
           p.y += vy + GRAV;
         }
         if (dragging) {
@@ -388,7 +399,7 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
     }
 
     function onEnter() {
-      if (!dragging) nudge(0.45);
+      if (!dragging) nudge(0.22);
     }
 
     function onVisibility() {
@@ -408,7 +419,7 @@ export function ThemeCord({ labels }: { labels: ThemeCordLabels }) {
     document.addEventListener("visibilitychange", onVisibility);
 
     // One gentle settle on arrival so the cord announces itself, then silence.
-    nudge(0.55);
+    nudge(0.3);
 
     return () => {
       if (raf) cancelAnimationFrame(raf);

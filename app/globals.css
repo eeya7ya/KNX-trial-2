@@ -136,7 +136,12 @@ html.dark ::selection {
     radial-gradient(45% 45% at 15% 20%, rgba(0, 176, 112, 0.16), transparent 70%),
     radial-gradient(40% 40% at 85% 80%, rgba(0, 122, 77, 0.14), transparent 70%),
     radial-gradient(35% 35% at 50% 50%, rgba(167, 243, 208, 0.25), transparent 70%);
-  background-attachment: local;
+  /* NOT `background-attachment: local`. On the snap-scroll container that sizes
+     these gradients to the full scrollable height — eight viewports — and makes
+     the browser re-rasterise them on every scroll frame. Measured at 1660x940
+     with 4x CPU throttling, that alone was 94ms of raster per 2.5s of scrolling
+     against 7ms without it. Pinned to the element's own box it is painted once
+     and the wash simply stays put behind the content. */
 }
 
 /* Same three washes, dialled down so they read as a glow in a dark room
@@ -374,7 +379,7 @@ html.knx-lights-out::view-transition-new(root) {
 
 .knx-cord-line {
   fill: none;
-  stroke-width: 2.2;
+  stroke-width: 2.6;
   stroke-linecap: round;
   transition: stroke 0.4s ease;
 }
@@ -385,7 +390,7 @@ html.knx-lights-out::view-transition-new(root) {
 .knx-cord-halo {
   fill: none;
   stroke: transparent;
-  stroke-width: 5;
+  stroke-width: 5.6;
   stroke-linecap: round;
   transition: stroke 0.4s ease;
 }
