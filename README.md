@@ -21,6 +21,19 @@ Vercel.
 - Language switcher in the header toggles between the two
 - Strings live in `lib/i18n.ts`
 
+## Brand identity
+
+The club's digital identity — colors, typography, logo rules, voice, and asset
+recipes — lives in one place:
+
+- `brand/identity.json` — machine-readable source of truth. Import it
+  (`import identity from "@/brand/identity.json"`) or hand it to any tool that
+  generates something on-brand.
+- `docs/BRAND_IDENTITY.md` — the human-readable guide behind it.
+
+Design tokens are mirrored from `app/globals.css`; if you change one, change
+both.
+
 ## Logo
 
 Drop your official KNX logo at `public/knx-logo.svg`. It is referenced by:
