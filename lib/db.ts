@@ -151,6 +151,23 @@ export function ensureSchema(): Promise<void> {
         created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    // Presenter submissions from the temporary /WebinarsAssign page. One
+    // presenter per day: the UNIQUE on slot_date is what actually closes a day
+    // to everyone else — the greyed-out cells in the picker are only the UI
+    // telling the same story, so two people submitting the same day at the
+    // same moment still end with exactly one booking.
+    await sql`
+      CREATE TABLE IF NOT EXISTS webinar_assignments (
+        id            BIGSERIAL PRIMARY KEY,
+        name          TEXT NOT NULL,
+        experience    TEXT,
+        photo_url     TEXT,
+        webinar_title TEXT NOT NULL,
+        slot_date     DATE NOT NULL UNIQUE,
+        locale        TEXT,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
   })().catch((err) => {
     schemaReady = null;
     throw err;

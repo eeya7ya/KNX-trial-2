@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/communications", label: "Communications" },
   { href: "/admin/email", label: "Send email" },
   { href: "/admin/responses", label: "Join responses" },
+  { href: "/admin/webinars", label: "Webinar slots" },
   { href: "/admin/content/news", label: "News" },
   { href: "/admin/content/videos", label: "Videos" },
   { href: "/admin/content/pictures", label: "Pictures" },
