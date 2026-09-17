@@ -30,6 +30,7 @@ After signing in, a vertical menu on the left is shown on every admin page:
 | Members         | The list of people who signed up for the club.                   |
 | Visitors        | The log of pages people viewed on the site.                      |
 | Communications  | Messages received through the contact channel.                   |
+| Webinar slots   | Presenter bookings made on the temporary `/WebinarsAssign` page.  |
 | News            | Add or remove news articles.                                     |
 | Videos          | Add or remove videos in the gallery.                             |
 | Pictures        | Add or remove photos in the gallery.                             |
@@ -120,6 +121,28 @@ Each card shows:
 The most recent **200** messages are shown, newest first.
 
 **Tip:** Reply to the sender using the email address on the card — the admin area is for review only and does not send replies on its own.
+
+---
+
+## 6b. Webinar Slots (temporary)
+
+**Where:** Sidebar → **Webinar slots**
+
+Presenters book themselves onto a day using the page at **`/WebinarsAssign`** — send them that link directly; it is not in the site menu and is hidden from search engines.
+
+What they fill in: their name, a short experience blurb, an optional photo, the webinar title, and one day from the calendar.
+
+| Column        | Meaning                                                         |
+|---------------|-----------------------------------------------------------------|
+| Photo         | The picture they uploaded, if any.                              |
+| Name / title  | The presenter and the webinar title they submitted.             |
+| Date          | The day they booked.                                            |
+| Submitted     | When the booking was made.                                      |
+
+- **One presenter per day.** The moment a day is booked it turns grey on the page and nobody else can choose it. If two people submit the same day at the same instant, only the first is saved; the second is told to pick another day.
+- The list is sorted by date, so it reads as the webinar calendar.
+- **To open a new round of dates**, edit `WINDOW_FIRST` and `WINDOW_LAST` in `lib/webinars.ts`. Days outside that range are shown as "outside window" and are refused by the server.
+- This page is temporary. Removing it means deleting the `/WebinarsAssign` route, this admin page, and the `webinar_assignments` table.
 
 ---
 
