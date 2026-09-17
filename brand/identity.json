@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json.schemastore.org/base.json",
+  "_about": "Single source of truth for the KNX Club Jordan digital identity. Values here mirror what the site actually ships (app/globals.css, app/[locale]/layout.tsx, lib/i18n.ts). If you change one, change the other.",
+  "version": "1.0.0",
+  "updated": "2026-09-16",
+
+  "organization": {
+    "name": { "en": "KNX Club Jordan", "ar": "نادي KNX الأردني" },
+    "shortName": { "en": "KNX Club", "ar": "نادي KNX" },
+    "legalDescriptor": {
+      "en": "A non-profit professional community for the KNX building and home automation standard in Jordan.",
+      "ar": "مجتمع مهني غير ربحي لمعيار KNX لأتمتة المباني والمنازل الذكية في الأردن."
+    },
+    "location": { "city": "Amman", "country": "Jordan", "display": "Amman · Jordan" },
+    "website": "https://knx-jordan-club.com",
+    "email": "hello@support.knx-jordan-club.com",
+    "standard": "KNX — ISO/IEC 14543-3"
+  },
+
+  "voice": {
+    "tagline": {
+      "en": "Smart buildings · open standard · one community",
+      "ar": "مبانٍ ذكية · معيار مفتوح · مجتمع واحد"
+    },
+    "shortTagline": {
+      "en": "The professional KNX community of Jordan.",
+      "ar": "النادي المهني الأردني لمعيار KNX."
+    },
+    "elevator": {
+      "en": "KNX Club Jordan is the professional community for engineers, integrators, architects, and specialists working with the world's leading open standard for home and building automation.",
+      "ar": "نادي KNX الأردني هو المجتمع المهني للمهندسين والمكاملين والمعماريين والمختصين العاملين بالمعيار المفتوح الأول عالمياً لأتمتة المنازل والمباني."
+    },
+    "principles": [
+      "Professional, not promotional. State what the club does; skip superlatives.",
+      "Concrete over abstract. Name the standard, the tool (ETS6), the city, the date.",
+      "Arabic is the default voice, English the equal second — never a machine translation of the other.",
+      "Short sentences. One idea per line. The hero is three lines, not a paragraph.",
+      "Never claim vendor endorsement: the club follows the open KNX standard, it does not speak for KNX Association."
+    ],
+    "avoid": ["revolutionary", "cutting-edge", "world-class", "exclamation marks", "ALL-CAPS headlines"],
+    "pillars": [
+      { "en": "Local expertise", "ar": "خبرة محلية" },
+      { "en": "Global standard", "ar": "معيار عالمي" },
+      { "en": "Always current", "ar": "مواكبة دائمة" }
+    ]
+  },
+
+  "logo": {
+    "primary": "public/KNX_logo.svg.png",
+    "intrinsicSize": { "width": 1920, "height": 916 },
+    "aspectRatio": "2.1:1",
+    "component": "app/[locale]/components/Logo.tsx",
+    "anatomy": {
+      "arc": { "rows": [9, 369], "note": "the swoosh above the wordmark" },
+      "clearBand": { "rows": [370, 397], "note": "fully transparent — the safe cut line for square lockups" },
+      "wordmark": { "rows": [398, 906], "note": "the letters KNX" }
+    },
+    "squareLockup": {
+      "rule": "For any square format (favicon, app icon, avatar) do NOT letterbox the wide lockup. Split at the clear band and stack arc over wordmark.",
+      "implementation": "lib/icon-image.tsx → renderIcon()",
+      "widthFraction": 0.92,
+      "gapFraction": 0.075
+    },
+    "clearSpace": "Keep free space equal to the height of the K on all four sides.",
+    "minWidth": { "screen": "96px", "print": "25mm" },
+    "onDark": {
+      "rule": "The mark is green + mid-grey + a dark blue X; the blue sinks on near-black. Lift it, do not dim it.",
+      "filter": "brightness(1.16) saturate(1.08) drop-shadow(0 0 12px rgba(0,196,124,0.18))",
+      "class": ".knx-logo"
+    },
+    "misuse": [
+      "Do not recolor, outline, or add a gradient to the mark.",
+      "Do not stretch, rotate, or skew it.",
+      "Do not place it on a busy photo without a white card behind it (see the OG image pattern).",
+      "Do not typeset 'KNX Club Jordan' in a different face and call it the logo."
+    ]
+  },
+
+  "color": {
+    "_note": "Brand steps are fixed in both themes. Semantic tokens are re-pointed for dark by `html.dark` in app/globals.css — build on the semantic names, never the raw hex.",
+    "brand": {
+      "knx": "#00965e",
+      "knx-50": "#ecfdf5",
+      "knx-100": "#d1fae5",
+      "knx-200": "#a7f3d0",
+      "knx-500": "#00b070",
+      "knx-600": "#00965e",
+      "knx-700": "#007a4d",
+      "knx-800": "#065f3c",
+      "knx-900": "#064e34"
+    },
+    "semantic": {
+      "light": {
+        "ink": "#0a0a0a",
+        "ink-muted": "#525252",
+        "line": "#e7e7e7",
+        "canvas": "#ffffff",
+        "card": "#ffffff",
+        "subtle": "#f5f5f5",
+        "accent": "#007a4d",
+        "accent-strong": "#065f3c",
+        "accent-soft": "#ecfdf5",
+        "cta": "#0a0a0a",
+        "cta-ink": "#ffffff",
+        "cta-hover": "#007a4d",
+        "invert": "#0a0a0a",
+        "invert-ink": "#ffffff",
+        "invert-muted": "#d4d4d4",
+        "scrim": "rgba(10, 10, 10, 0.5)",
+        "danger": "#dc2626"
+      },
+      "dark": {
+        "ink": "#e9efec",
+        "ink-muted": "#97a5a0",
+        "line": "#242e2c",
+        "canvas": "#0a0f0e",
+        "card": "#111817",
+        "subtle": "#161f1d",
+        "accent": "#3ddc97",
+        "accent-strong": "#7cebba",
+        "accent-soft": "#10261f",
+        "cta": "#00b070",
+        "cta-ink": "#04130d",
+        "cta-hover": "#2fd493",
+        "invert": "#053026",
+        "invert-ink": "#eafaf3",
+        "invert-muted": "#a7c4b8",
+        "scrim": "rgba(0, 0, 0, 0.72)",
+        "danger": "#f87171",
+        "knx": "#00c47c",
+        "knx-50": "#10261f",
+        "knx-700": "#3ddc97",
+        "knx-800": "#7cebba"
+      }
+    },
+    "themeColor": { "light": "#ffffff", "dark": "#0a0f0e" },
+    "gradients": {
+      "og": "linear-gradient(135deg, #064e34 0%, #00965e 100%)",
+      "ambientLight": "radial washes of rgba(0,176,112,.16) / rgba(0,122,77,.14) / rgba(167,243,208,.25) — see .knx-animated-bg",
+      "ambientDark": "same three washes at .13 / .11 / .06"
+    },
+    "usage": {
+      "60": "canvas — white in light, green-tinted near-black (#0a0f0e) in dark",
+      "30": "ink and ink-muted for type, line for hairlines",
+      "10": "brand green, and only as accent: eyebrows, icons, badges, hover states",
+      "rule": "Green is the accent, never the background of a full page. The one high-contrast panel (Join) uses `invert`, not green."
+    },
+    "contrast": "Body text must clear WCAG AA 4.5:1 on its surface. `accent` (#007a4d) passes on white; the raw `knx` (#00965e) does not at small sizes — use accent for green text."
+  },
+
+  "typography": {
+    "arabic": {
+      "family": "Cairo",
+      "source": "next/font/google",
+      "variable": "--font-cairo",
+      "stack": "var(--font-cairo), \"Segoe UI\", Tahoma, sans-serif",
+      "appliesTo": "html[dir=\"rtl\"]"
+    },
+    "latin": {
+      "family": "Inter",
+      "source": "next/font/google",
+      "variable": "--font-inter",
+      "stack": "var(--font-inter), ui-sans-serif, system-ui, sans-serif",
+      "appliesTo": "html[dir=\"ltr\"]"
+    },
+    "scale": {
+      "hero": "text-5xl → text-6xl, font-bold, leading-[1.02]",
+      "sectionTitle": "text-3xl → text-4xl, font-bold",
+      "cardTitle": "text-lg, font-semibold",
+      "body": "text-base, leading-relaxed, color ink-muted",
+      "eyebrow": "text-xs, font-semibold, uppercase (Latin only), tracking-wide, color accent",
+      "meta": "text-xs, color ink-muted"
+    },
+    "rules": [
+      "Never uppercase Arabic — it has no case and letterspacing breaks the joins.",
+      "Arabic eyebrows keep sentence case and normal tracking.",
+      "Numerals stay Western (38+, 2026) in both locales, matching lib/i18n.ts.",
+      "Body copy caps at max-w-3xl for readability."
+    ]
+  },
+
+  "layout": {
+    "contentWidth": "max-w-7xl",
+    "proseWidth": "max-w-3xl",
+    "radius": { "card": "rounded-2xl", "pill": "rounded-full", "input": "rounded-xl", "panel": "rounded-3xl" },
+    "hairline": "1px solid var(--color-line) — the default separator; shadows are for floating UI only",
+    "direction": "Arabic is RTL and is the default locale (/ → /ar). Author with logical properties (inset-inline, ms/me, text-start) and Tailwind's rtl: variants — never left/right."
+  },
+
+  "motion": {
+    "entrance": "subtle-rise — 8px translate + fade, 0.6s ease-out (.rise)",
+    "page": "knx-page-in — 16px translate + fade, 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
+    "themeSwap": "circular View Transitions wipe driven from the pull cord; 0.4s fade fallback",
+    "rule": "Opacity and transform only. Every animation must be cancelled under prefers-reduced-motion."
+  },
+
+  "signatures": {
+    "_note": "The details that make an asset read as KNX Club Jordan rather than generic.",
+    "pullCord": "The dark/light switch is a physical pull cord hanging from the header. It is the club's one piece of personality — keep it in product screenshots.",
+    "greenTintedDark": "Dark mode is a green-tinted near-black (#0a0f0e), not pure black, so the green reads as part of the surface.",
+    "threeLineHero": "Headlines break into three lines with the middle line in accent green: 'Smart buildings, / open standard, / one community.'",
+    "ambientWash": "Three soft green radial washes behind key sections (.knx-animated-bg)."
+  },
+
+  "assets": {
+    "logo": "public/KNX_logo.svg.png",
+    "favicon": "app/icon.tsx (512px, via lib/icon-image.tsx)",
+    "appIcons": "app/icon-192, app/icon-512, app/icon-maskable",
+    "appleIcon": "app/apple-icon.tsx",
+    "openGraph": "app/[locale]/opengraph-image.tsx — 1200×630, green gradient, logo on a white card, tagline in knx-100, footer in knx-200",
+    "manifest": "app/manifest.ts",
+    "tokens": "app/globals.css (@theme + html.dark)"
+  },
+
+  "socialTemplate": {
+    "size": { "width": 1200, "height": 630 },
+    "background": "linear-gradient(135deg, #064e34 0%, #00965e 100%)",
+    "padding": 76,
+    "logoCard": { "background": "#ffffff", "borderRadius": 28, "padding": "26px 34px", "logoWidth": 188 },
+    "title": { "size": 92, "weight": 700, "color": "#ffffff", "lineHeight": 1.02 },
+    "subtitle": { "size": 40, "weight": 500, "color": "#d1fae5" },
+    "footer": { "size": 30, "color": "#a7f3d0", "left": "knx-jordan-club.com", "right": "Amman · Jordan" }
+  }
+}
