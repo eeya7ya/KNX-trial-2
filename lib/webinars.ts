@@ -59,3 +59,10 @@ export function monthsInWindow(): MonthDef[] {
   }
   return out;
 }
+
+/** How many days the window holds, inclusive — every one of them bookable. */
+export function daysInWindow(): number {
+  const first = Date.parse(`${WINDOW_FIRST}T00:00:00Z`);
+  const last = Date.parse(`${WINDOW_LAST}T00:00:00Z`);
+  return Math.round((last - first) / 86_400_000) + 1;
+}

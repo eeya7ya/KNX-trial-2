@@ -56,6 +56,7 @@ It shows summary cards with the current totals for:
 - **Videos** — number of videos in the gallery.
 - **Pictures** — number of photos in the gallery.
 - **Prompts** — number of items in the prompts library.
+- **Webinar slots** — how many presenter bookings have been made. This card is clickable and opens the **Webinar slots** screen.
 
 Use the Dashboard as a quick health check before going into the detail screens.
 
@@ -136,11 +137,25 @@ What they fill in: their name, a short experience blurb, an optional photo, the 
 |---------------|-----------------------------------------------------------------|
 | Photo         | The picture they uploaded, if any.                              |
 | Name / title  | The presenter and the webinar title they submitted.             |
-| Date          | The day they booked.                                            |
-| Submitted     | When the booking was made.                                      |
+| Date          | The day they booked, e.g. *Sun 20 Sep 2026*.                    |
+| Submitted     | When the booking was made (Amman time).                         |
+| Language      | Which version of the page they filled in — Arabic or English.   |
+
+The bookings are split into **Upcoming** and **Past**, so the screen reads as the webinar calendar. A line under the title counts them: *booked · upcoming · days still open* in the current window.
+
+### Removing a booking
+
+Each booking has a **Delete · frees the day** button. Use it when a presenter drops out or picked the wrong day:
+
+1. Click **Delete · frees the day**.
+2. Confirm the message, which names the presenter and the day.
+3. The booking disappears and that day becomes selectable again on `/WebinarsAssign`.
+
+This is the only way a taken day reopens — deleting cannot be undone, so the presenter would have to book again.
+
+**Open photo** opens the uploaded picture full size in a new tab.
 
 - **One presenter per day.** The moment a day is booked it turns grey on the page and nobody else can choose it. If two people submit the same day at the same instant, only the first is saved; the second is told to pick another day.
-- The list is sorted by date, so it reads as the webinar calendar.
 - **To open a new round of dates**, edit `WINDOW_FIRST` and `WINDOW_LAST` in `lib/webinars.ts`. Days outside that range are shown as "outside window" and are refused by the server.
 - This page is temporary. Removing it means deleting the `/WebinarsAssign` route, this admin page, and the `webinar_assignments` table.
 
