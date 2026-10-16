@@ -144,21 +144,6 @@ export const SEED_EVENTS: Omit<CalendarEvent, "id">[] = [
   },
   {
     kind: "workshop",
-    title: "Solar Energy and Integration with KNX",
-    subtitle: "Design, Control and Practical Applications",
-    event_date: "2026-10-20",
-    start_time: "18:00",
-    end_time: "21:00",
-    location: null,
-    presenter_name: "Eng. Ahmed Al-Hariri",
-    presenter_role: "KNX Tutor | Head of KNX User Club Iraq",
-    presenter_bio:
-      "Head of KNX User Club Iraq and certified KNX Tutor, with extensive experience in solar energy systems and their integration with KNX for smart and sustainable building solutions.",
-    presenter_photo_url: "/events/ahmed-al-hariri.jpg",
-    register_url: null,
-  },
-  {
-    kind: "workshop",
     title: "HVAC Systems Integration with KNX",
     subtitle: "Design, Control and Practical Implementation",
     event_date: "2026-10-20",
@@ -170,6 +155,21 @@ export const SEED_EVENTS: Omit<CalendarEvent, "id">[] = [
     presenter_bio:
       "Experienced in HVAC systems and KNX-based building automation, with practical expertise in smart building control and system integration.",
     presenter_photo_url: "/events/diaa-aldeen-karajah.jpg",
+    register_url: null,
+  },
+  {
+    kind: "workshop",
+    title: "Solar Energy and Integration with KNX",
+    subtitle: "Design, Control and Practical Applications",
+    event_date: "2026-10-24",
+    start_time: "18:00",
+    end_time: "21:00",
+    location: null,
+    presenter_name: "Eng. Ahmed Al-Hariri",
+    presenter_role: "KNX Tutor | Head of KNX User Club Iraq",
+    presenter_bio:
+      "Head of KNX User Club Iraq and certified KNX Tutor, with extensive experience in solar energy systems and their integration with KNX for smart and sustainable building solutions.",
+    presenter_photo_url: "/events/ahmed-al-hariri.jpg",
     register_url: null,
   },
   {

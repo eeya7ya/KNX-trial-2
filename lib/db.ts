@@ -181,6 +181,22 @@ export function ensureSchema(): Promise<void> {
       )
       WHERE EXISTS (SELECT 1 FROM first_run)
     `;
+    // One-time fix for databases seeded before the Solar Energy workshop moved
+    // from 20 to 24 October 2026. It touches the row only while it still holds
+    // the seeded date, and claims its own flag, so it runs once and never undoes
+    // a later admin edit. A database seeded after the move matches nothing.
+    await sql`
+      WITH first_run AS (
+        INSERT INTO site_settings (key, value)
+        VALUES ('calendar_events_solar_moved_to_24', 'true'::jsonb)
+        ON CONFLICT (key) DO NOTHING
+        RETURNING key
+      )
+      UPDATE calendar_events SET event_date = '2026-10-24'
+      WHERE title = 'Solar Energy and Integration with KNX'
+        AND event_date = '2026-10-20'
+        AND EXISTS (SELECT 1 FROM first_run)
+    `;
     // Log of one-off emails sent from the admin composer.
     await sql`
       CREATE TABLE IF NOT EXISTS emails_sent (
