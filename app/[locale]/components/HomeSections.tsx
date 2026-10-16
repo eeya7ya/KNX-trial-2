@@ -433,10 +433,14 @@ export function HomeSections({
         />
       </Section>
 
-      {/* CONTACT — hero on top, footer pinned to bottom */}
+      {/* CONTACT — hero on top, footer pinned to bottom. The snap root's
+          scroll-padding parks every page a header-height below the top, and
+          as the last page this one cannot scroll any further: one header
+          shorter, its footer ends exactly at the bottom of the window instead
+          of below it. */}
       <section
         id="contact-page"
-        className="knx-snap-page snap-start !flex-col border-t border-line bg-canvas"
+        className="knx-snap-page snap-start !flex-col !min-h-[calc(100svh-var(--knx-header-h))] border-t border-line bg-canvas"
       >
         <div className="flex flex-1 items-center justify-center px-6">
           <div className="mx-auto max-w-3xl text-center">

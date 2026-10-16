@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import "../globals.css";
 import { notFound } from "next/navigation";
 import { getDict, isLocale, type Locale } from "@/lib/i18n";
+import { SiteCredit } from "./components/SiteCredit";
 
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://knx-jordan-club.com"
@@ -170,6 +171,7 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         {children}
+        <SiteCredit />
       </body>
     </html>
   );

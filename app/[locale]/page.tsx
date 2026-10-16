@@ -31,22 +31,11 @@ export default async function Page({
       upcoming={upcoming}
       footer={
         <footer id="contact" className="w-full">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">
-            <div>
-              <p className="text-xs text-ink-muted md:text-sm">
-                © {new Date().getFullYear()} KNX Club Jordan. {dict.footer.rights}
-              </p>
-              <a
-                href="https://espark.dev"
-                target="_blank"
-                rel="noopener noreferrer"
-                dir="ltr"
-                className="mt-1 block text-xs text-ink-muted/70 transition hover:text-ink-muted"
-              >
-                Designed by{" "}
-                <span className="font-semibold text-accent">espark.dev</span>
-              </a>
-            </div>
+          {/* pb-16 leaves room for the pinned SiteCredit below the last line. */}
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 pt-6 pb-16">
+            <p className="text-xs text-ink-muted md:text-sm">
+              © {new Date().getFullYear()} KNX Club Jordan. {dict.footer.rights}
+            </p>
             <Logo className="h-7 w-auto" />
           </div>
         </footer>
