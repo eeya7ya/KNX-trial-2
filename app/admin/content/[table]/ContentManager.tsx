@@ -7,7 +7,7 @@ type UploadKind = "image" | "video" | "file";
 type Field = {
   name: string;
   label: string;
-  type: "text" | "textarea" | "url" | "checkbox" | "datetime" | "select";
+  type: "text" | "textarea" | "url" | "checkbox" | "datetime" | "date" | "time" | "select";
   required?: boolean;
   upload?: { kind: UploadKind; accept: string };
   options?: { value: string; label: string }[];
@@ -23,6 +23,8 @@ function toLocalInput(s: string): string {
 type Row = {
   id: number;
   title: string;
+  /** Overrides title in the list, e.g. to put an event's date in front. */
+  label?: string;
   created_at: string;
   published: boolean;
   [k: string]: unknown;
@@ -228,9 +230,9 @@ export function ContentManager({
                     </option>
                   ))}
                 </select>
-              ) : f.type === "datetime" ? (
+              ) : f.type === "datetime" || f.type === "date" || f.type === "time" ? (
                 <input
-                  type="datetime-local"
+                  type={f.type === "datetime" ? "datetime-local" : f.type}
                   required={f.required}
                   value={values[f.name]}
                   onChange={(e) =>
@@ -350,7 +352,7 @@ export function ContentManager({
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{r.title}</p>
+                <p className="truncate text-sm font-medium">{r.label ?? r.title}</p>
                 <p className="text-xs text-ink-muted" dir="ltr">
                   {new Date(r.created_at).toLocaleString()}
                   {!r.published && " · draft"}

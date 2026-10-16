@@ -1,4 +1,11 @@
 import { neon } from "@neondatabase/serverless";
+import {
+  isClockTime,
+  isEventKind,
+  isIsoDate,
+  SEED_EVENTS,
+  type CalendarEvent,
+} from "./events";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not set");
@@ -128,6 +135,52 @@ export function ensureSchema(): Promise<void> {
         updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    // The events calendar on /events — workshops, meetups, the conference.
+    // event_date is a bare Amman day and the times are HH:MM text, so neither
+    // can drift with the server's time zone on the way in or out.
+    await sql`
+      CREATE TABLE IF NOT EXISTS calendar_events (
+        id                  BIGSERIAL PRIMARY KEY,
+        kind                TEXT NOT NULL DEFAULT 'workshop',
+        title               TEXT NOT NULL,
+        subtitle            TEXT,
+        event_date          DATE NOT NULL,
+        start_time          TEXT,
+        end_time            TEXT,
+        location            TEXT,
+        presenter_name      TEXT,
+        presenter_role      TEXT,
+        presenter_bio       TEXT,
+        presenter_photo_url TEXT,
+        register_url        TEXT,
+        published           BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    // One-time seed with the first round of workshops. The site_settings flag
+    // is claimed in the same statement, so the seed runs exactly once per
+    // database — not "whenever the table is empty", which would resurrect the
+    // rows the day an admin deletes the last of them.
+    await sql`
+      WITH first_run AS (
+        INSERT INTO site_settings (key, value)
+        VALUES ('calendar_events_seeded', 'true'::jsonb)
+        ON CONFLICT (key) DO NOTHING
+        RETURNING key
+      )
+      INSERT INTO calendar_events
+        (kind, title, subtitle, event_date, start_time, end_time, location,
+         presenter_name, presenter_role, presenter_bio, presenter_photo_url, register_url)
+      SELECT s.kind, s.title, s.subtitle, s.event_date::date, s.start_time, s.end_time,
+             s.location, s.presenter_name, s.presenter_role, s.presenter_bio,
+             s.presenter_photo_url, s.register_url
+      FROM jsonb_to_recordset(${JSON.stringify(SEED_EVENTS)}::jsonb) AS s(
+        kind TEXT, title TEXT, subtitle TEXT, event_date TEXT, start_time TEXT,
+        end_time TEXT, location TEXT, presenter_name TEXT, presenter_role TEXT,
+        presenter_bio TEXT, presenter_photo_url TEXT, register_url TEXT
+      )
+      WHERE EXISTS (SELECT 1 FROM first_run)
+    `;
     // Log of one-off emails sent from the admin composer.
     await sql`
       CREATE TABLE IF NOT EXISTS emails_sent (
@@ -175,7 +228,14 @@ export function ensureSchema(): Promise<void> {
   return schemaReady;
 }
 
-export const CONTENT_TABLES = ["news", "videos", "pictures", "prompts", "team_members"] as const;
+export const CONTENT_TABLES = [
+  "news",
+  "videos",
+  "pictures",
+  "prompts",
+  "team_members",
+  "calendar_events",
+] as const;
 export type ContentTable = (typeof CONTENT_TABLES)[number];
 
 export function isContentTable(value: string): value is ContentTable {
@@ -200,6 +260,21 @@ export const CONTENT_FIELDS: Record<ContentTable, string[]> = {
     "email",
     "published",
   ],
+  calendar_events: [
+    "kind",
+    "title",
+    "subtitle",
+    "event_date",
+    "start_time",
+    "end_time",
+    "location",
+    "presenter_name",
+    "presenter_role",
+    "presenter_bio",
+    "presenter_photo_url",
+    "register_url",
+    "published",
+  ],
 };
 
 export const BOOL_CONTENT_FIELDS = new Set(["published", "is_partner"]);
@@ -222,7 +297,27 @@ export function pickContentFields(
     }
     out[f] = v;
   }
+  // The type picker's blank option means the default, not "no type".
+  if (table === "calendar_events" && !isEventKind(out.kind)) out.kind = "workshop";
   return out;
+}
+
+/**
+ * Checks a picked row against the rules its columns can't enforce. Returns a
+ * message for the admin form, or null when the row can be written.
+ */
+export function contentFieldError(
+  table: ContentTable,
+  data: Record<string, unknown>,
+): string | null {
+  if (table !== "calendar_events") return null;
+  if (!data.title) return "Title is required.";
+  if (!isIsoDate(data.event_date)) return "Event date must be a real day (YYYY-MM-DD).";
+  if (data.start_time != null && !isClockTime(data.start_time))
+    return "Start time must be HH:MM.";
+  if (data.end_time != null && !isClockTime(data.end_time))
+    return "End time must be HH:MM.";
+  return null;
 }
 
 export type NewsItem = {
@@ -310,6 +405,26 @@ export async function getPublicContent(): Promise<PublicContent> {
   } catch (err) {
     console.error("getPublicContent error", err);
     return { latestNews: null, news: [], videos: [], pictures: [], team: [] };
+  }
+}
+
+/**
+ * Every published calendar event, earliest first. The page splits them into
+ * upcoming and past itself, so the cut-over at midnight needs no job.
+ */
+export async function getCalendarEvents(): Promise<CalendarEvent[]> {
+  try {
+    await ensureSchema();
+    return (await sql`
+      SELECT id, kind, title, subtitle, to_char(event_date, 'YYYY-MM-DD') AS event_date,
+             start_time, end_time, location, presenter_name, presenter_role,
+             presenter_bio, presenter_photo_url, register_url
+      FROM calendar_events WHERE published = TRUE
+      ORDER BY calendar_events.event_date ASC, start_time ASC NULLS LAST, id ASC LIMIT 200
+    `) as unknown as CalendarEvent[];
+  } catch (err) {
+    console.error("getCalendarEvents error", err);
+    return [];
   }
 }
 

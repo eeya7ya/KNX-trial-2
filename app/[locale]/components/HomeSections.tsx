@@ -12,17 +12,20 @@ const SERVICE_ICONS = [IconBolt, IconUsers, IconBuilding, IconBook];
 import { Avatar } from "./SectionDetails";
 import type { Dict, Locale } from "@/lib/i18n";
 import type { PublicContent } from "@/lib/db";
+import type { EventCard } from "@/lib/events";
 
 export function HomeSections({
   dict,
   locale,
   footer,
   content,
+  upcoming = [],
 }: {
   dict: Dict;
   locale: Locale;
   footer: ReactNode;
   content?: PublicContent;
+  upcoming?: EventCard[];
 }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -280,7 +283,60 @@ export function HomeSections({
           cta={dict.detailCta}
           href={`/${locale}/events`}
           dir={dict.dir}
-        />
+        >
+          {upcoming.length > 0 && (
+            <ul
+              className={`mt-8 grid w-full gap-4 ${
+                upcoming.length === 1
+                  ? "max-w-md"
+                  : upcoming.length === 2
+                    ? "max-w-3xl sm:grid-cols-2"
+                    : "max-w-5xl sm:grid-cols-2 lg:grid-cols-3"
+              }`}
+            >
+              {upcoming.map((e) => (
+                <li key={e.id}>
+                  <Link
+                    href={`/${locale}/events`}
+                    className="flex h-full items-start gap-4 rounded-2xl border border-line bg-card p-4 text-start transition hover:border-knx hover:shadow-sm"
+                  >
+                    {e.presenter_photo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={e.presenter_photo_url}
+                        alt=""
+                        loading="lazy"
+                        className="aspect-[4/5] w-16 flex-shrink-0 rounded-xl object-cover object-top"
+                      />
+                    ) : (
+                      <span
+                        aria-hidden="true"
+                        className="flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-xl bg-accent-soft text-accent"
+                      >
+                        <span className="text-xl font-extrabold leading-none">{e.day}</span>
+                        <span className="mt-1 text-[10px] font-semibold">{e.month}</span>
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold uppercase tracking-widest text-accent">
+                        {e.status === "today" ? dict.events.today : `${e.day} ${e.month}`}
+                        {e.startLabel && ` · ${e.startLabel}`}
+                      </p>
+                      <p className="mt-1 text-sm font-semibold leading-snug text-ink">
+                        <bdi>{e.title}</bdi>
+                      </p>
+                      {e.presenter_name && (
+                        <p className="mt-1 truncate text-xs text-ink-muted">
+                          <bdi>{e.presenter_name}</bdi>
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </BriefCard>
       </Section>
 
       {/* MEMBERS — brief */}

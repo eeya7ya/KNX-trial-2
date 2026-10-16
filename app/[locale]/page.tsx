@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n";
-import { getPublicContent } from "@/lib/db";
+import { getCalendarEvents, getPublicContent } from "@/lib/db";
+import { toEventCards } from "@/lib/events";
 import { getSiteDict } from "@/lib/site-content";
 import { Logo } from "./components/Logo";
 import { HomeSections } from "./components/HomeSections";
@@ -16,13 +17,18 @@ export default async function Page({
   if (!isLocale(locale)) notFound();
   const L = locale as Locale;
   const dict = await getSiteDict(L);
-  const content = await getPublicContent();
+  const [content, calendar] = await Promise.all([getPublicContent(), getCalendarEvents()]);
+  // The homepage teases what is next; the full calendar lives on /events.
+  const upcoming = toEventCards(calendar, L)
+    .filter((e) => e.status !== "past")
+    .slice(0, 3);
 
   return (
     <HomeSections
       dict={dict}
       locale={L}
       content={content}
+      upcoming={upcoming}
       footer={
         <footer id="contact" className="w-full">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6">

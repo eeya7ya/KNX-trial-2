@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { ensureSchema, isContentTable, pickContentFields, sql } from "@/lib/db";
+import {
+  contentFieldError,
+  ensureSchema,
+  isContentTable,
+  pickContentFields,
+  sql,
+} from "@/lib/db";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
@@ -24,6 +30,13 @@ export async function GET(_: Request, ctx: { params: Promise<{ table: string }> 
     rows = await sql`SELECT * FROM prompts ORDER BY created_at DESC LIMIT 200`;
   else if (table === "team_members")
     rows = await sql`SELECT * FROM team_members ORDER BY sort_order ASC NULLS LAST, created_at ASC LIMIT 200`;
+  else if (table === "calendar_events")
+    rows = await sql`SELECT id, kind, title, subtitle,
+        to_char(event_date, 'YYYY-MM-DD') AS event_date, start_time, end_time, location,
+        presenter_name, presenter_role, presenter_bio, presenter_photo_url, register_url,
+        published, created_at
+      FROM calendar_events ORDER BY calendar_events.event_date DESC,
+        start_time ASC NULLS LAST LIMIT 200`;
   return NextResponse.json({ ok: true, rows });
 }
 
@@ -42,6 +55,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ table: string 
   }
 
   const data = pickContentFields(table, body);
+  const invalid = contentFieldError(table, data);
+  if (invalid) return NextResponse.json({ ok: false, error: invalid }, { status: 400 });
   await ensureSchema();
 
   if (table === "news") {
@@ -63,6 +78,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ table: string 
         (name, role, company, photo_url, is_partner, experience, phone, email, published)
       VALUES (${data.name}, ${data.role}, ${data.company}, ${data.photo_url},
         ${data.is_partner}, ${data.experience}, ${data.phone}, ${data.email}, ${data.published})`;
+  } else if (table === "calendar_events") {
+    await sql`INSERT INTO calendar_events
+        (kind, title, subtitle, event_date, start_time, end_time, location, presenter_name,
+         presenter_role, presenter_bio, presenter_photo_url, register_url, published)
+      VALUES (${data.kind}, ${data.title}, ${data.subtitle}, ${data.event_date},
+        ${data.start_time}, ${data.end_time}, ${data.location}, ${data.presenter_name},
+        ${data.presenter_role}, ${data.presenter_bio}, ${data.presenter_photo_url},
+        ${data.register_url}, ${data.published})`;
   }
   return NextResponse.json({ ok: true });
 }
