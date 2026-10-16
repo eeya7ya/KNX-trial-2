@@ -66,13 +66,13 @@ A grid of six service cards explaining what members receive:
 6. **Certification** — the path toward becoming a recognised KNX Partner or Tutor.
 
 ### Events
-The **2026 Calendar** showing planned activities, for example:
+The **2026 Calendar** of club workshops, meetups, and the yearly conference.
 
-- **ETS6 Fundamentals** — Spring 2026.
-- **KNX Secure & IoT Workshop** — Summer 2026.
-- **Automation Professional Day Conference** — Autumn 2026.
+- **Upcoming** — the next events, soonest first. Each one shows the date and time (Amman time), the topics, and the presenter with their photo and experience. An event happening today is marked **Today**. Some events have a **Register** button.
+- **Past events** — events that have already taken place, most recent first, marked **Completed**.
+- **Sign up to be notified** — takes you to the **Join the club** form, so you hear about new dates as soon as they are announced.
 
-Events that have not yet opened for registration are marked **Coming soon**.
+The homepage **Events** section shows the next three upcoming events. Click one to open the full calendar.
 
 ### Members
 Two sections:

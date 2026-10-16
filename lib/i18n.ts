@@ -63,8 +63,16 @@ export type Dict = {
     eyebrow: string;
     title: string;
     body: string;
-    soon: string;
-    rows: { tag: string; title: string; meta: string }[];
+    upcoming: string;
+    past: string;
+    today: string;
+    completed: string;
+    kinds: { workshop: string; meetup: string; conference: string };
+    presenter: string;
+    register: string;
+    notify: string;
+    more: string;
+    empty: string;
   };
   join: {
     eyebrow: string;
@@ -214,12 +222,16 @@ const ar: Dict = {
     eyebrow: "الفعاليات",
     title: "أجندة 2026",
     body: "تابع أبرز ورش العمل واللقاءات. سجّل ليصلك التذكير قبل كل حدث.",
-    soon: "قريباً",
-    rows: [
-      { tag: "ورشة", title: "أساسيات ETS6", meta: "عمّان · ربيع 2026" },
-      { tag: "لقاء", title: "KNX Secure وIoT في 2026", meta: "عمّان · صيف 2026" },
-      { tag: "مؤتمر", title: "اليوم المهني للأتمتة", meta: "عمّان · خريف 2026" },
-    ],
+    upcoming: "الفعاليات القادمة",
+    past: "فعاليات سابقة",
+    today: "اليوم",
+    completed: "انتهت",
+    kinds: { workshop: "ورشة عمل", meetup: "لقاء", conference: "مؤتمر" },
+    presenter: "المحاضر",
+    register: "سجّل الآن",
+    notify: "سجّل ليصلك التذكير",
+    more: "نضيف ورشاً جديدة كل شهر — سجّل وسنعلمك فور الإعلان عن المواعيد القادمة.",
+    empty: "لا توجد فعاليات قادمة حالياً — مواعيد جديدة قريباً.",
   },
   join: {
     eyebrow: "العضوية",
@@ -400,12 +412,16 @@ const en: Dict = {
     eyebrow: "Events",
     title: "2026 calendar",
     body: "Workshops, meetups, and a yearly conference. Sign up to be notified.",
-    soon: "Coming soon",
-    rows: [
-      { tag: "Workshop", title: "ETS6 Fundamentals", meta: "Amman · Spring 2026" },
-      { tag: "Meetup", title: "KNX Secure & IoT in 2026", meta: "Amman · Summer 2026" },
-      { tag: "Conference", title: "Automation Professional Day", meta: "Amman · Autumn 2026" },
-    ],
+    upcoming: "Upcoming",
+    past: "Past events",
+    today: "Today",
+    completed: "Completed",
+    kinds: { workshop: "Workshop", meetup: "Meetup", conference: "Conference" },
+    presenter: "Presenter",
+    register: "Register",
+    notify: "Sign up to be notified",
+    more: "New workshops are added every month — sign up and we'll tell you as soon as the next dates are announced.",
+    empty: "No upcoming events right now — new dates are on the way.",
   },
   join: {
     eyebrow: "Membership",

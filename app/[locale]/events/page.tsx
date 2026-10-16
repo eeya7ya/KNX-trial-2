@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import { getDict, isLocale, type Locale } from "@/lib/i18n";
+import { getCalendarEvents } from "@/lib/db";
+import { toEventCards } from "@/lib/events";
 import { DetailPageShell } from "../components/DetailPageShell";
 import { EventsDetail } from "../components/SectionDetails";
+
+export const dynamic = "force-dynamic";
 
 export default async function EventsPage({
   params,
@@ -12,9 +16,10 @@ export default async function EventsPage({
   if (!isLocale(locale)) notFound();
   const L = locale as Locale;
   const dict = getDict(L);
+  const events = toEventCards(await getCalendarEvents(), L);
   return (
     <DetailPageShell dict={dict} locale={L}>
-      <EventsDetail dict={dict} />
+      <EventsDetail dict={dict} locale={L} events={events} />
     </DetailPageShell>
   );
 }

@@ -15,6 +15,7 @@ async function getStats() {
   const [videos] = (await sql`SELECT COUNT(*)::int AS n FROM videos`) as { n: number }[];
   const [pictures] = (await sql`SELECT COUNT(*)::int AS n FROM pictures`) as { n: number }[];
   const [prompts] = (await sql`SELECT COUNT(*)::int AS n FROM prompts`) as { n: number }[];
+  const [events] = (await sql`SELECT COUNT(*)::int AS n FROM calendar_events`) as { n: number }[];
   // A total, like every other card — the upcoming / past split belongs on the
   // slots page itself, where the days are listed.
   const [webinars] = (await sql`
@@ -28,6 +29,7 @@ async function getStats() {
     videos: videos.n,
     pictures: pictures.n,
     prompts: prompts.n,
+    events: events.n,
     webinars: webinars.n,
   };
 }
@@ -44,6 +46,7 @@ export default async function AdminHome() {
     { label: "Pictures", n: stats.pictures },
     { label: "Prompts", n: stats.prompts },
     { label: "Webinar slots", n: stats.webinars, href: "/admin/webinars" },
+    { label: "Events calendar", n: stats.events, href: "/admin/content/calendar_events" },
   ];
 
   return (

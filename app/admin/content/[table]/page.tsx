@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 type FieldMeta = {
   name: string;
   label: string;
-  type: "text" | "textarea" | "url" | "checkbox" | "datetime" | "select";
+  type: "text" | "textarea" | "url" | "checkbox" | "datetime" | "date" | "time" | "select";
   required?: boolean;
   upload?: { kind: "image" | "video" | "file"; accept: string };
   options?: { value: string; label: string }[];
@@ -86,6 +86,39 @@ const META: Record<ContentTable, { label: string; fields: FieldMeta[] }> = {
       { name: "is_partner", label: "Mark as KNX partner (shows partner logo)", type: "checkbox" },
     ],
   },
+  calendar_events: {
+    label: "Events calendar",
+    fields: [
+      {
+        name: "kind",
+        label: "Type (blank = Workshop)",
+        type: "select",
+        options: [
+          { value: "workshop", label: "Workshop" },
+          { value: "meetup", label: "Meetup" },
+          { value: "conference", label: "Conference" },
+        ],
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "subtitle", label: "Subtitle / topics", type: "text" },
+      { name: "event_date", label: "Date", type: "date", required: true },
+      { name: "start_time", label: "Start time (Amman)", type: "time" },
+      { name: "end_time", label: "End time (Amman)", type: "time" },
+      { name: "location", label: "Location (e.g. Amman, or Online)", type: "text" },
+      { name: "presenter_name", label: "Presenter name", type: "text" },
+      { name: "presenter_role", label: "Presenter title", type: "text" },
+      { name: "presenter_bio", label: "Presenter experience", type: "textarea" },
+      {
+        // Text, not url: the seeded photos are site paths like /events/x.jpg,
+        // which a url input refuses, and that would block saving the row.
+        name: "presenter_photo_url",
+        label: "Presenter photo",
+        type: "text",
+        upload: { kind: "image", accept: "image/*" },
+      },
+      { name: "register_url", label: "Registration link (optional)", type: "text" },
+    ],
+  },
 };
 
 type Row = {
@@ -107,6 +140,14 @@ async function loadRows(table: ContentTable): Promise<Row[]> {
     return (await sql`SELECT * FROM pictures ORDER BY created_at DESC LIMIT 200`) as Row[];
   if (table === "team_members")
     return (await sql`SELECT * FROM team_members ORDER BY sort_order ASC NULLS LAST, created_at ASC LIMIT 200`) as Row[];
+  if (table === "calendar_events")
+    // Newest date first, so the round being planned sits at the top.
+    return (await sql`SELECT id, kind, title, subtitle,
+        to_char(event_date, 'YYYY-MM-DD') AS event_date, start_time, end_time, location,
+        presenter_name, presenter_role, presenter_bio, presenter_photo_url, register_url,
+        published, created_at
+      FROM calendar_events ORDER BY calendar_events.event_date DESC,
+        start_time ASC NULLS LAST LIMIT 200`) as Row[];
   return (await sql`SELECT * FROM prompts ORDER BY created_at DESC LIMIT 200`) as Row[];
 }
 
@@ -145,6 +186,8 @@ export default async function ContentPage({
           ...r,
           id: r.id,
           title: r.title ?? r.name ?? "",
+          // The list shows one line per row, and an event is found by its day.
+          label: table === "calendar_events" ? `${r.event_date} · ${r.title}` : undefined,
           created_at: r.created_at,
           published: r.published,
         }))}

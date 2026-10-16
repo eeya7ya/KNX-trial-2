@@ -92,3 +92,30 @@ export function IconCheck({ className = base }: IconProps) {
     </svg>
   );
 }
+
+export function IconCalendar({ className = base }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke} className={className}>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+      <path d="M3.5 10 h17 M8 3 v4 M16 3 v4" />
+    </svg>
+  );
+}
+
+export function IconClock({ className = base }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke} className={className}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5 V12 l3 2" />
+    </svg>
+  );
+}
+
+export function IconPin({ className = base }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...stroke} className={className}>
+      <path d="M12 21 c-4-4.5-6.5-8-6.5-11 a6.5 6.5 0 0 1 13 0 c0 3-2.5 6.5-6.5 11 z" />
+      <circle cx="12" cy="10" r="2.3" />
+    </svg>
+  );
+}

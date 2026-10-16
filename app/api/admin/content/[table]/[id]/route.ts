@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { ensureSchema, isContentTable, pickContentFields, sql } from "@/lib/db";
+import {
+  contentFieldError,
+  ensureSchema,
+  isContentTable,
+  pickContentFields,
+  sql,
+} from "@/lib/db";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
@@ -25,6 +31,8 @@ export async function PATCH(
   }
 
   const d = pickContentFields(table, body);
+  const invalid = contentFieldError(table, d);
+  if (invalid) return NextResponse.json({ ok: false, error: invalid }, { status: 400 });
   await ensureSchema();
 
   if (table === "news") {
@@ -46,6 +54,13 @@ export async function PATCH(
     await sql`UPDATE team_members SET name = ${d.name}, role = ${d.role},
       company = ${d.company}, photo_url = ${d.photo_url}, is_partner = ${d.is_partner},
       experience = ${d.experience}, phone = ${d.phone}, email = ${d.email},
+      published = ${d.published} WHERE id = ${numId}`;
+  } else if (table === "calendar_events") {
+    await sql`UPDATE calendar_events SET kind = ${d.kind}, title = ${d.title},
+      subtitle = ${d.subtitle}, event_date = ${d.event_date}, start_time = ${d.start_time},
+      end_time = ${d.end_time}, location = ${d.location}, presenter_name = ${d.presenter_name},
+      presenter_role = ${d.presenter_role}, presenter_bio = ${d.presenter_bio},
+      presenter_photo_url = ${d.presenter_photo_url}, register_url = ${d.register_url},
       published = ${d.published} WHERE id = ${numId}`;
   }
   return NextResponse.json({ ok: true });
@@ -70,5 +85,7 @@ export async function DELETE(
   else if (table === "pictures") await sql`DELETE FROM pictures WHERE id = ${numId}`;
   else if (table === "prompts") await sql`DELETE FROM prompts WHERE id = ${numId}`;
   else if (table === "team_members") await sql`DELETE FROM team_members WHERE id = ${numId}`;
+  else if (table === "calendar_events")
+    await sql`DELETE FROM calendar_events WHERE id = ${numId}`;
   return NextResponse.json({ ok: true });
 }

@@ -36,6 +36,7 @@ After signing in, a vertical menu on the left is shown on every admin page:
 | Pictures        | Add or remove photos in the gallery.                             |
 | Prompts         | Manage the prompts library.                                      |
 | Team            | Manage board members and partner companies.                      |
+| Events calendar | Add, edit, or remove the workshops shown on the Events page.     |
 | Sign out        | Log out of the admin area.                                       |
 
 ---
@@ -57,6 +58,7 @@ It shows summary cards with the current totals for:
 - **Pictures** — number of photos in the gallery.
 - **Prompts** — number of items in the prompts library.
 - **Webinar slots** — how many presenter bookings have been made. This card is clickable and opens the **Webinar slots** screen.
+- **Events calendar** — how many events are on the calendar, past and upcoming. This card is clickable and opens the **Events calendar** screen.
 
 Use the Dashboard as a quick health check before going into the detail screens.
 
@@ -163,7 +165,7 @@ This is the only way a taken day reopens — deleting cannot be undone, so the p
 
 ## 7. Managing Content
 
-The five content sections — **News**, **Videos**, **Pictures**, **Prompts**, and **Team** — all behave in the same way.
+The six content sections — **News**, **Videos**, **Pictures**, **Prompts**, **Team**, and **Events calendar** — all behave in the same way.
 
 Each page has:
 
@@ -242,6 +244,29 @@ Deletion is final — there is no undo, so double-check before confirming.
 | Photo                                              | Optional  | Their portrait or company logo. URL or **Upload to R2**.                    |
 | **Mark as KNX partner (shows partner logo)**       | Optional  | Tick to display the **KNX partner** badge and move the entry to the partner section. |
 | Published                                          | Optional  | On = visible on the public site.                                            |
+
+#### Events calendar
+
+Each row is one workshop, meetup, or conference on the public **Events** page. Upcoming events are listed first, soonest at the top. The day after an event takes place it moves to **Past events** on its own, marked **Completed**. The homepage Events section shows the next three. Here the list is sorted by date, newest first, with the date at the start of each line.
+
+The site starts with the October 2026 workshops already entered. To publish next month's schedule, add one row per workshop.
+
+| Field                    | Required? | Notes                                                                                   |
+|--------------------------|-----------|-----------------------------------------------------------------------------------------|
+| Type                     | Optional  | Workshop, Meetup, or Conference. Leave blank for Workshop.                              |
+| Title                    | Yes       | The workshop name, for example *HVAC Systems Integration with KNX*.                     |
+| Subtitle / topics        | Optional  | The line under the title, for example *Design, Control and Practical Implementation*.   |
+| Date                     | Yes       | The day of the event.                                                                   |
+| Start time / End time    | Optional  | Amman time. They are shown on the site as *6:00 PM – 9:00 PM*.                          |
+| Location                 | Optional  | For example *Amman* or *Online*. Leave blank to hide it.                                |
+| Presenter name           | Optional  | For example *Eng. Ahmad Jallad*.                                                        |
+| Presenter title          | Optional  | For example *Senior Electrical Designer*.                                               |
+| Presenter experience     | Optional  | A sentence or two about the presenter. Shown on upcoming events only.                   |
+| Presenter photo          | Optional  | A portrait (upright, about 4:5, face near the top works best). URL or **Upload to R2**. |
+| Registration link        | Optional  | If set, a **Register** button appears on the event. Leave blank to hide it.             |
+| Published                | Optional  | On = visible on the public site.                                                        |
+
+Event text appears exactly as typed, in both the Arabic and the English version of the site.
 
 ---
 
